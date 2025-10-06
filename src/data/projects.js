@@ -1,5 +1,19 @@
 export const projects = [
   {
+    title: "Portafolio Web — RAJB",
+    subtitle: "React · Vite · Tailwind CSS · Sitio personal",
+    description:
+      "Portafolio profesional con diseño moderno, animaciones fluidas y secciones completas para mostrar habilidades, experiencia, proyectos, educación y certificaciones.",
+    image: "/projects/Porfolio-web-rajb.png",
+    features: [
+      "Animaciones y transiciones suaves con Framer Motion",
+      "Diseño responsive mobile‑first y accesible",
+      "Secciones: Sobre mí, Proyectos, Experiencia, Habilidades, Educación, Certificados y Contacto"
+    ],
+    tags: ["React", "TailwindCSS", "JavaScript", "Framer Motion", "GitHub"],
+    github: "https://github.com/xfiberex/portafolio-web-rajb",
+  },
+  {
     title: "Sistema de Ventas WEB",
     subtitle: "ASP.NET Core MVC · Gestión de ventas con arquitectura en capas",
     description:

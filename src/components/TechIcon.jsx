@@ -43,6 +43,8 @@ const BRAND_COLORS = {
   "Cursor IDE": "#000000",
   "AI Code Review": "#7C3AED",
   "Prompt Engineering": "#F59E0B",
+  Vite: "#646CFF",
+  "Framer Motion": "#FF0055",
 };
 
 const FALLBACK_COLOR = "#94a3b8"; // slate-400
@@ -172,6 +174,12 @@ const ICONS = {
   "Prompt Engineering": (
     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
   ),
+  Vite: (
+    <path d="M12 2l7 4-2 10-5 6-5-6-2-10 7-4zm0 3.2L8 7.2l1.2 6L12 18l2.8-4.8 1.2-6-4-2z" />
+  ),
+  "Framer Motion": (
+    <path d="M6 4h12v4H10l4 4-4 4h8v4H6l8-8-8-8z" />
+  ),
 };
 
 function pickColor(name) {
@@ -231,6 +239,8 @@ function pickColor(name) {
   if (/cursor.*ide/i.test(n)) return BRAND_COLORS["Cursor IDE"];
   if (/ai.*code.*review/i.test(n)) return BRAND_COLORS["AI Code Review"];
   if (/prompt.*engineering/i.test(n)) return BRAND_COLORS["Prompt Engineering"];
+  if (/vite/i.test(n)) return BRAND_COLORS.Vite;
+  if (/framer.*motion/i.test(n)) return BRAND_COLORS["Framer Motion"];
   return FALLBACK_COLOR;
 }
 
@@ -287,6 +297,8 @@ function pickIcon(name) {
   if (/cursor.*ide/i.test(n)) return ICONS["Cursor IDE"];
   if (/ai.*code.*review/i.test(n)) return ICONS["AI Code Review"];
   if (/prompt.*engineering/i.test(n)) return ICONS["Prompt Engineering"];
+  if (/vite/i.test(n)) return ICONS.Vite;
+  if (/framer.*motion/i.test(n)) return ICONS["Framer Motion"];
   return null;
 }
 
