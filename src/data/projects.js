@@ -13,7 +13,7 @@ export const projects = [
       "Secciones: Sobre mí, Proyectos, Experiencia, Habilidades, Educación, Certificados y Contacto"
     ],
     tags: ["React", "TailwindCSS", "JavaScript", "Framer Motion", "GitHub"],
-    github: "https://github.com/xfiberex/portafolio-web-rajb",
+    github: "https://portafolio-web-rajb.netlify.app",
   },
   {
     title: "Sistema de Ventas WEB",
@@ -51,7 +51,7 @@ export const projects = [
     tags: ["React", "Node.js", "Express", "MongoDB", "JWT", "TailwindCSS", "JavaScript"],
     frontend: "https://github.com/xfiberex/todolist-frontend",
     backend: "https://github.com/xfiberex/todolist-backend",
-    demo: "https://68e6a14b0b7a7b6794d20cb9--gestor-tareas-mern-rajb.netlify.app",
+    demo: "https://gestor-tareas-mern-rajb.netlify.app",
   },
   {
     title: "Sistema de Gestión de Tareas Recurrentes",
