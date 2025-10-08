@@ -21,7 +21,6 @@ export const useScrollspy = (sections = [], { rootMargin = "0px 0px -60% 0px", t
         }
       })
 
-      // Find the topmost visible section
       if (visibleSections.size > 0) {
         const visibleArray = Array.from(visibleSections)
         const topSection = sections.find(section => visibleArray.includes(section))
@@ -38,10 +37,9 @@ export const useScrollspy = (sections = [], { rootMargin = "0px 0px -60% 0px", t
     })
     observers.push(observer)
 
-    // Fallback: detect active section by scroll position
     const handleScroll = () => {
       if (visibleSections.size === 0) {
-        const scrollPosition = window.scrollY + 100 // Account for navbar height
+        const scrollPosition = window.scrollY + 100
         
         for (let i = sections.length - 1; i >= 0; i--) {
           const section = document.getElementById(sections[i])
