@@ -1,5 +1,3 @@
-import React from "react";
-
 // Brand colors for known technologies
 const BRAND_COLORS = {
   React: "#61DAFB",
@@ -45,9 +43,9 @@ const BRAND_COLORS = {
   "Prompt Engineering": "#F59E0B",
   Vite: "#646CFF",
   "Framer Motion": "#FF0055",
-};
+}
 
-const FALLBACK_COLOR = "#94a3b8"; // slate-400
+const FALLBACK_COLOR = "#94a3b8" // slate-400
 
 // Minimal inline SVG paths for common tech logos (single <path> each to keep it light)
 const ICONS = {
@@ -84,9 +82,7 @@ const ICONS = {
   SQL: (
     <path d="M12 4c4.3 0 7.8 1.3 7.8 3s-3.5 3-7.8 3S4.2 8.7 4.2 7 7.7 4 12 4Zm-7.8 6.2c0 1.6 3.5 3 7.8 3s7.8-1.4 7.8-3v2c0 1.7-3.5 3-7.8 3s-7.8-1.3-7.8-3v-2Zm0 4.9c0 1.7 3.5 3 7.8 3s7.8-1.3 7.8-3v2c0 1.7-3.5 3-7.8 3s-7.8-1.3-7.8-3v-2Z" />
   ),
-  Express: (
-    <path d="M2 12h4l3-7h2l3 7h4v1H2v-1zm7.5-3.5L12 4.5l2.5 4H9.5z" />
-  ),
+  Express: <path d="M2 12h4l3-7h2l3 7h4v1H2v-1zm7.5-3.5L12 4.5l2.5 4H9.5z" />,
   Firebase: (
     <path d="M6 17.5 8.2 6.8c.1-.7 1-.9 1.4-.3l1.6 2.6 1.8-3.1c.3-.5 1-.5 1.3 0l3.6 6.1-6.8 5.4c-.3.2-.6.2-.8 0L6 17.5Z" />
   ),
@@ -108,33 +104,25 @@ const ICONS = {
   JWT: (
     <path d="M10.2 2.29c.98-.98 2.56-.98 3.54 0l1.06 1.06c.98.98.98 2.56 0 3.54L12 9.69 9.17 6.86c-.98-.98-.98-2.56 0-3.54l1.03-1.03zm1.8 9.42L12 9.69l2.83 2.83c.98.98.98 2.56 0 3.54l-1.06 1.06c-.98.98-2.56.98-3.54 0l-1.06-1.06c-.98-.98-.98-2.56 0-3.54z" />
   ),
-  "Entity Framework": (
-    <path d="M2 4v16h20V4H2zm18 14H4V6h16v12zm-2-10H6v2h12V8zm0 4H6v2h12v-2z" />
-  ),
+  "Entity Framework": <path d="M2 4v16h20V4H2zm18 14H4V6h16v12zm-2-10H6v2h12V8zm0 4H6v2h12v-2z" />,
   Mongoose: (
     <path d="M12.5 2.5c.3.6 3.3 2.5 4.6 8.1 1.3 5.6-.7 8.9-4.45 10.9-.25.1-.4.1-.7 0C7.2 19.5 5.2 16.2 6.5 10.6 7.8 5 10.8 3.1 11.1 2.5c.2-.3.4-.5.4-.5s.2.2.4.5Z" />
   ),
-  "Clean Code": (
-    <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />
-  ),
+  "Clean Code": <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />,
   SOLID: (
     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
   ),
   MVC: (
     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8V9h2c.55 0 1-.45 1-1V6h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
   ),
-  Blazor: (
-    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-  ),
+  Blazor: <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />,
   WebAssembly: (
     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-.97.17-1.9.48-2.75L7 12l3 3 2-6 2 6 3-3 2.52-2.75c.31.85.48 1.78.48 2.75 0 4.41-3.59 8-8 8z" />
   ),
   "Swagger/OpenAPI": (
     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2zm0 4.5L9.5 10 12 11.5 14.5 10 12 6.5z" />
   ),
-  "PDF Reports": (
-    <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />
-  ),
+  "PDF Reports": <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />,
   "Background Services": (
     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
   ),
@@ -165,146 +153,141 @@ const ICONS = {
   Gemini: (
     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2zm0 4.5L9.5 10 12 11.5 14.5 10 12 6.5z" />
   ),
-  "Cursor IDE": (
-    <path d="M3 3v18h18V3H3zm2 2h14v14H5V5zm2 2v10h10V7H7zm2 2h6v6H9V9z" />
-  ),
+  "Cursor IDE": <path d="M3 3v18h18V3H3zm2 2h14v14H5V5zm2 2v10h10V7H7zm2 2h6v6H9V9z" />,
   "AI Code Review": (
     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2zm-1 7v6h2V9h-2z" />
   ),
   "Prompt Engineering": (
     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
   ),
-  Vite: (
-    <path d="M12 2l7 4-2 10-5 6-5-6-2-10 7-4zm0 3.2L8 7.2l1.2 6L12 18l2.8-4.8 1.2-6-4-2z" />
-  ),
-  "Framer Motion": (
-    <path d="M6 4h12v4H10l4 4-4 4h8v4H6l8-8-8-8z" />
-  ),
-};
+  Vite: <path d="M12 2l7 4-2 10-5 6-5-6-2-10 7-4zm0 3.2L8 7.2l1.2 6L12 18l2.8-4.8 1.2-6-4-2z" />,
+  "Framer Motion": <path d="M6 4h12v4H10l4 4-4 4h8v4H6l8-8-8-8z" />,
+}
 
 function pickColor(name) {
-  if (!name) return FALLBACK_COLOR;
-  const n = String(name);
-  // Exact match first
-  for (const key of Object.keys(BRAND_COLORS)) {
-    if (new RegExp(`^${key}$`, "i").test(n)) return BRAND_COLORS[key];
-  }
+  if (!name) return FALLBACK_COLOR
+  const n = String(name)
+  // Exact match first (case-insensitive, no regex pitfalls)
+  const exactKey = Object.keys(BRAND_COLORS).find((key) => key.toLowerCase() === n.toLowerCase())
+  if (exactKey) return BRAND_COLORS[exactKey]
   // Heuristics
-  if (/react/i.test(n)) return BRAND_COLORS.React;
-  if (/javascript.*es6|javascript/i.test(n)) return BRAND_COLORS.JavaScript;
-  if (/html/i.test(n)) return BRAND_COLORS.HTML5;
-  if (/css/i.test(n) && !/tailwind/i.test(n)) return BRAND_COLORS.CSS3;
-  if (/tailwind/i.test(n)) return BRAND_COLORS.TailwindCSS;
-  if (/bootstrap/i.test(n)) return BRAND_COLORS.Bootstrap;
-  if (/node\.js|node/i.test(n)) return BRAND_COLORS["Node.js"];
-  if (/mongodb|mongo/i.test(n)) return BRAND_COLORS.MongoDB;
-  if (/c#/i.test(n)) return BRAND_COLORS.Csharp;
-  if (/\.net.*core|asp\.net.*core|dotnet/i.test(n)) return BRAND_COLORS.DotNet;
-  if (/sql.*server|sql/i.test(n)) return BRAND_COLORS.SQL;
-  if (/express/i.test(n)) return BRAND_COLORS.Express;
-  if (/firebase/i.test(n)) return BRAND_COLORS.Firebase;
-  if (/github/i.test(n)) return BRAND_COLORS.GitHub;
-  if (/\bgit\b/i.test(n)) return BRAND_COLORS.Git;
-  if (/visual.*studio/i.test(n) && !/code/i.test(n)) return BRAND_COLORS["Visual Studio"];
-  if (/vs.*code|vscode/i.test(n)) return BRAND_COLORS["VS Code"];
-  if (/postman/i.test(n)) return BRAND_COLORS.Postman;
-  if (/jwt/i.test(n)) return BRAND_COLORS.JWT;
-  if (/entity.*framework/i.test(n)) return BRAND_COLORS["Entity Framework"];
-  if (/mongoose/i.test(n)) return BRAND_COLORS.Mongoose;
-  if (/clean.*code/i.test(n)) return BRAND_COLORS["Clean Code"];
-  if (/solid/i.test(n)) return BRAND_COLORS.SOLID;
-  if (/mvc/i.test(n)) return BRAND_COLORS.MVC;
-  if (/responsive.*design/i.test(n)) return BRAND_COLORS.CSS3;
-  if (/restful.*api/i.test(n)) return BRAND_COLORS.Express;
-  if (/diseño.*bd/i.test(n)) return BRAND_COLORS.SQL;
-  if (/arquitectura.*capas/i.test(n)) return BRAND_COLORS.SOLID;
-  if (/autenticación|autorización/i.test(n)) return BRAND_COLORS.JWT;
-  if (/blazor/i.test(n)) return BRAND_COLORS.Blazor;
-  if (/webassembly/i.test(n)) return BRAND_COLORS.WebAssembly;
-  if (/swagger|openapi/i.test(n)) return BRAND_COLORS["Swagger/OpenAPI"];
-  if (/pdf.*reports?/i.test(n)) return BRAND_COLORS["PDF Reports"];
-  if (/background.*services?/i.test(n)) return BRAND_COLORS["Background Services"];
-  if (/\.net.*\d+/i.test(n)) return BRAND_COLORS.DotNet;
-  if (/ef.*core/i.test(n)) return BRAND_COLORS["Entity Framework"];
-  if (/ado\.net/i.test(n)) return BRAND_COLORS["ADO.NET"];
-  if (/cypress/i.test(n)) return BRAND_COLORS.Cypress;
-  if (/programación.*orientada.*objetos|poo/i.test(n)) return BRAND_COLORS["Programación Orientada a Objetos (POO)"];
-  if (/principios.*solid/i.test(n)) return BRAND_COLORS["Principios SOLID"];
-  if (/arquitectura.*mvc/i.test(n)) return BRAND_COLORS["Arquitectura MVC"];
-  if (/tailwind.*css/i.test(n)) return BRAND_COLORS.TailwindCSS;
-  if (/github.*copilot/i.test(n)) return BRAND_COLORS["GitHub Copilot"];
-  if (/chatgpt/i.test(n)) return BRAND_COLORS.ChatGPT;
-  if (/claude/i.test(n)) return BRAND_COLORS.Claude;
-  if (/gemini/i.test(n)) return BRAND_COLORS.Gemini;
-  if (/cursor.*ide/i.test(n)) return BRAND_COLORS["Cursor IDE"];
-  if (/ai.*code.*review/i.test(n)) return BRAND_COLORS["AI Code Review"];
-  if (/prompt.*engineering/i.test(n)) return BRAND_COLORS["Prompt Engineering"];
-  if (/vite/i.test(n)) return BRAND_COLORS.Vite;
-  if (/framer.*motion/i.test(n)) return BRAND_COLORS["Framer Motion"];
-  return FALLBACK_COLOR;
+  if (/react/i.test(n)) return BRAND_COLORS.React
+  if (/javascript.*es6|javascript/i.test(n)) return BRAND_COLORS.JavaScript
+  if (/html/i.test(n)) return BRAND_COLORS.HTML5
+  if (/css/i.test(n) && !/tailwind/i.test(n)) return BRAND_COLORS.CSS3
+  if (/tailwind/i.test(n)) return BRAND_COLORS.TailwindCSS
+  if (/bootstrap/i.test(n)) return BRAND_COLORS.Bootstrap
+  if (/node\.js|node/i.test(n)) return BRAND_COLORS["Node.js"]
+  if (/mongodb|mongo/i.test(n)) return BRAND_COLORS.MongoDB
+  if (/c#/i.test(n)) return BRAND_COLORS.Csharp
+  if (/\.net.*core|asp\.net.*core|dotnet/i.test(n)) return BRAND_COLORS.DotNet
+  if (/sql.*server|sql/i.test(n)) return BRAND_COLORS.SQL
+  if (/express/i.test(n)) return BRAND_COLORS.Express
+  if (/firebase/i.test(n)) return BRAND_COLORS.Firebase
+  if (/github/i.test(n)) return BRAND_COLORS.GitHub
+  if (/\bgit\b/i.test(n)) return BRAND_COLORS.Git
+  if (/visual.*studio/i.test(n) && !/code/i.test(n)) return BRAND_COLORS["Visual Studio"]
+  if (/vs.*code|vscode/i.test(n)) return BRAND_COLORS["VS Code"]
+  if (/postman/i.test(n)) return BRAND_COLORS.Postman
+  if (/jwt/i.test(n)) return BRAND_COLORS.JWT
+  if (/entity.*framework/i.test(n)) return BRAND_COLORS["Entity Framework"]
+  if (/mongoose/i.test(n)) return BRAND_COLORS.Mongoose
+  if (/clean.*code/i.test(n)) return BRAND_COLORS["Clean Code"]
+  if (/solid/i.test(n)) return BRAND_COLORS.SOLID
+  if (/mvc/i.test(n)) return BRAND_COLORS.MVC
+  if (/responsive.*design/i.test(n)) return BRAND_COLORS.CSS3
+  if (/restful.*api/i.test(n)) return BRAND_COLORS.Express
+  if (/diseño.*bd/i.test(n)) return BRAND_COLORS.SQL
+  if (/arquitectura.*capas/i.test(n)) return BRAND_COLORS.SOLID
+  if (/autenticación|autorización/i.test(n)) return BRAND_COLORS.JWT
+  if (/blazor/i.test(n)) return BRAND_COLORS.Blazor
+  if (/webassembly/i.test(n)) return BRAND_COLORS.WebAssembly
+  if (/swagger|openapi/i.test(n)) return BRAND_COLORS["Swagger/OpenAPI"]
+  if (/pdf.*reports?/i.test(n)) return BRAND_COLORS["PDF Reports"]
+  if (/background.*services?/i.test(n)) return BRAND_COLORS["Background Services"]
+  if (/\.net.*\d+/i.test(n)) return BRAND_COLORS.DotNet
+  if (/ef.*core/i.test(n)) return BRAND_COLORS["Entity Framework"]
+  if (/ado\.net/i.test(n)) return BRAND_COLORS["ADO.NET"]
+  if (/cypress/i.test(n)) return BRAND_COLORS.Cypress
+  if (/programación.*orientada.*objetos|poo/i.test(n)) return BRAND_COLORS["Programación Orientada a Objetos (POO)"]
+  if (/principios.*solid/i.test(n)) return BRAND_COLORS["Principios SOLID"]
+  if (/arquitectura.*mvc/i.test(n)) return BRAND_COLORS["Arquitectura MVC"]
+  if (/tailwind.*css/i.test(n)) return BRAND_COLORS.TailwindCSS
+  if (/github.*copilot/i.test(n)) return BRAND_COLORS["GitHub Copilot"]
+  if (/chatgpt/i.test(n)) return BRAND_COLORS.ChatGPT
+  if (/claude/i.test(n)) return BRAND_COLORS.Claude
+  if (/gemini/i.test(n)) return BRAND_COLORS.Gemini
+  if (/cursor.*ide/i.test(n)) return BRAND_COLORS["Cursor IDE"]
+  if (/ai.*code.*review/i.test(n)) return BRAND_COLORS["AI Code Review"]
+  if (/prompt.*engineering/i.test(n)) return BRAND_COLORS["Prompt Engineering"]
+  if (/vite/i.test(n)) return BRAND_COLORS.Vite
+  if (/framer.*motion/i.test(n)) return BRAND_COLORS["Framer Motion"]
+  return FALLBACK_COLOR
 }
 
 function pickIcon(name) {
-  if (!name) return null;
-  const n = String(name);
-  if (ICONS[n]) return ICONS[n];
-  if (/javascript.*es6|javascript/i.test(n)) return ICONS.JavaScript;
-  if (/express/i.test(n)) return ICONS.Express;
-  if (/c#|csharp/i.test(n)) return ICONS.Csharp;
-  if (/\.net.*core|asp\.net.*core|dotnet/i.test(n)) return ICONS.DotNet;
-  if (/sql.*server|sql/i.test(n)) return ICONS.SQL;
-  if (/node\.js|node/i.test(n)) return ICONS["Node.js"];
-  if (/mongodb|mongo/i.test(n)) return ICONS.MongoDB;
-  if (/tailwind/i.test(n)) return ICONS.TailwindCSS;
-  if (/bootstrap/i.test(n)) return ICONS.Bootstrap;
-  if (/html/i.test(n)) return ICONS.HTML5;
-  if (/css/i.test(n)) return ICONS.CSS3;
-  if (/react/i.test(n)) return ICONS.React;
-  if (/firebase/i.test(n)) return ICONS.Firebase;
-  if (/github/i.test(n)) return ICONS.GitHub;
-  if (/\bgit\b/i.test(n)) return ICONS.Git;
-  if (/visual.*studio/i.test(n) && !/code/i.test(n)) return ICONS["Visual Studio"];
-  if (/vs.*code|vscode/i.test(n)) return ICONS["VS Code"];
-  if (/postman/i.test(n)) return ICONS.Postman;
-  if (/jwt/i.test(n)) return ICONS.JWT;
-  if (/entity.*framework/i.test(n)) return ICONS["Entity Framework"];
-  if (/mongoose/i.test(n)) return ICONS.Mongoose;
-  if (/clean.*code/i.test(n)) return ICONS["Clean Code"];
-  if (/solid/i.test(n)) return ICONS.SOLID;
-  if (/mvc/i.test(n)) return ICONS.MVC;
-  if (/responsive.*design/i.test(n)) return ICONS.CSS3;
-  if (/restful.*api/i.test(n)) return ICONS.Express;
-  if (/diseño.*bd/i.test(n)) return ICONS.SQL;
-  if (/arquitectura.*capas/i.test(n)) return ICONS.SOLID;
-  if (/autenticación|autorización/i.test(n)) return ICONS.JWT;
-  if (/blazor/i.test(n)) return ICONS.Blazor;
-  if (/webassembly/i.test(n)) return ICONS.WebAssembly;
-  if (/swagger|openapi/i.test(n)) return ICONS["Swagger/OpenAPI"];
-  if (/pdf.*reports?/i.test(n)) return ICONS["PDF Reports"];
-  if (/background.*services?/i.test(n)) return ICONS["Background Services"];
-  if (/\.net.*\d+/i.test(n)) return ICONS.DotNet;
-  if (/ef.*core/i.test(n)) return ICONS["Entity Framework"];
-  if (/ado\.net/i.test(n)) return ICONS["ADO.NET"];
-  if (/cypress/i.test(n)) return ICONS.Cypress;
-  if (/programación.*orientada.*objetos|poo/i.test(n)) return ICONS["Programación Orientada a Objetos (POO)"];
-  if (/principios.*solid/i.test(n)) return ICONS["Principios SOLID"];
-  if (/arquitectura.*mvc/i.test(n)) return ICONS["Arquitectura MVC"];
-  if (/tailwind.*css/i.test(n)) return ICONS.TailwindCSS;
-  if (/github.*copilot/i.test(n)) return ICONS["GitHub Copilot"];
-  if (/chatgpt/i.test(n)) return ICONS.ChatGPT;
-  if (/claude/i.test(n)) return ICONS.Claude;
-  if (/gemini/i.test(n)) return ICONS.Gemini;
-  if (/cursor.*ide/i.test(n)) return ICONS["Cursor IDE"];
-  if (/ai.*code.*review/i.test(n)) return ICONS["AI Code Review"];
-  if (/prompt.*engineering/i.test(n)) return ICONS["Prompt Engineering"];
-  if (/vite/i.test(n)) return ICONS.Vite;
-  if (/framer.*motion/i.test(n)) return ICONS["Framer Motion"];
-  return null;
+  if (!name) return null
+  const n = String(name)
+  // Exact key match (case-insensitive)
+  const exactKey = Object.keys(ICONS).find((key) => key.toLowerCase() === n.toLowerCase())
+  if (exactKey) return ICONS[exactKey]
+  if (/javascript.*es6|javascript/i.test(n)) return ICONS.JavaScript
+  if (/express/i.test(n)) return ICONS.Express
+  if (/c#|csharp/i.test(n)) return ICONS.Csharp
+  if (/\.net.*core|asp\.net.*core|dotnet/i.test(n)) return ICONS.DotNet
+  if (/sql.*server|sql/i.test(n)) return ICONS.SQL
+  if (/node\.js|node/i.test(n)) return ICONS["Node.js"]
+  if (/mongodb|mongo/i.test(n)) return ICONS.MongoDB
+  if (/tailwind/i.test(n)) return ICONS.TailwindCSS
+  if (/bootstrap/i.test(n)) return ICONS.Bootstrap
+  if (/html/i.test(n)) return ICONS.HTML5
+  if (/css/i.test(n)) return ICONS.CSS3
+  if (/react/i.test(n)) return ICONS.React
+  if (/firebase/i.test(n)) return ICONS.Firebase
+  if (/github/i.test(n)) return ICONS.GitHub
+  if (/\bgit\b/i.test(n)) return ICONS.Git
+  if (/visual.*studio/i.test(n) && !/code/i.test(n)) return ICONS["Visual Studio"]
+  if (/vs.*code|vscode/i.test(n)) return ICONS["VS Code"]
+  if (/postman/i.test(n)) return ICONS.Postman
+  if (/jwt/i.test(n)) return ICONS.JWT
+  if (/entity.*framework/i.test(n)) return ICONS["Entity Framework"]
+  if (/mongoose/i.test(n)) return ICONS.Mongoose
+  if (/clean.*code/i.test(n)) return ICONS["Clean Code"]
+  if (/solid/i.test(n)) return ICONS.SOLID
+  if (/mvc/i.test(n)) return ICONS.MVC
+  if (/responsive.*design/i.test(n)) return ICONS.CSS3
+  if (/restful.*api/i.test(n)) return ICONS.Express
+  if (/diseño.*bd/i.test(n)) return ICONS.SQL
+  if (/arquitectura.*capas/i.test(n)) return ICONS.SOLID
+  if (/autenticación|autorización/i.test(n)) return ICONS.JWT
+  if (/blazor/i.test(n)) return ICONS.Blazor
+  if (/webassembly/i.test(n)) return ICONS.WebAssembly
+  if (/swagger|openapi/i.test(n)) return ICONS["Swagger/OpenAPI"]
+  if (/pdf.*reports?/i.test(n)) return ICONS["PDF Reports"]
+  if (/background.*services?/i.test(n)) return ICONS["Background Services"]
+  if (/\.net.*\d+/i.test(n)) return ICONS.DotNet
+  if (/ef.*core/i.test(n)) return ICONS["Entity Framework"]
+  if (/ado\.net/i.test(n)) return ICONS["ADO.NET"]
+  if (/cypress/i.test(n)) return ICONS.Cypress
+  if (/programación.*orientada.*objetos|poo/i.test(n)) return ICONS["Programación Orientada a Objetos (POO)"]
+  if (/principios.*solid/i.test(n)) return ICONS["Principios SOLID"]
+  if (/arquitectura.*mvc/i.test(n)) return ICONS["Arquitectura MVC"]
+  if (/tailwind.*css/i.test(n)) return ICONS.TailwindCSS
+  if (/github.*copilot/i.test(n)) return ICONS["GitHub Copilot"]
+  if (/chatgpt/i.test(n)) return ICONS.ChatGPT
+  if (/claude/i.test(n)) return ICONS.Claude
+  if (/gemini/i.test(n)) return ICONS.Gemini
+  if (/cursor.*ide/i.test(n)) return ICONS["Cursor IDE"]
+  if (/ai.*code.*review/i.test(n)) return ICONS["AI Code Review"]
+  if (/prompt.*engineering/i.test(n)) return ICONS["Prompt Engineering"]
+  if (/vite/i.test(n)) return ICONS.Vite
+  if (/framer.*motion/i.test(n)) return ICONS["Framer Motion"]
+  return null
 }
 
 const FallbackGlyph = () => (
   <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 3a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm-2 6h4v7h-2v-5h-2v-2Z" />
-);
+)
 
 // Props
 // - name: string (required)
@@ -314,18 +297,19 @@ const FallbackGlyph = () => (
 // - label: optional text next to the icon
 // - labelClassName, wrapperClassName: styling hooks
 // - title: accessible label (defaults to name)
-export default function TechIcon({
-  name,
-  size,
-  className = "w-5 h-5",
-  withBg = false,
-  label,
-  labelClassName = "ml-2 text-sm",
-  wrapperClassName = "inline-flex items-center",
-  title,
-}) {
-  const color = pickColor(name);
-  const px = typeof size === "number" ? size : undefined;
+export default function TechIcon(props) {
+  const {
+    name,
+    size,
+    className = "w-5 h-5",
+    withBg = false,
+    label,
+    labelClassName = "ml-2 text-sm",
+    wrapperClassName = "inline-flex items-center",
+    title,
+  } = props || {}
+  const color = pickColor(name)
+  const px = typeof size === "number" ? size : undefined
 
   const svgProps = {
     viewBox: "0 0 24 24",
@@ -337,9 +321,9 @@ export default function TechIcon({
     className,
     style: { color },
     fill: "currentColor",
-  };
+  }
 
-  const glyph = pickIcon(name);
+  const glyph = pickIcon(name)
 
   const content = (
     <svg {...svgProps}>
@@ -352,15 +336,13 @@ export default function TechIcon({
         glyph || <FallbackGlyph />
       )}
     </svg>
-  );
+  )
 
-  if (!label) return content;
+  if (!label) return content
   return (
     <span className={wrapperClassName} title={title || name}>
       {content}
       <span className={labelClassName}>{label}</span>
     </span>
-  );
+  )
 }
-
-

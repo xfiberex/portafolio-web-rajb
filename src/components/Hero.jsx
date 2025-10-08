@@ -1,4 +1,3 @@
-"use client"
 import { Github, Linkedin, Download, ArrowRight } from "lucide-react"
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion"
@@ -32,10 +31,7 @@ const Hero = () => {
         initial="hidden"
         animate="visible"
       >
-        <motion.p
-          variants={itemVariants}
-          className="text-sm uppercase tracking-widest text-indigo-400 font-semibold"
-        >
+        <motion.p variants={itemVariants} className="text-sm uppercase tracking-widest text-indigo-400 font-semibold">
           Hola, soy
         </motion.p>
 
@@ -46,15 +42,11 @@ const Hero = () => {
           Ricky Angel Jiménez Bueno
         </motion.h1>
 
-        <motion.p
-          variants={itemVariants}
-          className="mt-6 text-lg sm:text-xl text-zinc-300 max-w-3xl leading-relaxed"
-        >
+        <motion.p variants={itemVariants} className="mt-6 text-lg sm:text-xl text-zinc-300 max-w-3xl leading-relaxed">
           Desarrollador Web Full‑Stack (.NET | MERN). Construyo aplicaciones modernas, escalables y accesibles con
           enfoque en performance y buenas prácticas.
         </motion.p>
 
-        {/* Primary Actions */}
         <motion.div variants={itemVariants} className="mt-8 flex flex-wrap gap-4">
           <a
             href="#projects"
@@ -71,7 +63,6 @@ const Hero = () => {
           </a>
         </motion.div>
 
-        {/* CV Downloads */}
         <motion.div variants={itemVariants} className="mt-6 flex flex-wrap gap-3">
           <a
             href="/assets/CV-Ricky Angel Jiménez Bueno-06102025.pdf"
@@ -91,7 +82,6 @@ const Hero = () => {
           </a>
         </motion.div>
 
-        {/* Social Links */}
         <motion.div variants={itemVariants} className="mt-8 flex items-center gap-4">
           <span className="text-sm text-zinc-400">Encuéntrame en:</span>
           <a
@@ -121,5 +111,3 @@ const Hero = () => {
 }
 
 export default Hero
-
-

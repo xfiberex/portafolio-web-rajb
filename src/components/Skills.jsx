@@ -1,5 +1,3 @@
-"use client"
-
 import { useRef } from "react"
 // eslint-disable-next-line no-unused-vars
 import { motion, useInView } from "framer-motion"
@@ -30,42 +28,50 @@ const Skills = () => {
   }
 
   return (
-    <section id="skills" className="py-16 sm:py-24 border-t border-zinc-800">
+    <section id="skills" className="py-16 sm:py-24 border-t border-zinc-800/50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5 }}
-          className="text-3xl font-bold text-white"
-        >
-          Competencias
-        </motion.h2>
+        <div className="mb-12">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.5 }}
+            className="text-3xl sm:text-4xl font-bold text-white mb-3"
+          >
+            Competencias
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-zinc-400 text-lg"
+          >
+            Tecnologías y herramientas que domino
+          </motion.p>
+        </div>
 
         <motion.div
           ref={ref}
           variants={containerVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
-          className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
           {skills.map((group, idx) => (
             <motion.div
               key={idx}
               variants={itemVariants}
-              className="rounded-xl border border-zinc-800 p-6 bg-zinc-900 shadow-sm hover:shadow-md hover:border-indigo-500/30 dark:hover:border-indigo-500/30 transition-all duration-300"
+              className="group rounded-xl border border-zinc-800/80 p-6 bg-gradient-to-br from-zinc-900 to-zinc-900/50 shadow-lg hover:shadow-xl hover:shadow-indigo-500/10 hover:border-indigo-500/50 transition-all duration-300 hover:-translate-y-1"
             >
-              <h3 className="text-lg font-semibold text-white">{group.category}</h3>
-              <ul className="mt-4 flex flex-wrap gap-2">
+              <h3 className="text-lg font-bold text-white mb-4 group-hover:text-indigo-400 transition-colors duration-300">
+                {group.category}
+              </h3>
+              <ul className="flex flex-wrap gap-2">
                 {group.items.map((item) => (
                   <li
                     key={item}
-                    className="text-xs px-3 py-1.5 rounded-full bg-zinc-800 text-zinc-300 font-medium hover:bg-indigo-900/30 hover:text-indigo-300 transition-all duration-300 flex items-center gap-1.5"
+                    className="text-xs px-3 py-2 rounded-lg bg-zinc-800/80 text-zinc-300 font-medium hover:bg-indigo-900/40 hover:text-indigo-300 hover:scale-105 transition-all duration-300 flex items-center gap-2 border border-zinc-700/50 hover:border-indigo-500/50"
                   >
-                    <TechIcon 
-                      name={item} 
-                      className="w-3.5 h-3.5" 
-                      withBg={false}
-                    />
+                    <TechIcon name={item} className="w-4 h-4" withBg={false} />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -79,5 +85,3 @@ const Skills = () => {
 }
 
 export default Skills
-
-

@@ -1,5 +1,3 @@
-"use client"
-
 import { useRef } from "react"
 // eslint-disable-next-line no-unused-vars
 import { motion, useInView } from "framer-motion"
@@ -21,8 +19,8 @@ const Contact = () => {
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-white">Conectemos</h2>
           <p className="mt-4 text-lg text-zinc-300 leading-relaxed">
-            ¿Cuentas con una oportunidad laboral disponible? Me encantaría conocer más detalles sobre la oferta. 
-            Siempre estoy dispuesto a asumir nuevos retos y colaboraciones que impulsen mi crecimiento profesional.
+            ¿Cuentas con una oportunidad laboral disponible? Me encantaría conocer más detalles sobre la oferta. Siempre
+            estoy dispuesto a asumir nuevos retos y colaboraciones que impulsen mi crecimiento profesional.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -49,5 +47,3 @@ const Contact = () => {
 }
 
 export default Contact
-
-

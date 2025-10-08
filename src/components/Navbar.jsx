@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
 // eslint-disable-next-line no-unused-vars
@@ -9,9 +7,9 @@ import useScrollspy from "../hooks/useScrollspy"
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const sections = ["home", "about", "projects", "experience", "skills", "education", "certificates", "contact"]
-  const active = useScrollspy(sections, { 
-    rootMargin: "-90px 0px -45% 0px", 
-    threshold: 0.1 
+  const active = useScrollspy(sections, {
+    rootMargin: "-90px 0px -45% 0px",
+    threshold: 0.1,
   })
   const baseLink = "hover:text-white transition-colors"
   const activeLink = "text-white font-medium"
@@ -28,17 +26,17 @@ const Navbar = () => {
 
   const handleLinkClick = (sectionId) => {
     setIsOpen(false)
-    
+
     setTimeout(() => {
       const element = document.getElementById(sectionId)
       if (element) {
         const headerHeight = 64
         const elementPosition = element.getBoundingClientRect().top
         const offsetPosition = elementPosition + window.pageYOffset - headerHeight
-        
+
         window.scrollTo({
           top: offsetPosition,
-          behavior: 'smooth'
+          behavior: "smooth",
         })
       }
     }, 100)
@@ -52,19 +50,18 @@ const Navbar = () => {
           className="font-bold text-lg text-zinc-100 hover:text-indigo-400 transition-colors"
           onClick={(e) => {
             e.preventDefault()
-            handleLinkClick('home')
+            handleLinkClick("home")
           }}
         >
           Ricky Jiménez
         </a>
 
         <div className="flex items-center gap-4">
-          {/* Desktop Navigation */}
           <ul className="hidden lg:flex items-center gap-6 text-sm text-zinc-300">
             {navItems.map((item) => (
               <li key={item.id}>
-                <a 
-                  className={`${active === item.id ? activeLink : baseLink}`} 
+                <a
+                  className={`${active === item.id ? activeLink : baseLink}`}
                   href={`#${item.id}`}
                   onClick={(e) => {
                     e.preventDefault()
@@ -77,7 +74,6 @@ const Navbar = () => {
             ))}
           </ul>
 
-          {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="lg:hidden p-2 rounded-md hover:bg-zinc-800 transition-colors"
@@ -88,7 +84,6 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Mobile Navigation */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -127,5 +122,3 @@ const Navbar = () => {
 }
 
 export default Navbar
-
-

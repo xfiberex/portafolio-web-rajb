@@ -1,4 +1,3 @@
-"use client"
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion"
 import { useInView } from "framer-motion"
@@ -18,7 +17,9 @@ const About = () => {
         className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8"
       >
         <h2 className="text-3xl font-bold text-white">Sobre mí</h2>
-        <div className="mt-6 space-y-4 text-zinc-300 max-w-3xl leading-relaxed">
+        <p className="mt-2 text-zinc-400">Conoce más sobre mi trayectoria y experiencia</p>
+
+        <div className="mt-8 space-y-4 text-zinc-300 max-w-3xl leading-relaxed">
           <p>
             Desarrollador Web Full‑Stack con 2 años de experiencia práctica construyendo aplicaciones web robustas y
             escalables con los stacks
@@ -41,5 +42,3 @@ const About = () => {
 }
 
 export default About
-
-
