@@ -19,15 +19,16 @@ const Contact = () => {
         className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8"
       >
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white">Contacto</h2>
+          <h2 className="text-3xl font-bold text-white">Conectemos</h2>
           <p className="mt-4 text-lg text-zinc-300 leading-relaxed">
-            ¿Tienes una idea o proyecto? Escríbeme y conversemos sobre cómo puedo ayudarte.
+            ¿Cuentas con una oportunidad laboral disponible? Me encantaría conocer más detalles sobre la oferta. 
+            Siempre estoy dispuesto a asumir nuevos retos y colaboraciones que impulsen mi crecimiento profesional.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
               href="mailto:rickyjimenez1820@gmail.com"
-              className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 text-white px-6 py-3 text-sm font-medium hover:bg-indigo-600 bg-indigo-500 hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-500/30"
+              className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 text-white px-6 py-3 text-sm font-medium hover:bg-indigo-600 transition-colors shadow-lg shadow-indigo-500/30"
             >
               <Send size={18} />
               Enviar email

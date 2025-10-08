@@ -1,3 +1,5 @@
+import { FeatherIcon } from "lucide-react";
+
 export const projects = [
   {
     title: "Portafolio Web — RAJB",
@@ -64,4 +66,19 @@ export const projects = [
     tags: ["Blazor", ".NET 9", "WebAssembly", "EF Core", "SQL Server", "Swagger/OpenAPI", "Background Services"],
     github: "https://github.com/xfiberex/S_Blazor_TDApp",
   },
+  {
+    title: "Sistema de Ventas Desktop",
+    subtitle: "C# · Windows Forms · Arquitectura en capas con SQL Server",
+    description:
+      "Sistema integral de gestión de ventas con arquitectura n-tier, desarrollado desde cero con Windows Forms. Incluye gestión completa de usuarios, inventario, ventas y reportes financieros.",
+    image: "/projects/SistemaVentasDesktop.png",
+    features: [
+      "Arquitectura en 4 capas (Datos, Entidades, Negocio, Presentación)",
+      "Sistema de autenticación con roles y permisos de usuario",
+      "Gestión completa de inventario, clientes, proveedores y ventas",
+      "Módulo de reportes detallados y análisis financiero"
+    ],
+    tags: ["C#", ".NET Framework", "Windows Forms", "SQL Server", "Arquitectura en capas"],
+    github: "https://github.com/xfiberex/Sistema_Ventas_Completo",
+  }
 ]
