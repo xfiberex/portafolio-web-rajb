@@ -51,7 +51,7 @@ export const projects = [
     tags: ["React", "Node.js", "Express", "MongoDB", "JWT", "TailwindCSS", "JavaScript"],
     frontend: "https://github.com/xfiberex/todolist-frontend",
     backend: "https://github.com/xfiberex/todolist-backend",
-    demo: "https://68e6a14b0b7a7b6794d20cb9--gestor-tareas-mern-rajb.netlify.app",
+    demo: "https://68e6b32e9944bc000867f213--portafolio-web-rajb.netlify.app",
   },
   {
     title: "Sistema de Gestión de Tareas Recurrentes",
