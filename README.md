@@ -7,7 +7,7 @@ Un portafolio web moderno y responsivo construido con React, Vite y Tailwind CSS
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.0+-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-![Portafolio-web-rajb](public/assets/projects/Porfolio-web-rajb.png)
+![Portafolio-web-rajb](public/projects/Porfolio-web-rajb.png)
 
 ## ✨ Características - [Demostración](https://portafolio-web-rajb.netlify.app/)
 
