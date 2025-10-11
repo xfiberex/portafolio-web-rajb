@@ -21,19 +21,10 @@ const About = () => {
 
         <div className="mt-8 space-y-4 text-zinc-300 max-w-3xl leading-relaxed">
           <p>
-            Desarrollador Web Full‑Stack con 2 años de experiencia práctica construyendo aplicaciones web robustas y
-            escalables con los stacks
-            <strong> .NET</strong> y <strong> MERN</strong>. Sólida experiencia en diseño de bases de datos, desarrollo
-            de APIs RESTful y creación de interfaces de usuario interactivas y accesibles.
-          </p>
-          <p>
-            Actualmente trabajo como Operador de Sistemas TI en Banco Múltiple Ademi y busco activamente mi primer rol
-            profesional formal en el desarrollo web fullstack para aportar mi pasión por la tecnología y la resolución
-            de problemas en un equipo de desarrollo innovador.
-          </p>
-          <p>
-            Tecnologías con las que trabajo: React, Node.js, Express, C#/.NET, SQL Server y MongoDB; con enfoque en
-            buenas prácticas, rendimiento y mantenibilidad.
+            Mi camino en la tecnología no ha sido una línea recta, y eso es lo que lo hace interesante. 
+            Vengo de un fondo en TI, pero la curiosidad y el deseo de construir me llevaron a sumergirme de lleno 
+            en el desarrollo de software. Fue en mis tiempos libres y a través de proyectos freelance donde encontré 
+            mi verdadera pasión. Actualmente me enfoco en el stack MERN y .NET
           </p>
         </div>
       </motion.div>
