@@ -21,10 +21,12 @@ const About = () => {
 
         <div className="mt-8 space-y-4 text-zinc-300 max-w-3xl leading-relaxed">
           <p>
-            Mi camino en la tecnología no ha sido una línea recta, y eso es lo que lo hace interesante. 
-            Vengo de un fondo en TI, pero la curiosidad y el deseo de construir me llevaron a sumergirme de lleno 
-            en el desarrollo de software. Fue en mis tiempos libres y a través de proyectos freelance donde encontré 
-            mi verdadera pasión. Actualmente me enfoco en el stack MERN y .NET
+            Desarrollador Full-Stack con enfoque especializado en el stack MERN y .NET. Mi carrera en TI 
+            me ha proporcionado una sólida base técnica, la cual he expandido de forma proactiva hacia el desarrollo de 
+            software a través de proyectos personales y trabajos como freelancer. Poseo experiencia demostrable en la 
+            construcción de aplicaciones web completas, desde la creación de APIs REST con Node.js hasta el desarrollo de 
+            interfaces de usuario interactivas con React o Blazor. Busco una oportunidad a tiempo completo para aplicar mis 
+            habilidades en el desarrollo de soluciones web modernas.
           </p>
         </div>
       </motion.div>
