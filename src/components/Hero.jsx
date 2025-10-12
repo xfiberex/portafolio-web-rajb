@@ -65,7 +65,7 @@ const Hero = () => {
 
         <motion.div variants={itemVariants} className="mt-6 flex flex-wrap gap-3">
           <a
-            href="/assets/CV-Ricky Angel Jiménez Bueno-06102025.pdf"
+            href="/assets/CV-Ricky Angel Jiménez Bueno-11-10-2025"
             download
             className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
           >
@@ -73,7 +73,7 @@ const Hero = () => {
             Descargar CV
           </a>
           <a
-            href="/assets/ATS-CV-Ricky Angel Jiménez Bueno-06102025.pdf"
+            href="/assets/ATS-CV-Ricky Angel Jiménez Bueno-11-10-2025"
             download
             className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
           >
