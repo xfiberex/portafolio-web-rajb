@@ -15,7 +15,7 @@ const Footer = () => {
               className="inline-flex items-center gap-1.5 hover:text-white transition-colors"
               href="https://github.com/xfiberex"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               aria-label="GitHub"
             >
               <Github size={16} />
@@ -25,7 +25,7 @@ const Footer = () => {
               className="inline-flex items-center gap-1.5 hover:text-white transition-colors"
               href="https://www.linkedin.com/in/ricky-angel-jimenez-bueno-52659928a"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               aria-label="LinkedIn"
             >
               <Linkedin size={16} />

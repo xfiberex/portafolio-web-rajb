@@ -1,6 +1,6 @@
-import { FeatherIcon } from "lucide-react";
+import type { Project } from "../types";
 
-export const projects = [
+export const projects: Project[] = [
   {
     title: "Portafolio Web — RAJB",
     subtitle: "React · Vite · Tailwind CSS · Sitio personal",

@@ -1,9 +1,15 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react";
 // eslint-disable-next-line no-unused-vars
-import { motion, useInView } from "framer-motion"
-import { ExternalLink, Github, Maximize2, X } from "lucide-react"
-import { projects } from "../data/projects"
-import TechIcon from "./TechIcon"
+import { motion, useInView } from "framer-motion";
+import { ExternalLink, Github, Maximize2, X } from "lucide-react";
+import { projects } from "../data/projects";
+import TechIcon from "./TechIcon";
+
+interface LightboxState {
+  open: boolean;
+  src: string;
+  alt: string;
+}
 
 const Projects = () => {
   const ref = useRef(null)
@@ -28,21 +34,21 @@ const Projects = () => {
     },
   }
 
-  const topThree = projects.slice(0, 3)
-  const rest = projects.slice(3)
+  const topThree = projects.slice(0, 3);
+  const rest = projects.slice(3);
 
-  const [lightbox, setLightbox] = useState({ open: false, src: "", alt: "" })
-  const openLightbox = (src, alt) => setLightbox({ open: true, src, alt })
-  const closeLightbox = () => setLightbox({ open: false, src: "", alt: "" })
+  const [lightbox, setLightbox] = useState<LightboxState>({ open: false, src: "", alt: "" });
+  const openLightbox = (src: string, alt: string) => setLightbox({ open: true, src, alt });
+  const closeLightbox = () => setLightbox({ open: false, src: "", alt: "" });
 
   useEffect(() => {
-    if (!lightbox.open) return
-    const onKey = (e) => {
-      if (e.key === "Escape") closeLightbox()
-    }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [lightbox.open])
+    if (!lightbox.open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLightbox();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightbox.open]);
 
   return (
     <section id="projects" className="py-16 sm:py-24 border-t border-zinc-800">
@@ -61,7 +67,7 @@ const Projects = () => {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-zinc-400 text-base"
         >
-          Una selección de mis trabajos más destacados
+          Una selección de mis trabajos personales más destacados
         </motion.p>
 
         <motion.div
@@ -125,7 +131,7 @@ const Projects = () => {
                     <a
                       href={p.github}
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
                     >
                       <Github size={18} />
@@ -147,7 +153,7 @@ const Projects = () => {
                     <a
                       href={p.frontend}
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
                     >
                       <ExternalLink size={18} />
@@ -158,7 +164,7 @@ const Projects = () => {
                     <a
                       href={p.backend}
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
                     >
                       <ExternalLink size={18} />
@@ -169,7 +175,7 @@ const Projects = () => {
                     <a
                       href={p.demo}
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
                     >
                       <ExternalLink size={18} />
@@ -242,7 +248,7 @@ const Projects = () => {
                         <a
                           href={p.github}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
                         >
                           <Github size={18} />
@@ -264,7 +270,7 @@ const Projects = () => {
                         <a
                           href={p.frontend}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
                         >
                           <ExternalLink size={18} />
@@ -275,7 +281,7 @@ const Projects = () => {
                         <a
                           href={p.backend}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
                         >
                           <ExternalLink size={18} />
@@ -286,7 +292,7 @@ const Projects = () => {
                         <a
                           href={p.demo}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
                         >
                           <ExternalLink size={18} />

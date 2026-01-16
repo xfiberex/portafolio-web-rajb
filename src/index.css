@@ -1,6 +1,50 @@
 @import "tailwindcss";
 
-/* Base tweaks */
+/* ═══════════════════════════════════════════════════════════
+   DESIGN SYSTEM - Modern Minimalism Theme
+   ═══════════════════════════════════════════════════════════ */
+
+@theme {
+  /* ─── Semantic Color Palette ─────────────────────────────── */
+  --color-background: oklch(15.1% 0.013 256);
+  --color-surface: oklch(18.8% 0.016 256);
+  --color-surface-hover: oklch(22% 0.018 256);
+  
+  --color-primary: oklch(62.8% 0.2 264);
+  --color-primary-hover: oklch(57% 0.22 264);
+  --color-primary-muted: oklch(62.8% 0.2 264 / 20%);
+  
+  --color-secondary: oklch(70% 0.15 200);
+  
+  --color-text: oklch(98% 0 0);
+  --color-text-secondary: oklch(78% 0.01 256);
+  --color-text-muted: oklch(62% 0.015 256);
+  
+  --color-border: oklch(28% 0.015 256 / 80%);
+  --color-border-hover: oklch(62.8% 0.2 264 / 50%);
+  
+  /* ─── Fluid Typography Scale ─────────────────────────────── */
+  --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --font-size-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+  --font-size-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+  --font-size-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
+  --font-size-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+  --font-size-2xl: clamp(1.5rem, 1.25rem + 1.25vw, 2rem);
+  --font-size-3xl: clamp(1.875rem, 1.5rem + 1.875vw, 2.5rem);
+  --font-size-4xl: clamp(2.25rem, 1.75rem + 2.5vw, 3.5rem);
+  
+  /* ─── Spacing Scale ─────────────────────────────────────── */
+  --spacing-section-y: clamp(4rem, 3rem + 5vw, 6rem);
+  --spacing-container-x: clamp(1rem, 0.5rem + 2vw, 2rem);
+  
+  /* ─── Animation Timings ─────────────────────────────────── */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── Base Tweaks ─────────────────────────────────────────── */
 html {
   scroll-behavior: smooth;
 }
@@ -12,17 +56,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Better focus */
+/* ─── Better Focus States ─────────────────────────────────── */
 a:focus-visible,
 button:focus-visible {
-  outline: 2px solid rgb(99, 102, 241);
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
   border-radius: 8px;
 }
 
-/* Smooth transitions */
+/* ─── Smooth Transitions ──────────────────────────────────── */
 * {
   transition-property: color, background-color, border-color;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
+  transition-timing-function: var(--ease-out-expo);
+  transition-duration: var(--duration-fast);
 }

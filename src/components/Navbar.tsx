@@ -8,7 +8,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const sections = ["home", "about", "projects", "experience", "skills", "education", "certificates", "contact"]
   const active = useScrollspy(sections, {
-    rootMargin: "-90px 0px -45% 0px",
+    rootMargin: "-90px 0px -30% 0px",
     threshold: 0.1,
   })
   const baseLink = "hover:text-white transition-colors"
@@ -24,7 +24,7 @@ const Navbar = () => {
     { id: "contact", label: "Contacto" },
   ]
 
-  const handleLinkClick = (sectionId) => {
+  const handleLinkClick = (sectionId: string) => {
     setIsOpen(false)
 
     setTimeout(() => {
@@ -53,7 +53,7 @@ const Navbar = () => {
             handleLinkClick("home")
           }}
         >
-          Ricky Jiménez
+          Inicio
         </a>
 
         <div className="flex items-center gap-4">

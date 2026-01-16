@@ -1,4 +1,6 @@
-export const experience = [
+import type { Experience } from "../types";
+
+export const experience: Experience[] = [
   {
     role: "Operador de Sistemas TI",
     company: "Banco Múltiple ADEMI",
@@ -13,21 +15,6 @@ export const experience = [
       "Registro y Mejora de Procesos.",
       "Automatización de Procesos.",
       "Mantenimiento de Documentación Técnica.",
-    ],
-  },
-  {
-    role: "Desarrollador Full‑Stack",
-    company: "Independiente o Freelancer",
-    location: "Remoto",
-    period: "Octubre 2023 - Presente",
-    achievements: [
-      "Desarrollo de aplicaciones web full-stack utilizando .NET Core, ASP.NET MVC y Blazor WebAssembly.",
-      "Implementación de sistemas MERN stack con React, Node.js, Express y MongoDB.",
-      "Creación de APIs RESTful documentadas con Swagger/OpenAPI y autenticación JWT.",
-      "Diseño de interfaces de usuario responsivas con HTML5, CSS3 y Tailwind CSS.",
-      "Gestión de bases de datos SQL Server con Entity Framework Core y ADO.NET.",
-      "Aplicación de principios SOLID y arquitectura MVC en el desarrollo de software.",
-      "Control de versiones con Git/GitHub y testing automatizado con Cypress.",
     ],
   },
   {

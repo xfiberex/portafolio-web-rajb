@@ -1,0 +1,142 @@
+# =============================================================================
+# NETLIFY CONFIGURATION - PRODUCTION HARDENED SECURITY
+# Portafolio Web - React 19 + Vite 7 + Tailwind CSS 4
+# Last Updated: 2026
+# =============================================================================
+
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+# =============================================================================
+# SECURITY HEADERS - APLICADOS A TODAS LAS RUTAS
+# =============================================================================
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # =========================================================================
+    # CONTENT SECURITY POLICY (CSP)
+    # Política estricta pero funcional para React/Vite/Tailwind/Framer Motion
+    # =========================================================================
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self';
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: https:;
+      connect-src 'self' https://vitals.vercel-insights.com;
+      frame-ancestors 'none';
+      form-action 'self';
+      base-uri 'self';
+      object-src 'none';
+      upgrade-insecure-requests;
+    """
+
+    # =========================================================================
+    # ANTI-CLICKJACKING
+    # Previene que tu sitio sea embebido en iframes maliciosos
+    # =========================================================================
+    X-Frame-Options = "DENY"
+
+    # =========================================================================
+    # HSTS - HTTP STRICT TRANSPORT SECURITY
+    # Fuerza HTTPS por 2 años, incluye subdominios y permite preload list
+    # =========================================================================
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+
+    # =========================================================================
+    # MIME SNIFFING PROTECTION
+    # Previene que el navegador interprete archivos con tipo MIME incorrecto
+    # =========================================================================
+    X-Content-Type-Options = "nosniff"
+
+    # =========================================================================
+    # XSS PROTECTION (Legacy pero útil para navegadores antiguos)
+    # =========================================================================
+    X-XSS-Protection = "1; mode=block"
+
+    # =========================================================================
+    # REFERRER POLICY
+    # Controla qué información del referrer se envía en las solicitudes
+    # =========================================================================
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+    # =========================================================================
+    # PERMISSIONS POLICY (antes Feature-Policy)
+    # Bloquea acceso a APIs del navegador innecesarias para un portafolio
+    # =========================================================================
+    Permissions-Policy = """
+      accelerometer=(),
+      autoplay=(),
+      camera=(),
+      cross-origin-isolated=(),
+      display-capture=(),
+      encrypted-media=(),
+      fullscreen=(self),
+      geolocation=(),
+      gyroscope=(),
+      keyboard-map=(),
+      magnetometer=(),
+      microphone=(),
+      midi=(),
+      payment=(),
+      picture-in-picture=(),
+      publickey-credentials-get=(),
+      screen-wake-lock=(),
+      sync-xhr=(),
+      usb=(),
+      xr-spatial-tracking=()
+    """
+
+    # =========================================================================
+    # CROSS-ORIGIN POLICIES
+    # Protección adicional contra ataques cross-origin
+    # =========================================================================
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Embedder-Policy = "credentialless"
+    Cross-Origin-Resource-Policy = "same-origin"
+
+# =============================================================================
+# CACHE HEADERS PARA ASSETS ESTÁTICOS
+# Mejora rendimiento y seguridad con cache inmutable
+# =============================================================================
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/projects/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# =============================================================================
+# REDIRECTS - SPA FALLBACK
+# Necesario para React Router (si lo usas) o navegación SPA
+# =============================================================================
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# =============================================================================
+# CONTEXT: DEPLOY PREVIEWS (Menos restrictivo para testing)
+# =============================================================================
+[context.deploy-preview]
+  [context.deploy-preview.environment]
+    NODE_ENV = "development"
+
+[[context.deploy-preview.headers]]
+  for = "/*"
+  [context.deploy-preview.headers.values]
+    X-Robots-Tag = "noindex, nofollow"

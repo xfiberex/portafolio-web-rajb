@@ -1,4 +1,6 @@
-export const skills = [
+import type { Skill } from "../types";
+
+export const skills: Skill[] = [
   {
     category: "Frontend",
     items: ["JavaScript (ES6+)", "React", "Blazor", "HTML5", "CSS3", "Tailwind CSS", "Bootstrap"],
@@ -13,7 +15,7 @@ export const skills = [
   },
   {
     category: "Herramientas & DevOps",
-    items: ["Git", "GitHub", "Visual Studio", "VS Code", "Postman", "Cypress"],
+    items: ["Git", "GitHub", "Visual Studio", "VS Code", "Google Antigravity", "Postman", "Cypress"],
   },
   {
     category: "Principios",
@@ -21,6 +23,6 @@ export const skills = [
   },
   {
     category: "IAs & Herramientas de Desarrollo",
-    items: ["GitHub Copilot", "ChatGPT", "Claude", "Gemini", "Cursor IDE", "AI Code Review", "Prompt Engineering"],
+    items: ["GitHub Copilot", "ChatGPT", "Claude", "Gemini", "AI Code Review", "Prompt Engineering"],
   },
 ]

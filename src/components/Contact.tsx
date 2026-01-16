@@ -8,7 +8,7 @@ const Contact = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   return (
-    <section id="contact" className="py-16 sm:py-24 border-t border-zinc-800">
+    <section id="contact" className="py-16 sm:py-24 pb-64 border-t border-zinc-800">
       <motion.div
         ref={ref}
         initial={{ opacity: 0, y: 50 }}

@@ -1,4 +1,6 @@
-export const certificates = [
+import type { Certificate } from "../types";
+
+export const certificates: Certificate[] = [
   {
     name: "JavaScript Moderno Guía Definitiva Construye +20 Proyectos",
     issuer: "Udemy",

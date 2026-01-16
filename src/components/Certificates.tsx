@@ -70,7 +70,7 @@ const Certificates = () => {
                 <a
                   href={c.link}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="mt-4 inline-flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
                 >
                   Ver certificado
