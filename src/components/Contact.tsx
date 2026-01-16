@@ -2,6 +2,7 @@ import { useRef } from "react"
 // eslint-disable-next-line no-unused-vars
 import { motion, useInView } from "framer-motion"
 import { Mail, Send } from "lucide-react"
+import ObfuscatedEmail from "./ui/ObfuscatedEmail"
 
 const Contact = () => {
   const ref = useRef(null)
@@ -24,21 +25,29 @@ const Contact = () => {
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="mailto:rickyjimenez1820@gmail.com"
-              className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 text-white px-6 py-3 text-sm font-medium hover:bg-indigo-600 transition-colors shadow-lg shadow-indigo-500/30"
-            >
-              <Send size={18} />
-              Enviar email
-            </a>
+            <ObfuscatedEmail emailParts={['rickyjimenez1820', 'gmail', 'com']}>
+              {(_, handleClick) => (
+                <button
+                  onClick={handleClick}
+                  className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 text-white px-6 py-3 text-sm font-medium hover:bg-indigo-600 transition-colors shadow-lg shadow-indigo-500/30"
+                >
+                  <Send size={18} />
+                  Enviar email
+                </button>
+              )}
+            </ObfuscatedEmail>
 
-            <a
-              href="mailto:rickyjimenez1820@gmail.com"
-              className="inline-flex items-center gap-2 text-zinc-300 hover:text-white transition-colors"
-            >
-              <Mail size={18} />
-              rickyjimenez1820@gmail.com
-            </a>
+            <ObfuscatedEmail emailParts={['rickyjimenez1820', 'gmail', 'com']}>
+              {(email, handleClick) => (
+                <button
+                  onClick={handleClick}
+                  className="inline-flex items-center gap-2 text-zinc-300 hover:text-white transition-colors"
+                >
+                  <Mail size={18} />
+                  {email}
+                </button>
+              )}
+            </ObfuscatedEmail>
           </div>
         </div>
       </motion.div>
