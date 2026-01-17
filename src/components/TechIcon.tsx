@@ -45,6 +45,28 @@ const BRAND_COLORS: Record<string, string> = {
   "Prompt Engineering": "#F59E0B",
   Vite: "#646CFF",
   "Framer Motion": "#FF0055",
+  TypeScript: "#3178C6",
+  "Next.js": "#000000",
+  "Next.js 16": "#000000",
+  "React 19": "#61DAFB",
+  "Tailwind CSS 4": "#38BDF8",
+  PostgreSQL: "#336791",
+  "Prisma 7": "#2D3748",
+  Prisma: "#2D3748",
+  Zustand: "#453E39",
+  Zod: "#3E67B1",
+  Cloudinary: "#3448C5",
+  SWR: "#000000",
+  "Windows Forms": "#68217A",
+  ".NET Framework": "#512BD4",
+  ".NET 9": "#512BD4",
+  ".NET 8": "#512BD4",
+  "EF Core": "#512BD4",
+  "Minimal APIs": "#512BD4",
+  "SQL Server": "#CC2927",
+  Neon: "#00E599",
+  Netlify: "#00C7B7",
+  Vercel: "#000000",
 }
 
 const FALLBACK_COLOR = "#94a3b8" // slate-400
@@ -164,6 +186,45 @@ const ICONS: Record<string, React.ReactElement> = {
   ),
   Vite: <path d="M12 2l7 4-2 10-5 6-5-6-2-10 7-4zm0 3.2L8 7.2l1.2 6L12 18l2.8-4.8 1.2-6-4-2z" />,
   "Framer Motion": <path d="M6 4h12v4H10l4 4-4 4h8v4H6l8-8-8-8z" />,
+  TypeScript: (
+    <path d="M3 3h18v18H3V3zm14.5 12.5h-2V14h2v1.5zm-3-6.5H13v8h1.5V9zM9 14H6.5v-1.5H9V11H6.5V9.5H9V8H5v8h4v-2z" />
+  ),
+  "Next.js": (
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c5.51 0 10-4.48 10-10S17.51 2 12 2zm-.5 14.56L5.64 9.27h.01l2.46 3.53 2.89 4.14v.01zm1 .01V7.43l7.86 11.28c-1.05.89-2.33 1.54-3.75 1.87l-4.11-5.91z" />
+  ),
+  PostgreSQL: (
+    <path d="M12 2c-4 0-7 1-7 3v14c0 2 3 3 7 3s7-1 7-3V5c0-2-3-3-7-3zm5 15c0 .6-2.2 1.5-5 1.5S7 17.6 7 17v-2.3c1.3.6 3 .8 5 .8s3.7-.2 5-.8V17zm0-4c0 .6-2.2 1.5-5 1.5S7 13.6 7 13v-2.3c1.3.6 3 .8 5 .8s3.7-.2 5-.8V13zm0-4c0 .6-2.2 1.5-5 1.5S7 9.6 7 9V6.7C8.3 7.3 10 7.5 12 7.5s3.7-.2 5-.8V9zm-5-5c2.8 0 5 .9 5 1.5S14.8 7 12 7 7 6.1 7 5.5 9.2 4 12 4z" />
+  ),
+  Prisma: (
+    <path d="M12 2l9 16-3.5 2L12 22l-5.5-2L3 18 12 2zm0 3.5L6.5 16.5l5.5 2 5.5-2L12 5.5z" />
+  ),
+  Zustand: (
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2V7zm0 8h2v2h-2v-2z" />
+  ),
+  Zod: (
+    <path d="M12 2l9 16-3.5 2L12 22l-5.5-2L3 18 12 2zm0 3.5L6.5 16.5 12 19l5.5-2.5L12 5.5zM9 14l3-5 3 5H9z" />
+  ),
+  Cloudinary: (
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-1.48.41-2.86 1.12-4.06L8 11v1c0 2.21 1.79 4 4 4v2zm6.88-2.94c-.33-.67-1-1.06-1.88-1.06h-2v-4c0-.55-.45-1-1-1H8V9h2c.55 0 1-.45 1-1V6h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 1.48-.41 2.86-1.12 4.06z" />
+  ),
+  SWR: (
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+  ),
+  "Windows Forms": (
+    <path d="M3 3v8.5l8.5-1.5V3H3zm9.5 0v7l9.5-1.5V3h-9.5zM3 12.5V21h8.5v-7L3 12.5zm9.5 1.5V21H22v-7.5l-9.5 1.5z" />
+  ),
+  ".NET Framework": (
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8V9h2c.55 0 1-.45 1-1V6h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+  ),
+  Neon: (
+    <path d="M12 2l9 16-3.5 2L12 22l-5.5-2L3 18 12 2zm0 3.5L6.5 16.5l5.5 2 5.5-2L12 5.5zm0 3L9 14h6l-3-5.5z" />
+  ),
+  Netlify: (
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+  ),
+  Vercel: (
+    <path d="M12 2l10 18H2L12 2z" />
+  ),
 }
 
 function pickColor(name?: string): string {
@@ -224,6 +285,25 @@ function pickColor(name?: string): string {
   if (/prompt.*engineering/i.test(n)) return BRAND_COLORS["Prompt Engineering"]
   if (/vite/i.test(n)) return BRAND_COLORS.Vite
   if (/framer.*motion/i.test(n)) return BRAND_COLORS["Framer Motion"]
+  if (/typescript/i.test(n)) return BRAND_COLORS.TypeScript
+  if (/next\.?js.*16|next\.?js/i.test(n)) return BRAND_COLORS["Next.js"]
+  if (/react.*19|react/i.test(n)) return BRAND_COLORS.React
+  if (/tailwind.*css.*4|tailwind.*css/i.test(n)) return BRAND_COLORS.TailwindCSS
+  if (/postgresql|postgres/i.test(n)) return BRAND_COLORS.PostgreSQL
+  if (/prisma.*7|prisma/i.test(n)) return BRAND_COLORS.Prisma
+  if (/zustand/i.test(n)) return BRAND_COLORS.Zustand
+  if (/zod/i.test(n)) return BRAND_COLORS.Zod
+  if (/cloudinary/i.test(n)) return BRAND_COLORS.Cloudinary
+  if (/swr/i.test(n)) return BRAND_COLORS.SWR
+  if (/windows.*forms/i.test(n)) return BRAND_COLORS["Windows Forms"]
+  if (/\.net.*framework/i.test(n)) return BRAND_COLORS[".NET Framework"]
+  if (/\.net.*9/i.test(n)) return BRAND_COLORS[".NET 9"]
+  if (/\.net.*8/i.test(n)) return BRAND_COLORS[".NET 8"]
+  if (/minimal.*apis?/i.test(n)) return BRAND_COLORS["Minimal APIs"]
+  if (/ef.*core/i.test(n)) return BRAND_COLORS["EF Core"]
+  if (/neon/i.test(n)) return BRAND_COLORS.Neon
+  if (/netlify/i.test(n)) return BRAND_COLORS.Netlify
+  if (/vercel/i.test(n)) return BRAND_COLORS.Vercel
   return FALLBACK_COLOR
 }
 
@@ -284,6 +364,24 @@ function pickIcon(name?: string): React.ReactElement | null {
   if (/prompt.*engineering/i.test(n)) return ICONS["Prompt Engineering"]
   if (/vite/i.test(n)) return ICONS.Vite
   if (/framer.*motion/i.test(n)) return ICONS["Framer Motion"]
+  if (/typescript/i.test(n)) return ICONS.TypeScript
+  if (/next\.?js.*16|next\.?js/i.test(n)) return ICONS["Next.js"]
+  if (/react.*19/i.test(n)) return ICONS.React
+  if (/tailwind.*css.*4/i.test(n)) return ICONS.TailwindCSS
+  if (/postgresql|postgres/i.test(n)) return ICONS.PostgreSQL
+  if (/prisma.*7|prisma/i.test(n)) return ICONS.Prisma
+  if (/zustand/i.test(n)) return ICONS.Zustand
+  if (/zod/i.test(n)) return ICONS.Zod
+  if (/cloudinary/i.test(n)) return ICONS.Cloudinary
+  if (/swr/i.test(n)) return ICONS.SWR
+  if (/windows.*forms/i.test(n)) return ICONS["Windows Forms"]
+  if (/\.net.*framework/i.test(n)) return ICONS[".NET Framework"]
+  if (/\.net.*9/i.test(n)) return ICONS.DotNet
+  if (/\.net.*8/i.test(n)) return ICONS.DotNet
+  if (/minimal.*apis?/i.test(n)) return ICONS.DotNet
+  if (/neon/i.test(n)) return ICONS.Neon
+  if (/netlify/i.test(n)) return ICONS.Netlify
+  if (/vercel/i.test(n)) return ICONS.Vercel
   return null
 }
 

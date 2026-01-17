@@ -7,24 +7,6 @@ interface ObfuscatedEmailProps {
   children?: (email: string, handleClick: () => void) => React.ReactNode
 }
 
-/**
- * Componente para ofuscar emails y protegerlos del scraping de bots.
- * 
- * El email se construye en tiempo de ejecución usando JavaScript,
- * lo que dificulta que los bots de scraping lo detecten.
- * 
- * @example
- * // Uso básico
- * <ObfuscatedEmail emailParts={['usuario', 'gmail', 'com']} />
- * 
- * @example
- * // Con render prop personalizado
- * <ObfuscatedEmail emailParts={['usuario', 'gmail', 'com']}>
- *   {(email, handleClick) => (
- *     <button onClick={handleClick}>Contactar</button>
- *   )}
- * </ObfuscatedEmail>
- */
 const ObfuscatedEmail = ({ emailParts, className = '', children }: ObfuscatedEmailProps) => {
   const [isRevealed, setIsRevealed] = useState(false)
 

@@ -2,6 +2,11 @@ import type { Certificate } from "../types";
 
 export const certificates: Certificate[] = [
   {
+    name: "React y TypeScript - La Guía Completa Creando +10 Proyectos",
+    issuer: "Udemy",
+    link: "https://ude.my/UC-37760f9e-90f7-4d69-949b-39677cda27f7",
+  },
+  {
     name: "JavaScript Moderno Guía Definitiva Construye +20 Proyectos",
     issuer: "Udemy",
     link: "https://ude.my/UC-ab97420b-943d-492e-9274-26f8d83bb73f",
