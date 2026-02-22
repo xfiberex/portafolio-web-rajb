@@ -1,5 +1,4 @@
 import { useRef } from "react"
-// eslint-disable-next-line no-unused-vars
 import { motion, useInView } from "framer-motion"
 import { Award, ExternalLink } from "lucide-react"
 import { certificates } from "../data/certificates"
@@ -46,9 +45,9 @@ const Certificates = () => {
           animate={isInView ? "visible" : "hidden"}
           className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {certificates.map((c, idx) => (
+          {certificates.map((c) => (
             <motion.article
-              key={idx}
+              key={`${c.name}-${c.issuer}`}
               variants={itemVariants}
               whileHover={{ y: -5 }}
               className="group rounded-xl border border-zinc-800 p-6 bg-gradient-to-br from-zinc-900 to-zinc-900/50 shadow-lg hover:shadow-xl hover:shadow-indigo-500/10 hover:border-indigo-500/50 transition-all duration-300"

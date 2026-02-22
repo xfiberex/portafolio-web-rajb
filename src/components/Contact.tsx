@@ -1,5 +1,4 @@
 import { useRef } from "react"
-// eslint-disable-next-line no-unused-vars
 import { motion, useInView } from "framer-motion"
 import { Mail, Send } from "lucide-react"
 import ObfuscatedEmail from "./ui/ObfuscatedEmail"

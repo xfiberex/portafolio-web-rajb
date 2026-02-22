@@ -1,5 +1,4 @@
 import { useRef } from "react"
-// eslint-disable-next-line no-unused-vars
 import { motion, useInView } from "framer-motion"
 import { Briefcase } from "lucide-react"
 import { experience } from "../data/experience"
@@ -47,9 +46,9 @@ const Experience = () => {
           animate={isInView ? "visible" : "hidden"}
           className="mt-8 space-y-6"
         >
-          {experience.map((e, idx) => (
+          {experience.map((e) => (
             <motion.article
-              key={idx}
+              key={`${e.role}-${e.company}-${e.period}`}
               variants={itemVariants}
               className="group relative rounded-xl border border-zinc-800/80 p-6 sm:p-8 bg-gradient-to-br from-zinc-900 to-zinc-900/50 shadow-lg hover:shadow-xl hover:shadow-indigo-500/10 hover:border-indigo-500/50 transition-all duration-300"
             >
@@ -76,8 +75,8 @@ const Experience = () => {
                   </p>
 
                   <ul className="mt-4 space-y-3">
-                    {e.achievements?.map((a, i) => (
-                      <li key={i} className="flex items-start gap-3 text-sm text-zinc-300 leading-relaxed">
+                    {e.achievements?.map((a) => (
+                      <li key={`${e.role}-${a}`} className="flex items-start gap-3 text-sm text-zinc-300 leading-relaxed">
                         <span className="inline-block w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 flex-shrink-0" />
                         <span>{a}</span>
                       </li>

@@ -1,5 +1,4 @@
 import { useRef } from "react"
-// eslint-disable-next-line no-unused-vars
 import { motion, useInView } from "framer-motion"
 import { skills } from "../data/skills"
 import TechIcon from "./TechIcon"
@@ -56,9 +55,9 @@ const Skills = () => {
           animate={isInView ? "visible" : "hidden"}
           className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {skills.map((group, idx) => (
+          {skills.map((group) => (
             <motion.div
-              key={idx}
+              key={group.category}
               variants={itemVariants}
               className="group rounded-xl border border-zinc-800/80 p-6 bg-gradient-to-br from-zinc-900 to-zinc-900/50 shadow-lg hover:shadow-xl hover:shadow-indigo-500/10 hover:border-indigo-500/50 transition-all duration-300 hover:-translate-y-1"
             >

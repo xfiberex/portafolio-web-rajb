@@ -23,6 +23,6 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src", "helpers"],
+  "include": ["src"],
   "exclude": ["node_modules"]
 }

@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-// eslint-disable-next-line no-unused-vars
 import { motion, useInView } from "framer-motion";
 import { ExternalLink, Github, Maximize2, X } from "lucide-react";
 import { projects } from "../data/projects";
@@ -84,9 +83,9 @@ const Projects = () => {
           animate={isInView ? "visible" : "hidden"}
           className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {topThree.map((p, idx) => (
+          {topThree.map((p) => (
             <motion.article
-              key={`top-${idx}`}
+              key={p.title}
               variants={itemVariants}
               whileHover={{ y: -8 }}
               className="group relative rounded-2xl border border-zinc-800 bg-gradient-to-b from-zinc-900 to-zinc-900/50 shadow-xl hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-500/60 transition-all duration-300 overflow-hidden"
@@ -112,8 +111,8 @@ const Projects = () => {
 
                 {p.features && (
                   <ul className="mt-5 space-y-2.5">
-                    {p.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2.5 text-xs text-zinc-400">
+                    {p.features.map((feature) => (
+                      <li key={`${p.title}-${feature}`} className="flex items-start gap-2.5 text-xs text-zinc-400">
                         <span className="text-indigo-500 mt-0.5 font-bold">▸</span>
                         <span className="leading-relaxed">{feature}</span>
                       </li>
@@ -202,9 +201,9 @@ const Projects = () => {
             animate={isInView ? "visible" : "hidden"}
             className="mt-8 space-y-6"
           >
-            {rest.map((p, idx) => (
+            {rest.map((p) => (
               <motion.article
-                key={`rest-${idx}`}
+                key={p.title}
                 variants={itemVariants}
                 className="relative rounded-2xl border border-zinc-800 p-6 bg-gradient-to-br from-zinc-900 to-zinc-900/50 shadow-lg hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-500/40 transition-all duration-300"
               >
@@ -229,8 +228,8 @@ const Projects = () => {
 
                     {p.features && (
                       <ul className="mt-4 space-y-2">
-                        {p.features.map((feature, index) => (
-                          <li key={index} className="flex items-start gap-2.5 text-sm text-zinc-400">
+                        {p.features.map((feature) => (
+                          <li key={`${p.title}-${feature}`} className="flex items-start gap-2.5 text-sm text-zinc-400">
                             <span className="text-indigo-500 mt-0.5 font-bold">▸</span>
                             <span className="leading-relaxed">{feature}</span>
                           </li>

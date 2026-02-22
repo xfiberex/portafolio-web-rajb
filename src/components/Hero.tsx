@@ -3,6 +3,8 @@ import { motion } from "framer-motion"
 import { TypeAnimation } from "react-type-animation"
 import { staggerContainer, fadeUpVariant } from "../lib/animations"
 
+const toAssetUrl = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, "")}`
+
 const Hero = () => {
   return (
     <section id="home" className="py-20 sm:py-32">
@@ -61,7 +63,7 @@ const Hero = () => {
 
         <motion.div variants={fadeUpVariant} className="mt-6 flex flex-wrap gap-3">
           <a
-            href="/assets/CV-Ricky Angel Jiménez Bueno-11-10-2025.pdf"
+            href={toAssetUrl("assets/CV-Ricky Angel Jiménez Bueno-11-10-2025.pdf")}
             download
             className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
           >
@@ -69,7 +71,7 @@ const Hero = () => {
             Descargar CV
           </a>
           <a
-            href="/assets/ATS-CV-Ricky Angel Jiménez Bueno-11-10-2025.pdf"
+            href={toAssetUrl("assets/ATS-CV-Ricky Angel Jiménez Bueno-11-10-2025.pdf")}
             download
             className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
           >

@@ -1,28 +1,28 @@
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion"
 import useScrollspy from "../hooks/useScrollspy"
 
+const sections = ["home", "about", "projects", "experience", "skills", "education", "certificates", "contact"]
+
+const navItems = [
+  { id: "about", label: "Sobre mí" },
+  { id: "projects", label: "Proyectos" },
+  { id: "experience", label: "Experiencia" },
+  { id: "skills", label: "Competencias" },
+  { id: "education", label: "Educación" },
+  { id: "certificates", label: "Certificados" },
+  { id: "contact", label: "Contacto" },
+]
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const sections = ["home", "about", "projects", "experience", "skills", "education", "certificates", "contact"]
   const active = useScrollspy(sections, {
     rootMargin: "-90px 0px -30% 0px",
     threshold: 0.1,
   })
   const baseLink = "hover:text-white transition-colors"
   const activeLink = "text-white font-medium"
-
-  const navItems = [
-    { id: "about", label: "Sobre mí" },
-    { id: "projects", label: "Proyectos" },
-    { id: "experience", label: "Experiencia" },
-    { id: "skills", label: "Competencias" },
-    { id: "education", label: "Educación" },
-    { id: "certificates", label: "Certificados" },
-    { id: "contact", label: "Contacto" },
-  ]
 
   const handleLinkClick = (sectionId: string) => {
     setIsOpen(false)

@@ -1,5 +1,4 @@
 import { useRef } from "react"
-// eslint-disable-next-line no-unused-vars
 import { motion, useInView } from "framer-motion"
 import { GraduationCap } from "lucide-react"
 import { education } from "../data/education"
@@ -30,9 +29,9 @@ const Education = () => {
         </motion.div>
 
         <div ref={ref} className="mt-8 space-y-6">
-          {education.map((e, idx) => (
+          {education.map((e) => (
             <motion.article
-              key={idx}
+              key={`${e.degree}-${e.institution}-${e.period}`}
               variants={itemVariants}
               initial="hidden"
               animate={isInView ? "visible" : "hidden"}
