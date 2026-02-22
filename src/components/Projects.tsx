@@ -11,6 +11,13 @@ interface LightboxState {
   alt: string;
 }
 
+const toAssetUrl = (path?: string) => {
+  if (!path) return "/placeholder.svg";
+  if (/^(https?:)?\/\//i.test(path)) return path;
+  const normalizedPath = path.replace(/^\/+/, "");
+  return `${import.meta.env.BASE_URL}${normalizedPath}`;
+};
+
 const Projects = () => {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
@@ -87,7 +94,7 @@ const Projects = () => {
               {p.image && (
                 <div className="relative aspect-video w-full overflow-hidden">
                   <img
-                    src={p.image || "/placeholder.svg"}
+                    src={toAssetUrl(p.image)}
                     alt={p.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
@@ -141,7 +148,7 @@ const Projects = () => {
                   {p.image && (
                     <button
                       type="button"
-                      onClick={() => openLightbox(p.image, p.title)}
+                      onClick={() => openLightbox(toAssetUrl(p.image), p.title)}
                       className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
                       aria-label={`Ver imagen de ${p.title} en pantalla completa`}
                     >
@@ -205,7 +212,7 @@ const Projects = () => {
                   {p.image && (
                     <div className="hidden sm:block w-48 flex-shrink-0 rounded-xl overflow-hidden bg-zinc-800/50 border border-zinc-700/50">
                       <div className="aspect-video w-full h-auto relative">
-                        <img src={p.image || "/placeholder.svg"} alt={p.title} className="w-full h-full object-cover" />
+                        <img src={toAssetUrl(p.image)} alt={p.title} className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-gradient-to-br from-transparent to-zinc-900/30" />
                       </div>
                     </div>
@@ -258,7 +265,7 @@ const Projects = () => {
                       {p.image && (
                         <button
                           type="button"
-                          onClick={() => openLightbox(p.image, p.title)}
+                          onClick={() => openLightbox(toAssetUrl(p.image), p.title)}
                           className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
                           aria-label={`Ver imagen de ${p.title} en pantalla completa`}
                         >
@@ -334,7 +341,7 @@ const Projects = () => {
               <X size={22} />
             </button>
             <img
-              src={lightbox.src || "/placeholder.svg"}
+              src={toAssetUrl(lightbox.src)}
               alt={lightbox.alt}
               className="max-h-[85vh] max-w-[95vw] sm:max-w-[90vw] rounded-2xl object-contain shadow-2xl border border-zinc-800"
             />
