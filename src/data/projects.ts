@@ -60,7 +60,7 @@ export const projects: Project[] = [
     subtitle: ".NET Blazor · Aplicación Web Full-Stack con Blazor WebAssembly y .NET 9",
     description:
       "Aplicación empresarial para gestión de tareas recurrentes con calendario interactivo y servicios automatizados.",
-    image: "/projects/TareasRecurrentes-S-Blazor-TDApp.png",
+    image: "/projects/S-Blazor-TDApp.png",
     features: [
       "Calendario interactivo con programación de tareas por días específicos",
       "Panel de reportes y seguimiento de procesos completados",

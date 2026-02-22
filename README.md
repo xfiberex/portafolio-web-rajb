@@ -43,6 +43,7 @@ Un portafolio web moderno, seguro y responsivo construido con las últimas tecno
 
 ### Development Tools
 - **ESLint 9** - Linter moderno para TypeScript/React
+- **typescript-eslint** - Parser y reglas para análisis de archivos TypeScript/TSX
 - **Vite Plugin React** - Plugin oficial optimizado para React
 
 ## 🚀 Instalación y Uso
@@ -117,10 +118,7 @@ portafolio-web/
 │   │   ├── Skills.tsx
 │   │   ├── TechIcon.tsx
 │   │   └── ui/           # Componentes UI reutilizables
-│   │       ├── ObfuscatedEmail.tsx  # Protección de email
-│   │       ├── ProjectCard.tsx
-│   │       ├── SectionContainer.tsx
-│   │       └── SectionHeading.tsx
+│   │       └── ObfuscatedEmail.tsx  # Protección de email
 │   ├── data/             # Datos tipados
 │   │   ├── certificates.ts
 │   │   ├── education.ts
@@ -136,11 +134,6 @@ portafolio-web/
 │   ├── App.tsx           # Componente principal
 │   ├── main.tsx          # Punto de entrada
 │   └── index.css         # Estilos globales
-├── helpers/              # Funciones auxiliares JavaScript
-│   ├── animations.js
-│   ├── constants.js
-│   └── utils.js
-├── .env.example          # Plantilla de variables de entorno
 ├── netlify.toml          # Configuración de seguridad Netlify
 ├── eslint.config.js      # Configuración de ESLint
 ├── tsconfig.json         # Configuración de TypeScript
@@ -209,7 +202,7 @@ Los estilos están definidos en `src/index.css` y utilizan Tailwind CSS 4. Puede
 - Animaciones
 
 ### Configurar Variables de Entorno
-1. Copia `.env.example` a `.env`
+1. Crea un archivo `.env` en la raíz del proyecto
 2. Configura tus claves API (si usas servicios externos como EmailJS)
 3. Solo las variables con prefijo `VITE_` son accesibles en el frontend
 
