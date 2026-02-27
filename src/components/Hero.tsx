@@ -61,32 +61,23 @@ const Hero = () => {
           </a>
         </motion.div>
 
-        <motion.div variants={fadeUpVariant} className="mt-6 flex flex-col gap-3">
-          <div className="flex flex-wrap gap-3">
-            <a
-              href={toAssetUrl("assets/CV-Ricky Angel Jiménez Bueno-11-10-2025.pdf")}
-              download
-              className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-500 opacity-50 cursor-not-allowed select-none"
-              onClick={(e) => e.preventDefault()}
-              aria-disabled="true"
-              tabIndex={-1}
-            >
-              <Download size={16} />
-              Descargar CV
-            </a>
-            <a
-              href={toAssetUrl("assets/ATS-CV-Ricky Angel Jiménez Bueno-11-10-2025.pdf")}
-              download
-              className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-500 opacity-50 cursor-not-allowed select-none"
-              onClick={(e) => e.preventDefault()}
-              aria-disabled="true"
-              tabIndex={-1}
-            >
-              <Download size={16} />
-              CV-ATS
-            </a>
-          </div>
-          <p className="text-xs text-zinc-500 italic">⏳ Actualizando mis CVs...</p>
+        <motion.div variants={fadeUpVariant} className="mt-6 flex flex-wrap gap-3">
+          <a
+            href={toAssetUrl("assets/CV-Ricky Angel Jiménez Bueno-27-02-2026.pdf")}
+            download
+            className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
+          >
+            <Download size={16} />
+            Descargar CV
+          </a>
+          <a
+            href={toAssetUrl("assets/ATS-CV-Ricky Angel Jiménez Bueno-27-02-2026.pdf")}
+            download
+            className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
+          >
+            <Download size={16} />
+            CV-ATS
+          </a>
         </motion.div>
 
         <motion.div variants={fadeUpVariant} className="mt-8 flex items-center gap-4">
