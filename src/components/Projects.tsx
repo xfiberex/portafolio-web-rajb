@@ -17,6 +17,20 @@ const toAssetUrl = (path?: string) => {
   return `${import.meta.env.BASE_URL}${normalizedPath}`;
 };
 
+/**
+ * Validates that a URL uses http: or https: protocol.
+ * Prevents javascript: and data: protocol injection in external links.
+ */
+const safeExternalUrl = (url?: string): string | undefined => {
+  if (!url) return undefined;
+  try {
+    const { protocol } = new URL(url);
+    return protocol === "https:" || protocol === "http:" ? url : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
 const Projects = () => {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
@@ -135,7 +149,7 @@ const Projects = () => {
                 <div className="mt-6 pt-5 border-t border-zinc-800 flex flex-wrap gap-4 text-sm">
                   {p.github && (
                     <a
-                      href={p.github}
+                      href={safeExternalUrl(p.github)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
@@ -157,7 +171,7 @@ const Projects = () => {
                   )}
                   {p.frontend && (
                     <a
-                      href={p.frontend}
+                      href={safeExternalUrl(p.frontend)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
@@ -168,7 +182,7 @@ const Projects = () => {
                   )}
                   {p.backend && (
                     <a
-                      href={p.backend}
+                      href={safeExternalUrl(p.backend)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
@@ -179,7 +193,7 @@ const Projects = () => {
                   )}
                   {p.demo && p.demo !== "#" && (
                     <a
-                      href={p.demo}
+                      href={safeExternalUrl(p.demo)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
@@ -252,7 +266,7 @@ const Projects = () => {
                     <div className="mt-6 pt-5 border-t border-zinc-800 flex flex-wrap gap-4 text-sm">
                       {p.github && (
                         <a
-                          href={p.github}
+                          href={safeExternalUrl(p.github)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
@@ -274,7 +288,7 @@ const Projects = () => {
                       )}
                       {p.frontend && (
                         <a
-                          href={p.frontend}
+                          href={safeExternalUrl(p.frontend)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
@@ -285,7 +299,7 @@ const Projects = () => {
                       )}
                       {p.backend && (
                         <a
-                          href={p.backend}
+                          href={safeExternalUrl(p.backend)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
@@ -296,7 +310,7 @@ const Projects = () => {
                       )}
                       {p.demo && p.demo !== "#" && (
                         <a
-                          href={p.demo}
+                          href={safeExternalUrl(p.demo)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 text-zinc-300 hover:text-indigo-400 font-medium transition-colors"
@@ -340,7 +354,7 @@ const Projects = () => {
               <X size={22} />
             </button>
             <img
-              src={toAssetUrl(lightbox.src)}
+              src={lightbox.src}
               alt={lightbox.alt}
               className="max-h-[85vh] max-w-[95vw] sm:max-w-[90vw] rounded-2xl object-contain shadow-2xl border border-zinc-800"
             />

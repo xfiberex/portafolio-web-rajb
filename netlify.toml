@@ -24,7 +24,7 @@
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       font-src 'self' https://fonts.gstatic.com;
       img-src 'self' data: https:;
-      connect-src 'self' https://vitals.vercel-insights.com;
+      connect-src 'self';
       frame-ancestors 'none';
       form-action 'self';
       base-uri 'self';
@@ -49,6 +49,12 @@
     # Previene que el navegador interprete archivos con tipo MIME incorrecto
     # =========================================================================
     X-Content-Type-Options = "nosniff"
+
+    # =========================================================================
+    # CROSS-DOMAIN POLICIES
+    # Previene que Flash, PDF y Silverlight accedan datos cross-domain
+    # =========================================================================
+    X-Permitted-Cross-Domain-Policies = "none"
 
     # =========================================================================
     # XSS PROTECTION (Legacy pero útil para navegadores antiguos)
