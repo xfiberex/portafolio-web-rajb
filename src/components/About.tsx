@@ -20,12 +20,11 @@ const About = () => {
 
         <div className="mt-8 space-y-4 text-zinc-300 max-w-3xl leading-relaxed">
           <p>
-            Desarrollador Full-Stack con enfoque especializado en el stack MERN y .NET. Mi carrera en TI 
+            Desarrollador Full-Stack con enfoque especializado en el stack MERN/PERN y .NET. Mi carrera en TI 
             me ha proporcionado una sólida base técnica, la cual he expandido de forma proactiva hacia el desarrollo de 
             software a través de proyectos personales. Poseo experiencia práctica demostrable en la 
             construcción de aplicaciones web completas, desde la creación de APIs REST con Node.js hasta el desarrollo de 
-            interfaces de usuario interactivas con React o Blazor. Busco una oportunidad a tiempo completo para aplicar mis 
-            habilidades en el desarrollo de soluciones web modernas.
+            interfaces de usuario interactivas con React o Blazor.
           </p>
         </div>
       </motion.div>

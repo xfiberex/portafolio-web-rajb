@@ -19,7 +19,7 @@ export const skills: Skill[] = [
   },
   {
     category: "Principios",
-    items: ["Programación Orientada a Objetos (POO)", "Principios SOLID", "Arquitectura MVC"],
+    items: ["Programación Orientada a Objetos (POO)", "Principios SOLID", "Arquitectura MVC - Modular - Feature Based"],
   },
   {
     category: "IAs & Herramientas de Desarrollo",

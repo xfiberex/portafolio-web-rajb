@@ -30,7 +30,7 @@ const Hero = () => {
             sequence={[
               "Desarrollador Web Full-Stack",
               2000,
-              "Especialista en .NET & MERN",
+              "Especialista en .NET & MERN/PERN",
               2000,
               "Creador de interfaces modernas con agentes IA",
               2000,
