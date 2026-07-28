@@ -96,6 +96,7 @@ export const projects: Project[] = [
       "Secciones: Sobre mí, Proyectos, Experiencia, Habilidades, Educación, Certificados y Contacto"
     ],
     tags: ["React", "TailwindCSS", "TypeScript", "Framer Motion", "GitHub"],
-    github: "https://portafolio-web-rajb.netlify.app",
+    github: "https://github.com/xfiberex/portafolio-web-rajb",
+    demo: "https://portafolio-web-rajb.netlify.app",
   },
 ]

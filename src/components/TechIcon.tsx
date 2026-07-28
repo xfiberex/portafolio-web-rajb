@@ -13,14 +13,14 @@ const BRAND_COLORS: Record<string, string> = {
   Csharp: "#9B4F96",
   DotNet: "#512BD4",
   SQL: "#CC2927",
-  Express: "#000000",
+  Express: "#E5E7EB",
   Firebase: "#FFCA28",
   Git: "#F05032",
-  GitHub: "#181717",
+  GitHub: "#E6EDF3",
   "Visual Studio": "#5C2D91",
   "VS Code": "#007ACC",
   Postman: "#FF6C37",
-  JWT: "#000000",
+  JWT: "#FB015B",
   "Entity Framework": "#512BD4",
   Mongoose: "#880000",
   "Clean Code": "#4CAF50",
@@ -32,31 +32,31 @@ const BRAND_COLORS: Record<string, string> = {
   "PDF Reports": "#DC143C",
   "Background Services": "#512BD4",
   "ADO.NET": "#512BD4",
-  Cypress: "#17202C",
+  Cypress: "#69D3A7",
   "Programación Orientada a Objetos (POO)": "#4CAF50",
   "Principios SOLID": "#2196F3",
   "Arquitectura MVC": "#FF9800",
-  "GitHub Copilot": "#24292e",
+  "GitHub Copilot": "#E6EDF3",
   ChatGPT: "#00A67E",
   Claude: "#D97757",
   Gemini: "#4285F4",
-  "Cursor IDE": "#000000",
+  "Cursor IDE": "#E5E7EB",
   "AI Code Review": "#7C3AED",
   "Prompt Engineering": "#F59E0B",
   Vite: "#646CFF",
   "Framer Motion": "#FF0055",
   TypeScript: "#3178C6",
-  "Next.js": "#000000",
-  "Next.js 16": "#000000",
+  "Next.js": "#E5E7EB",
+  "Next.js 16": "#E5E7EB",
   "React 19": "#61DAFB",
   "Tailwind CSS 4": "#38BDF8",
   PostgreSQL: "#336791",
-  "Prisma 7": "#2D3748",
-  Prisma: "#2D3748",
-  Zustand: "#453E39",
+  "Prisma 7": "#16A394",
+  Prisma: "#16A394",
+  Zustand: "#C4A484",
   Zod: "#3E67B1",
   Cloudinary: "#3448C5",
-  SWR: "#000000",
+  SWR: "#E5E7EB",
   "Windows Forms": "#68217A",
   ".NET Framework": "#512BD4",
   ".NET 9": "#512BD4",
@@ -66,7 +66,20 @@ const BRAND_COLORS: Record<string, string> = {
   "SQL Server": "#CC2927",
   Neon: "#00E599",
   Netlify: "#00C7B7",
-  Vercel: "#000000",
+  Vercel: "#E5E7EB",
+  ".NET": "#512BD4",
+  Docker: "#2496ED",
+  xUnit: "#26A69A",
+  Vitest: "#FCC72B",
+  "Diseño de APIs REST": "#22D3EE",
+  "Google Antigravity": "#4285F4",
+  "WinUI 3": "#0078D4",
+  "Windows App SDK": "#0EA5E9",
+  MVVM: "#A855F7",
+  "Tauri 2": "#FFC131",
+  Rust: "#DEA584",
+  Python: "#4B8BBE",
+  "Inno Setup": "#A3E635",
 }
 
 const FALLBACK_COLOR = "#94a3b8" // slate-400
@@ -225,6 +238,45 @@ const ICONS: Record<string, React.ReactElement> = {
   Vercel: (
     <path d="M12 2l10 18H2L12 2z" />
   ),
+  ".NET": (
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-.5 15h-3v-3h1v2h2v1zm0-4h-3v-1h1v-2h-1v-1h3v4zm4.5 4h-3v-1h2v-2h1v3zm0-4h-3v-4h3v1h-2v2h2v1z" />
+  ),
+  Docker: (
+    <path d="M4.8 10.6h2.1v2.1H4.8v-2.1zm2.6 0h2.1v2.1H7.4v-2.1zm2.6 0h2.1v2.1h-2.1v-2.1zm2.6 0h2.1v2.1h-2.1v-2.1zm-5.2-2.5h2.1v2.1H7.4V8.1zm2.6 0h2.1v2.1h-2.1V8.1zm2.6 0h2.1v2.1h-2.1V8.1zm0-2.5h2.1v2.1h-2.1V5.6zm9.4 5.2c-.46-.31-1.5-.42-2.3-.27-.1-.75-.52-1.4-1.27-1.99l-.43-.29-.29.43c-.57.86-.72 2.28-.11 3.22-.27.15-.8.35-1.5.34H2.14c-.27 1.6.18 3.67 1.4 5.09 1.18 1.38 2.95 2.08 5.26 2.08 5 0 8.71-2.3 10.45-6.5 .68.01 2.16.01 2.91-1.44.05-.08.19-.36.35-.79l.09-.26-.29-.19z" />
+  ),
+  xUnit: (
+    <path d="M10 2h4v2h-1v5.2l4.8 8.3A2 2 0 0 1 16.1 21H7.9a2 2 0 0 1-1.7-3.5L11 9.2V4h-1V2zm1.6 8.9L9.1 15.3h5.8l-2.5-4.4z" />
+  ),
+  Vitest: (
+    <path d="M13.5 2 4 13.5h5.5L8.5 22 20 10.5h-6L13.5 2z" />
+  ),
+  "Diseño de APIs REST": (
+    <path d="M3 7h13.2l-2.6-2.6L15 3l5 5-5 5-1.4-1.4L16.2 9H3V7zm18 10H7.8l2.6 2.6L9 21l-5-5 5-5 1.4 1.4L7.8 15H21v2z" />
+  ),
+  "Google Antigravity": (
+    <path d="M12 2 5 9h4v6h6V9h4l-7-7zm-5 16h10v3H7v-3z" />
+  ),
+  "WinUI 3": (
+    <path d="M3 5.5 10.2 4.5v7.1H3V5.5zm8.4-1.2L21 3v8.6h-9.6V4.3zM3 12.9h7.2v7.1L3 19v-6.1zm8.4 0H21V21l-9.6-1.3v-6.8z" />
+  ),
+  "Windows App SDK": (
+    <path d="M12 2 3 6.5v11L12 22l9-4.5v-11L12 2zm0 2.2 6.4 3.2L12 10.6 5.6 7.4 12 4.2zM5 9.1l6 3v7.2l-6-3V9.1zm14 0v7.2l-6 3v-7.2l6-3z" />
+  ),
+  MVVM: (
+    <path d="M12 2 2 7l10 5 10-5-10-5zM4.2 10.2 2 11.3l10 5 10-5-2.2-1.1L12 13.8l-7.8-3.6zm0 4L2 15.3l10 5 10-5-2.2-1.1L12 17.8l-7.8-3.6z" />
+  ),
+  "Tauri 2": (
+    <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM9.1 7a2.1 2.1 0 1 1 0 4.2A2.1 2.1 0 0 1 9.1 7zm5.8 5.8a2.1 2.1 0 1 1 0 4.2 2.1 2.1 0 0 1 0-4.2z" />
+  ),
+  Rust: (
+    <path d="M12 2 9.9 4.1a10 10 0 0 0-1.6.66L5.6 3.6l-2 2 1.16 2.7a10 10 0 0 0-.66 1.6L2 12l2.1 2.1c.16.55.38 1.09.66 1.6L3.6 18.4l2 2 2.7-1.16c.51.28 1.05.5 1.6.66L12 22l2.1-2.1c.55-.16 1.09-.38 1.6-.66l2.7 1.16 2-2-1.16-2.7c.28-.51.5-1.05.66-1.6L22 12l-2.1-2.1a10 10 0 0 0-.66-1.6l1.16-2.7-2-2-2.7 1.16a10 10 0 0 0-1.6-.66L12 2zm-5.5 5H13a2 2 0 0 1 0 4h-1.2l1.9 4h-2.2l-1.7-4H8.5v4h-2V7zm2 1.7v1.6H12a.8.8 0 0 0 0-1.6H8.5z" />
+  ),
+  Python: (
+    <path d="M11.9 2c-.9 0-1.7.08-2.4.22-2.1.37-2.5 1.15-2.5 2.6v1.9h5v.63H5.1c-1.46 0-2.74.88-3.14 2.55-.46 1.92-.48 3.12 0 5.12.36 1.49 1.21 2.55 2.67 2.55h1.72v-2.28c0-1.66 1.44-3.12 3.14-3.12h4.99c1.4 0 2.51-1.15 2.51-2.55V4.82c0-1.36-1.15-2.38-2.51-2.61A15.6 15.6 0 0 0 11.9 2zM9.2 3.53c.52 0 .94.43.94.95a.94.94 0 0 1-.94.94.94.94 0 0 1-.94-.94c0-.52.42-.95.94-.95zm8.5 3.42v2.21c0 1.73-1.47 3.19-3.14 3.19H9.57c-1.38 0-2.51 1.18-2.51 2.55v4.79c0 1.36 1.18 2.16 2.51 2.55 1.6.47 3.13.55 5.04 0 1.27-.37 2.51-1.11 2.51-2.55v-1.92h-5.01v-.63h7.52c1.46 0 2-1.02 2.51-2.55.53-1.57.5-3.08 0-5.11-.36-1.46-1.05-2.55-2.51-2.55h-1.93zm-2.82 12.1c.52 0 .94.42.94.94a.94.94 0 0 1-.94.95.95.95 0 0 1-.95-.95c0-.52.43-.94.95-.94z" />
+  ),
+  "Inno Setup": (
+    <path d="M5 3h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2h-5.2l1.7 2H8.5l1.7-2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm6 3v4H8.5l3.5 4 3.5-4H13V6h-2z" />
+  ),
 }
 
 function pickColor(name?: string): string {
@@ -283,6 +335,7 @@ function pickColor(name?: string): string {
   if (/cursor.*ide/i.test(n)) return BRAND_COLORS["Cursor IDE"]
   if (/ai.*code.*review/i.test(n)) return BRAND_COLORS["AI Code Review"]
   if (/prompt.*engineering/i.test(n)) return BRAND_COLORS["Prompt Engineering"]
+  if (/vitest/i.test(n)) return BRAND_COLORS.Vitest
   if (/vite/i.test(n)) return BRAND_COLORS.Vite
   if (/framer.*motion/i.test(n)) return BRAND_COLORS["Framer Motion"]
   if (/typescript/i.test(n)) return BRAND_COLORS.TypeScript
@@ -304,6 +357,18 @@ function pickColor(name?: string): string {
   if (/neon/i.test(n)) return BRAND_COLORS.Neon
   if (/netlify/i.test(n)) return BRAND_COLORS.Netlify
   if (/vercel/i.test(n)) return BRAND_COLORS.Vercel
+  if (/docker/i.test(n)) return BRAND_COLORS.Docker
+  if (/xunit/i.test(n)) return BRAND_COLORS.xUnit
+  if (/dise[ñn]o.*apis?.*rest|apis?\s*rest/i.test(n)) return BRAND_COLORS["Diseño de APIs REST"]
+  if (/antigravity/i.test(n)) return BRAND_COLORS["Google Antigravity"]
+  if (/winui/i.test(n)) return BRAND_COLORS["WinUI 3"]
+  if (/windows.*app.*sdk/i.test(n)) return BRAND_COLORS["Windows App SDK"]
+  if (/mvvm/i.test(n)) return BRAND_COLORS.MVVM
+  if (/tauri/i.test(n)) return BRAND_COLORS["Tauri 2"]
+  if (/\brust\b/i.test(n)) return BRAND_COLORS.Rust
+  if (/python/i.test(n)) return BRAND_COLORS.Python
+  if (/inno.*setup/i.test(n)) return BRAND_COLORS["Inno Setup"]
+  if (/\.net/i.test(n)) return BRAND_COLORS[".NET"]
   return FALLBACK_COLOR
 }
 
@@ -362,6 +427,7 @@ function pickIcon(name?: string): React.ReactElement | null {
   if (/cursor.*ide/i.test(n)) return ICONS["Cursor IDE"]
   if (/ai.*code.*review/i.test(n)) return ICONS["AI Code Review"]
   if (/prompt.*engineering/i.test(n)) return ICONS["Prompt Engineering"]
+  if (/vitest/i.test(n)) return ICONS.Vitest
   if (/vite/i.test(n)) return ICONS.Vite
   if (/framer.*motion/i.test(n)) return ICONS["Framer Motion"]
   if (/typescript/i.test(n)) return ICONS.TypeScript
@@ -382,6 +448,18 @@ function pickIcon(name?: string): React.ReactElement | null {
   if (/neon/i.test(n)) return ICONS.Neon
   if (/netlify/i.test(n)) return ICONS.Netlify
   if (/vercel/i.test(n)) return ICONS.Vercel
+  if (/docker/i.test(n)) return ICONS.Docker
+  if (/xunit/i.test(n)) return ICONS.xUnit
+  if (/dise[ñn]o.*apis?.*rest|apis?\s*rest/i.test(n)) return ICONS["Diseño de APIs REST"]
+  if (/antigravity/i.test(n)) return ICONS["Google Antigravity"]
+  if (/winui/i.test(n)) return ICONS["WinUI 3"]
+  if (/windows.*app.*sdk/i.test(n)) return ICONS["Windows App SDK"]
+  if (/mvvm/i.test(n)) return ICONS.MVVM
+  if (/tauri/i.test(n)) return ICONS["Tauri 2"]
+  if (/\brust\b/i.test(n)) return ICONS.Rust
+  if (/python/i.test(n)) return ICONS.Python
+  if (/inno.*setup/i.test(n)) return ICONS["Inno Setup"]
+  if (/\.net/i.test(n)) return ICONS[".NET"]
   return null
 }
 

@@ -3,26 +3,31 @@ import type { Skill } from "../types";
 export const skills: Skill[] = [
   {
     category: "Frontend",
-    items: ["React", "TypeScript", "Blazor", "HTML5", "CSS3", "Tailwind CSS", "Bootstrap"],
+    items: ["React", "Next.js", "TypeScript", "Blazor", "HTML5", "CSS3", "Tailwind CSS", "Vite", "Bootstrap"],
   },
   {
     category: "Backend",
-    items: ["C#", ".NET Core", "ASP.NET (MVC, Web API)", "Node.js", "Next.js", "Express", "RESTful APIs", "JWT"],
+    items: ["C#", ".NET", "ASP.NET Core (MVC, Web API)", "Node.js", "Express", "RESTful APIs", "JWT"],
   },
   {
-    category: "Bases de datos",
-    items: ["SQL Server", "ADO.NET", "Entity Framework Core", "MongoDB", "Firebase", "PostgreSQL", "MySQL"],
+    category: "Bases de datos & ORMs",
+    items: ["SQL Server", "PostgreSQL", "MongoDB", "Entity Framework Core", "ADO.NET", "Prisma", "Mongoose", "MySQL", "Firebase"],
   },
   {
-    category: "Herramientas & DevOps",
-    items: ["Git", "GitHub", "Visual Studio", "VS Code", "Google Antigravity", "Postman", "Cypress", "Swagger"],
+    category: "Herramientas, QA & DevOps",
+    items: ["Git", "GitHub", "Docker", "Visual Studio", "VS Code", "Postman", "Swagger", "Prisma Studio", "Vitest", "xUnit", "Cypress"],
   },
   {
     category: "Principios",
-    items: ["Programación Orientada a Objetos (POO)", "Principios SOLID", "Arquitectura MVC - Modular - Feature Based"],
+    items: [
+      "Programación Orientada a Objetos (POO)",
+      "Principios SOLID",
+      "Arquitectura MVC - Modular por dominios - Feature Based",
+      "Diseño de APIs REST",
+    ],
   },
   {
     category: "IAs & Herramientas de Desarrollo",
-    items: ["GitHub Copilot", "ChatGPT", "Claude", "Gemini", "AI Code Review", "Prompt Engineering"],
+    items: ["GitHub Copilot", "ChatGPT", "Claude", "AI Code Review", "Prompt Engineering"],
   },
 ]
