@@ -8,6 +8,11 @@
   publish = "dist"
   command = "npm run build"
 
+# Fijado explícitamente para no depender del default de Netlify, que puede cambiar.
+# Vite 7 requiere ^20.19.0 || >=22.12.0 y ESLint 10 requiere ^20.19.0 || ^22.13.0 || >=24
+[build.environment]
+  NODE_VERSION = "22"
+
 # =============================================================================
 # SECURITY HEADERS - APLICADOS A TODAS LAS RUTAS
 # =============================================================================
