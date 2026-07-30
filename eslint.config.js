@@ -6,7 +6,10 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // El flat config no respeta .gitignore, así que las herramientas de
+  // agentes IA hay que excluirlas acá: sus scripts son de terceros y
+  // no deben poder romper el lint del proyecto.
+  globalIgnores(['dist', '.agents', '.claude', '.codegraph']),
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
     extends: [

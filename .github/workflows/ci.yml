@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Si se empujan varios commits seguidos, cancela las corridas viejas
+# de la misma rama en vez de hacerlas cola.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Tipos, lint y build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node 22 para igualar NODE_VERSION de netlify.toml: si el build
+      # pasa acá, pasa en el deploy.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # npm ci instala exactamente lo del lock y falla si package.json y
+      # package-lock.json están desincronizados — justo el estado que tenía
+      # este repo, con ESLint 10 declarado y 9 instalado.
+      - name: Instalar dependencias
+        run: npm ci
+
+      # type-check y build corren ambos tsc, pero como pasos separados dan
+      # dos señales distintas en la UI: se ve si falló por tipos o por bundle.
+      - name: Chequeo de tipos
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build de producción
+        run: npm run build
