@@ -18,21 +18,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Revisar enlaces
         id: lychee
         uses: lycheeverse/lychee-action@v2
         with:
-          # Los datos viven en src/data/*.ts (repos, demos, certificados);
-          # index.html tiene las meta og: y el JSON-LD; src/components los
-          # perfiles de GitHub y LinkedIn.
-          args: --config lychee.toml --no-progress src/ index.html
+          # Globs explícitos, no `src/`: pasando el directorio, lychee filtra
+          # por extensión conocida y se saltea los .ts, así que no revisaba
+          # ninguno de los enlaces de src/data (repos, demos, certificados).
+          #
+          # --root-dir resuelve los enlaces root-relative de archivos locales,
+          # como el /favicon.svg de index.html.
+          args: >-
+            --config lychee.toml
+            --no-progress
+            --root-dir "$GITHUB_WORKSPACE"
+            index.html
+            'src/**/*.ts'
+            'src/**/*.tsx'
           fail: false # no falla el job: el reporte se convierte en issue
 
       - name: Abrir issue si hay enlaces rotos
         if: steps.lychee.outputs.exit_code != 0
-        uses: peter-evans/create-issue-from-file@v5
+        uses: peter-evans/create-issue-from-file@v6
         with:
           title: Enlaces rotos detectados en el portafolio
           content-filepath: ./lychee/out.md
