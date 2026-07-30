@@ -2,14 +2,95 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Portafolio de Ricky Angel Jiménez Bueno - Desarrollador Web Full-Stack especializado en .NET y MERN stack" />
-    <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
     <title>Ricky Jiménez - Desarrollador Full-Stack</title>
+    <meta
+      name="description"
+      content="Portafolio de Ricky Angel Jiménez Bueno - Desarrollador Web Full-Stack especializado en .NET y MERN stack"
+    />
+    <meta name="author" content="Ricky Angel Jiménez Bueno" />
+    <link rel="canonical" href="https://portafolio-web-rajb.netlify.app/" />
+
+    <!-- Pinta la barra del navegador móvil del color del fondo -->
+    <meta name="theme-color" content="#1a1c22" />
+
+    <!-- ===================================================================
+         OPEN GRAPH / TWITTER
+         Sin esto, compartir el portafolio en LinkedIn o X mostraba
+         solo la URL pelada, sin título, descripción ni imagen.
+         =================================================================== -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Ricky Jiménez — Portafolio" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:url" content="https://portafolio-web-rajb.netlify.app/" />
+    <meta property="og:title" content="Ricky Jiménez — Desarrollador Web Full-Stack" />
+    <meta
+      property="og:description"
+      content="Desarrollador Full-Stack especializado en .NET y MERN/PERN. Construyo aplicaciones modernas, escalables y accesibles."
+    />
+    <meta property="og:image" content="https://portafolio-web-rajb.netlify.app/projects/Porfolio-web-rajb.png" />
+    <meta property="og:image:alt" content="Vista del portafolio de Ricky Angel Jiménez Bueno" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Ricky Jiménez — Desarrollador Web Full-Stack" />
+    <meta
+      name="twitter:description"
+      content="Desarrollador Full-Stack especializado en .NET y MERN/PERN. Construyo aplicaciones modernas, escalables y accesibles."
+    />
+    <meta name="twitter:image" content="https://portafolio-web-rajb.netlify.app/projects/Porfolio-web-rajb.png" />
+
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- ===================================================================
+         DATOS ESTRUCTURADOS (schema.org/Person)
+         No lo bloquea el CSP `script-src 'self'`: los tipos que no son
+         JavaScript ejecutable salen del algoritmo de preparación del
+         script antes de la comprobación de CSP.
+         =================================================================== -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Ricky Angel Jiménez Bueno",
+        "url": "https://portafolio-web-rajb.netlify.app/",
+        "jobTitle": "Desarrollador Web Full-Stack",
+        "description": "Desarrollador Full-Stack especializado en el stack MERN/PERN y .NET.",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "DO",
+          "addressLocality": "Santo Domingo"
+        },
+        "alumniOf": {
+          "@type": "CollegeOrUniversity",
+          "name": "Universidad Dominicana O&M"
+        },
+        "knowsAbout": [
+          "React",
+          "Next.js",
+          "TypeScript",
+          "Node.js",
+          "C#",
+          "ASP.NET Core",
+          "Blazor",
+          "PostgreSQL",
+          "SQL Server",
+          "MongoDB"
+        ],
+        "sameAs": [
+          "https://github.com/xfiberex",
+          "https://www.linkedin.com/in/ricky-angel-jimenez-bueno-52659928a"
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

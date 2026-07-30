@@ -1,57 +1,59 @@
-import { useRef } from "react"
-import { motion, useInView } from "framer-motion"
-import { Mail, Send } from "lucide-react"
-import ObfuscatedEmail from "./ui/ObfuscatedEmail"
+import { motion } from "framer-motion";
+import { Mail, Send } from "lucide-react";
+import { fadeUpVariant, sectionViewport, staggerContainer } from "../lib/animations";
+import Section from "./ui/Section";
+import ObfuscatedEmail from "./ui/ObfuscatedEmail";
 
-const Contact = () => {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-100px" })
+const EMAIL_PARTS: [string, string, string] = ["rickyjimenez1820", "gmail", "com"];
 
-  return (
-    <section id="contact" className="py-16 sm:py-24 pb-64 border-t border-zinc-800">
+const Contact = () => (
+  <Section id="contact">
+    <motion.div
+      variants={staggerContainer}
+      initial="hidden"
+      whileInView="visible"
+      viewport={sectionViewport}
+      className="mx-auto max-w-2xl text-center"
+    >
+      <motion.h2 variants={fadeUpVariant} className="text-4xl font-bold text-foreground">
+        Conectemos
+      </motion.h2>
+
+      <motion.p variants={fadeUpVariant} className="mt-4 text-lg leading-relaxed text-muted">
+        ¿Cuentas con una oportunidad laboral disponible? Me encantaría conocer más detalles sobre la oferta. Siempre
+        estoy dispuesto a asumir nuevos retos y colaboraciones que impulsen mi crecimiento profesional.
+      </motion.p>
+
       <motion.div
-        ref={ref}
-        initial={{ opacity: 0, y: 50 }}
-        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-        transition={{ duration: 0.6 }}
-        className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8"
+        variants={fadeUpVariant}
+        className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
       >
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white">Conectemos</h2>
-          <p className="mt-4 text-lg text-zinc-300 leading-relaxed">
-            ¿Cuentas con una oportunidad laboral disponible? Me encantaría conocer más detalles sobre la oferta. Siempre
-            estoy dispuesto a asumir nuevos retos y colaboraciones que impulsen mi crecimiento profesional.
-          </p>
+        <ObfuscatedEmail emailParts={EMAIL_PARTS}>
+          {(_, handleClick) => (
+            <button
+              onClick={handleClick}
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary-hover"
+            >
+              <Send size={18} aria-hidden="true" />
+              Enviar email
+            </button>
+          )}
+        </ObfuscatedEmail>
 
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <ObfuscatedEmail emailParts={['rickyjimenez1820', 'gmail', 'com']}>
-              {(_, handleClick) => (
-                <button
-                  onClick={handleClick}
-                  className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 text-white px-6 py-3 text-sm font-medium hover:bg-indigo-600 transition-colors shadow-lg shadow-indigo-500/30"
-                >
-                  <Send size={18} />
-                  Enviar email
-                </button>
-              )}
-            </ObfuscatedEmail>
-
-            <ObfuscatedEmail emailParts={['rickyjimenez1820', 'gmail', 'com']}>
-              {(email, handleClick) => (
-                <button
-                  onClick={handleClick}
-                  className="inline-flex items-center gap-2 text-zinc-300 hover:text-white transition-colors"
-                >
-                  <Mail size={18} />
-                  {email}
-                </button>
-              )}
-            </ObfuscatedEmail>
-          </div>
-        </div>
+        <ObfuscatedEmail emailParts={EMAIL_PARTS}>
+          {(email, handleClick) => (
+            <button
+              onClick={handleClick}
+              className="inline-flex items-center gap-2 rounded-lg px-4 py-3 text-sm text-muted hover:bg-surface-hover hover:text-foreground"
+            >
+              <Mail size={18} aria-hidden="true" />
+              {email}
+            </button>
+          )}
+        </ObfuscatedEmail>
       </motion.div>
-    </section>
-  )
-}
+    </motion.div>
+  </Section>
+);
 
-export default Contact
+export default Contact;

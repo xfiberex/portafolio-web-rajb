@@ -1,9 +1,11 @@
-import { useState } from "react"
-import { Menu, X } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import useScrollspy from "../hooks/useScrollspy"
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Menu, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import useScrollspy from "../hooks/useScrollspy";
 
-const sections = ["home", "about", "projects", "experience", "skills", "education", "certificates", "contact"]
+const MENU_ID = "menu-principal";
+
+const sections = ["home", "about", "projects", "experience", "skills", "education", "certificates", "contact"];
 
 const navItems = [
   { id: "about", label: "Sobre mí" },
@@ -13,112 +15,130 @@ const navItems = [
   { id: "education", label: "Educación" },
   { id: "certificates", label: "Certificados" },
   { id: "contact", label: "Contacto" },
-]
+];
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const active = useScrollspy(sections, {
-    rootMargin: "-90px 0px -30% 0px",
-    threshold: 0.1,
-  })
-  const baseLink = "hover:text-white transition-colors"
-  const activeLink = "text-white font-medium"
+  const [isOpen, setIsOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const active = useScrollspy(sections, { rootMargin: "-90px 0px -30% 0px", threshold: 0.1 });
 
-  const handleLinkClick = (sectionId: string) => {
-    setIsOpen(false)
+  const closeMenu = useCallback(() => setIsOpen(false), []);
 
-    setTimeout(() => {
-      const element = document.getElementById(sectionId)
-      if (element) {
-        const headerHeight = 64
-        const elementPosition = element.getBoundingClientRect().top
-        const offsetPosition = elementPosition + window.pageYOffset - headerHeight
+  // Escape cierra el menú y devuelve el foco al botón que lo abrió
+  useEffect(() => {
+    if (!isOpen) return;
 
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: "smooth",
-        })
-      }
-    }, 100)
-  }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setIsOpen(false);
+      toggleRef.current?.focus();
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [isOpen]);
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-zinc-900/80 border-b border-zinc-800">
-      <nav className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
+      <nav className="mx-auto flex h-header max-w-6xl items-center justify-between px-gutter" aria-label="Navegación principal">
         <a
           href="#home"
-          className="font-bold text-lg text-zinc-100 hover:text-indigo-400 transition-colors"
-          onClick={(e) => {
-            e.preventDefault()
-            handleLinkClick("home")
-          }}
+          className="-mx-2 inline-flex min-h-11 items-center rounded-md px-2 text-lg font-bold text-foreground hover:text-primary"
+          onClick={closeMenu}
         >
           Inicio
         </a>
 
-        <div className="flex items-center gap-4">
-          <ul className="hidden lg:flex items-center gap-6 text-sm text-zinc-300">
-            {navItems.map((item) => (
-              <li key={item.id}>
-                <a
-                  className={`${active === item.id ? activeLink : baseLink}`}
-                  href={`#${item.id}`}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handleLinkClick(item.id)
-                  }}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
+        <div className="flex items-center gap-2">
+          <ul className="hidden items-center gap-1 lg:flex">
+            {navItems.map((item) => {
+              const isActive = active === item.id;
+              return (
+                <li key={item.id} className="relative">
+                  <a
+                    href={`#${item.id}`}
+                    aria-current={isActive ? "true" : undefined}
+                    className={`inline-block rounded-md px-3 py-3 text-sm ${
+                      isActive ? "font-medium text-foreground" : "text-muted hover:text-foreground"
+                    }`}
+                  >
+                    {item.label}
+                  </a>
+                  {/*
+                    Indicador de sección activa. El estado activo no puede
+                    depender solo del color (WCAG: no usar color como único
+                    portador de información).
+                  */}
+                  {isActive && (
+                    <motion.span
+                      layoutId="nav-indicator"
+                      className="absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-primary"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </li>
+              );
+            })}
           </ul>
 
           <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden p-2 rounded-md hover:bg-zinc-800 transition-colors"
-            aria-label="Toggle menu"
+            ref={toggleRef}
+            type="button"
+            onClick={() => setIsOpen((open) => !open)}
+            className="rounded-md p-3 text-muted hover:bg-surface-hover hover:text-foreground lg:hidden"
+            aria-expanded={isOpen}
+            aria-controls={MENU_ID}
+            aria-label={isOpen ? "Cerrar menú de navegación" : "Abrir menú de navegación"}
           >
-            {isOpen ? <X size={20} /> : <Menu size={20} />}
+            {isOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
           </button>
         </div>
       </nav>
 
       <AnimatePresence>
         {isOpen && (
+          /*
+            `absolute` en lugar de estar en el flujo: al cerrarse no cambia
+            el alto del header, así que no desplaza las secciones. Eso es lo
+            que permite usar anchors nativos (antes hacía falta un
+            setTimeout de 100ms + scrollTo manual para compensar el salto).
+          */
           <motion.div
+            id={MENU_ID}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
+            exit={{ opacity: 0, height: 0, transition: { duration: 0.15 } }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden border-t border-zinc-800 bg-zinc-900"
+            className="absolute inset-x-0 top-full overflow-hidden border-b border-border bg-background lg:hidden"
           >
-            <ul className="px-4 py-4 space-y-3">
-              {navItems.map((item) => (
-                <motion.li
-                  key={item.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <a
-                    className={`block py-2 text-sm ${active === item.id ? activeLink : baseLink}`}
-                    href={`#${item.id}`}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handleLinkClick(item.id)
-                    }}
-                  >
-                    {item.label}
-                  </a>
-                </motion.li>
-              ))}
+            <ul className="px-gutter py-3">
+              {navItems.map((item) => {
+                const isActive = active === item.id;
+                return (
+                  <li key={item.id}>
+                    <a
+                      href={`#${item.id}`}
+                      onClick={closeMenu}
+                      aria-current={isActive ? "true" : undefined}
+                      className={`flex items-center gap-3 rounded-md py-3 pr-3 text-sm ${
+                        isActive ? "font-medium text-foreground" : "text-muted"
+                      }`}
+                    >
+                      <span
+                        className={`h-5 w-0.5 rounded-full ${isActive ? "bg-primary" : "bg-transparent"}`}
+                        aria-hidden="true"
+                      />
+                      {item.label}
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </motion.div>
         )}
       </AnimatePresence>
     </header>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

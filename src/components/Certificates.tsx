@@ -1,87 +1,67 @@
-import { useRef } from "react"
-import { motion, useInView } from "framer-motion"
-import { Award, ExternalLink } from "lucide-react"
-import { certificates } from "../data/certificates"
+import { motion } from "framer-motion";
+import { Award, ExternalLink } from "lucide-react";
+import { certificates } from "../data/certificates";
+import { cardLift, scaleUpVariant, sectionViewport, staggerContainer } from "../lib/animations";
+import { safeExternalUrl } from "../lib/assets";
+import Section from "./ui/Section";
+import SectionHeader from "./ui/SectionHeader";
 
-const Certificates = () => {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-100px" })
+const Certificates = () => (
+  <Section id="certificates">
+    <SectionHeader title="Certificados" subtitle="Certificaciones y cursos completados" />
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  }
+    <motion.div
+      variants={staggerContainer}
+      initial="hidden"
+      whileInView="visible"
+      viewport={sectionViewport}
+      className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+    >
+      {certificates.map((certificate) => {
+        const url = safeExternalUrl(certificate.link);
 
-  const itemVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.4 },
-    },
-  }
-
-  return (
-    <section id="certificates" className="py-16 sm:py-24 border-t border-zinc-800">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h2 className="text-3xl font-bold text-white">Certificados</h2>
-          <p className="mt-2 text-zinc-400">Certificaciones y cursos completados</p>
-        </motion.div>
-
-        <motion.div
-          ref={ref}
-          variants={containerVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {certificates.map((c) => (
-            <motion.article
-              key={`${c.name}-${c.issuer}`}
-              variants={itemVariants}
-              whileHover={{ y: -5 }}
-              className="group rounded-xl border border-zinc-800 p-6 bg-gradient-to-br from-zinc-900 to-zinc-900/50 shadow-lg hover:shadow-xl hover:shadow-indigo-500/10 hover:border-indigo-500/50 transition-all duration-300"
-            >
-              <div className="flex items-start gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex-shrink-0 group-hover:bg-indigo-500/20 group-hover:border-indigo-500/40 transition-all duration-300">
-                  <Award size={20} />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-bold text-white leading-snug group-hover:text-indigo-400 transition-colors">
-                    {c.name}
-                  </h3>
-                  <p className="text-sm text-zinc-400 mt-1">{c.issuer}</p>
-                </div>
+        return (
+          <motion.article
+            key={`${certificate.name}-${certificate.issuer}`}
+            variants={scaleUpVariant}
+            whileHover={cardLift}
+            className="group flex flex-col rounded-card border border-border bg-surface p-6 shadow-lg transition-[box-shadow,border-color] duration-300 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10"
+          >
+            <div className="flex items-start gap-3">
+              <div
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary-soft text-primary transition-colors duration-300 group-hover:border-primary/40"
+                aria-hidden="true"
+              >
+                <Award size={20} />
               </div>
 
-              {c.link && (
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base leading-snug font-bold text-foreground transition-colors group-hover:text-primary">
+                  {certificate.name}
+                </h3>
+                <p className="mt-1 text-sm text-subtle">{certificate.issuer}</p>
+              </div>
+            </div>
+
+            {url && (
+              <div className="mt-auto -mb-1.5 -ml-3 pt-4">
                 <a
-                  href={c.link}
+                  href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-4 inline-flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-primary hover:bg-surface-hover"
                 >
                   Ver certificado
-                  <ExternalLink size={14} />
+                  <ExternalLink size={14} aria-hidden="true" />
+                  <span className="sr-only">de {certificate.name}</span>
                 </a>
-              )}
-            </motion.article>
-          ))}
-        </motion.div>
-      </div>
-    </section>
-  )
-}
+              </div>
+            )}
+          </motion.article>
+        );
+      })}
+    </motion.div>
+  </Section>
+);
 
-export default Certificates
+export default Certificates;

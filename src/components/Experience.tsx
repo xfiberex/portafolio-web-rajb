@@ -1,95 +1,68 @@
-import { useRef } from "react"
-import { motion, useInView } from "framer-motion"
-import { Briefcase } from "lucide-react"
-import { experience } from "../data/experience"
+import { motion } from "framer-motion";
+import { Briefcase } from "lucide-react";
+import { experience } from "../data/experience";
+import { sectionViewport, slideLeftVariant, staggerContainer } from "../lib/animations";
+import Section from "./ui/Section";
+import SectionHeader from "./ui/SectionHeader";
 
-const Experience = () => {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-100px" })
+const Experience = () => (
+  <Section id="experience">
+    <SectionHeader title="Experiencia" subtitle="Mi trayectoria profesional" />
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-      },
-    },
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, x: -30 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.5 },
-    },
-  }
-
-  return (
-    <section id="experience" className="py-16 sm:py-24 border-t border-zinc-800/50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5 }}
-          className="mb-12"
+    <motion.div
+      variants={staggerContainer}
+      initial="hidden"
+      whileInView="visible"
+      viewport={sectionViewport}
+      className="space-y-6"
+    >
+      {experience.map((item) => (
+        <motion.article
+          key={`${item.role}-${item.company}-${item.period}`}
+          variants={slideLeftVariant}
+          className="group rounded-card border border-border bg-surface p-6 shadow-lg transition-[box-shadow,border-color] duration-300 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 sm:p-8"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-2">Experiencia</h2>
-          <p className="text-zinc-400 text-lg">Mi trayectoria profesional</p>
-        </motion.div>
-
-        <motion.div
-          ref={ref}
-          variants={containerVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          className="mt-8 space-y-6"
-        >
-          {experience.map((e) => (
-            <motion.article
-              key={`${e.role}-${e.company}-${e.period}`}
-              variants={itemVariants}
-              className="group relative rounded-xl border border-zinc-800/80 p-6 sm:p-8 bg-gradient-to-br from-zinc-900 to-zinc-900/50 shadow-lg hover:shadow-xl hover:shadow-indigo-500/10 hover:border-indigo-500/50 transition-all duration-300"
+          <div className="flex items-start gap-4 sm:gap-6">
+            <div
+              className="hidden h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary-soft text-primary transition-colors duration-300 group-hover:border-primary/40 sm:flex"
+              aria-hidden="true"
             >
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500/0 to-indigo-500/0 group-hover:from-indigo-500/5 group-hover:to-transparent transition-all duration-300" />
+              <Briefcase size={24} strokeWidth={2} />
+            </div>
 
-              <div className="relative flex items-start gap-4 sm:gap-6">
-                <div className="hidden sm:flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-900/40 to-indigo-900/20 text-indigo-400 flex-shrink-0 border border-indigo-500/20 group-hover:border-indigo-500/40 group-hover:shadow-lg group-hover:shadow-indigo-500/20 transition-all duration-300">
-                  <Briefcase size={24} strokeWidth={2} />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-baseline justify-between gap-2 mb-2">
-                    <h3 className="text-xl font-bold text-white group-hover:text-indigo-300 transition-colors duration-300">
-                      {e.role}
-                    </h3>
-                    <span className="text-sm text-zinc-400 font-semibold px-3 py-1 rounded-full bg-zinc-800/50 border border-zinc-700/50">
-                      {e.period}
-                    </span>
-                  </div>
-
-                  <p className="text-base text-zinc-300 font-medium mb-4">
-                    {e.company} <span className="text-zinc-500">•</span>{" "}
-                    <span className="text-zinc-400">{e.location}</span>
-                  </p>
-
-                  <ul className="mt-4 space-y-3">
-                    {e.achievements?.map((a) => (
-                      <li key={`${e.role}-${a}`} className="flex items-start gap-3 text-sm text-zinc-300 leading-relaxed">
-                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 flex-shrink-0" />
-                        <span>{a}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+            <div className="min-w-0 flex-1">
+              <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+                <h3 className="text-xl font-bold text-foreground transition-colors duration-300 group-hover:text-primary">
+                  {item.role}
+                </h3>
+                <span className="rounded-full border border-border bg-surface-hover px-3 py-1 text-sm font-semibold text-muted">
+                  {item.period}
+                </span>
               </div>
-            </motion.article>
-          ))}
-        </motion.div>
-      </div>
-    </section>
-  )
-}
 
-export default Experience
+              <p className="mb-4 font-medium text-muted">
+                {item.company} <span className="text-subtle">•</span> <span className="text-subtle">{item.location}</span>
+              </p>
+
+              {item.achievements?.length ? (
+                <ul className="mt-4 space-y-3">
+                  {item.achievements.map((achievement) => (
+                    <li key={achievement} className="flex items-start gap-3 text-sm leading-relaxed text-muted">
+                      <span
+                        className="mt-2 inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary"
+                        aria-hidden="true"
+                      />
+                      <span>{achievement}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          </div>
+        </motion.article>
+      ))}
+    </motion.div>
+  </Section>
+);
+
+export default Experience;

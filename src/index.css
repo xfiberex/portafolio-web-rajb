@@ -1,50 +1,96 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════
-   DESIGN SYSTEM - Modern Minimalism Theme
+   DESIGN SYSTEM
+   ───────────────────────────────────────────────────────────
+   Arquitectura de dos capas para permitir cambio de tema en
+   runtime:
+
+   1. Capa de valores (`:root`) — los colores crudos. Agregar
+      un tema es agregar un bloque de overrides, nada más.
+   2. Capa semántica (`@theme inline`) — expone los valores
+      como utilidades de Tailwind (bg-surface, text-muted…).
+      `inline` hace que Tailwind emita `var(--…)` en lugar de
+      copiar el valor, que es lo que permite el cambio en vivo.
    ═══════════════════════════════════════════════════════════ */
 
+:root {
+  color-scheme: dark;
+
+  /* ─── Superficies ──────────────────────────────────────── */
+  --value-background: oklch(15.1% 0.013 256);
+  --value-surface: oklch(18.8% 0.016 256);
+  --value-surface-hover: oklch(22% 0.018 256);
+  --value-elevated: oklch(21% 0.016 256);
+
+  /* ─── Texto (3 niveles de jerarquía) ───────────────────── */
+  --value-foreground: oklch(98% 0 0);
+  --value-muted: oklch(78% 0.01 256);
+  --value-subtle: oklch(62% 0.015 256);
+
+  /* ─── Acento ───────────────────────────────────────────── */
+  --value-primary: oklch(62.8% 0.2 264);
+  --value-primary-hover: oklch(57% 0.22 264);
+  --value-primary-soft: oklch(62.8% 0.2 264 / 12%);
+  --value-primary-foreground: oklch(98% 0 0);
+
+  /* ─── Líneas y foco ────────────────────────────────────── */
+  --value-border: oklch(28% 0.015 256 / 80%);
+  --value-border-strong: oklch(36% 0.018 256);
+  --value-ring: oklch(70% 0.18 264);
+
+  /* ─── Scrim de modales ─────────────────────────────────── */
+  --value-scrim: oklch(8% 0.01 256 / 88%);
+}
+
+@theme inline {
+  --color-background: var(--value-background);
+  --color-surface: var(--value-surface);
+  --color-surface-hover: var(--value-surface-hover);
+  --color-elevated: var(--value-elevated);
+
+  --color-foreground: var(--value-foreground);
+  --color-muted: var(--value-muted);
+  --color-subtle: var(--value-subtle);
+
+  --color-primary: var(--value-primary);
+  --color-primary-hover: var(--value-primary-hover);
+  --color-primary-soft: var(--value-primary-soft);
+  --color-primary-foreground: var(--value-primary-foreground);
+
+  --color-border: var(--value-border);
+  --color-border-strong: var(--value-border-strong);
+  --color-ring: var(--value-ring);
+  --color-scrim: var(--value-scrim);
+}
+
 @theme {
-  /* ─── Semantic Color Palette ─────────────────────────────── */
-  --color-background: oklch(15.1% 0.013 256);
-  --color-surface: oklch(18.8% 0.016 256);
-  --color-surface-hover: oklch(22% 0.018 256);
-  
-  --color-primary: oklch(62.8% 0.2 264);
-  --color-primary-hover: oklch(57% 0.22 264);
-  --color-primary-muted: oklch(62.8% 0.2 264 / 20%);
-  
-  --color-secondary: oklch(70% 0.15 200);
-  
-  --color-text: oklch(98% 0 0);
-  --color-text-secondary: oklch(78% 0.01 256);
-  --color-text-muted: oklch(62% 0.015 256);
-  
-  --color-border: oklch(28% 0.015 256 / 80%);
-  --color-border-hover: oklch(62.8% 0.2 264 / 50%);
-  
-  /* ─── Fluid Typography Scale ─────────────────────────────── */
-  --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-  --font-size-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
-  --font-size-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
-  --font-size-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
-  --font-size-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
-  --font-size-2xl: clamp(1.5rem, 1.25rem + 1.25vw, 2rem);
-  --font-size-3xl: clamp(1.875rem, 1.5rem + 1.875vw, 2.5rem);
-  --font-size-4xl: clamp(2.25rem, 1.75rem + 2.5vw, 3.5rem);
-  
-  /* ─── Spacing Scale ─────────────────────────────────────── */
-  --spacing-section-y: clamp(4rem, 3rem + 5vw, 6rem);
-  --spacing-container-x: clamp(1rem, 0.5rem + 2vw, 2rem);
-  
-  /* ─── Animation Timings ─────────────────────────────────── */
-  --duration-fast: 150ms;
-  --duration-normal: 300ms;
-  --duration-slow: 500ms;
+  /* ─── Escala de display fluida ──────────────────────────
+     Solo los tamaños de display son fluidos. Los tamaños de
+     cuerpo (xs…xl) usan los defaults de Tailwind a propósito:
+     16px mínimo en móvil, sin sorpresas de legibilidad. */
+  --text-3xl: clamp(1.5rem, 1.2rem + 1.4vw, 1.875rem);
+  --text-3xl--line-height: 1.2;
+  --text-4xl: clamp(1.75rem, 1.35rem + 1.9vw, 2.25rem);
+  --text-4xl--line-height: 1.15;
+  --text-5xl: clamp(2.25rem, 1.6rem + 3vw, 3rem);
+  --text-5xl--line-height: 1.1;
+  --text-6xl: clamp(2.25rem, 1.5rem + 3.6vw, 3.75rem);
+  --text-6xl--line-height: 1.05;
+
+  /* ─── Ritmo vertical y horizontal ──────────────────────── */
+  --spacing-section: clamp(4rem, 3rem + 4vw, 6rem);
+  --spacing-gutter: clamp(1rem, 0.5rem + 2vw, 2rem);
+  --spacing-header: 4rem; /* alto del navbar sticky → scroll-mt-header */
+
+  /* ─── Radio de tarjetas (un solo valor para todas) ─────── */
+  --radius-card: 0.875rem;
+
+  /* ─── Easing ───────────────────────────────────────────── */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ─── Base Tweaks ─────────────────────────────────────────── */
+/* ─── Base ────────────────────────────────────────────────── */
 html {
   scroll-behavior: smooth;
 }
@@ -56,22 +102,51 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ─── Better Focus States ─────────────────────────────────── */
-a:focus-visible,
-button:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-  border-radius: 8px;
+/* Títulos: evita la última palabra huérfana en 2 líneas */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
 }
 
-/* ─── Smooth Transitions ──────────────────────────────────── */
+/* ─── Foco visible ────────────────────────────────────────── */
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 3px;
+  border-radius: 0.5rem;
+}
+
+/* ─── Transiciones por defecto ────────────────────────────── */
 a,
 button,
-input,
-textarea,
-select,
 [role="button"] {
-  transition-property: color, background-color, border-color;
+  transition-property: color, background-color, border-color, opacity;
   transition-timing-function: var(--ease-out-expo);
-  transition-duration: var(--duration-fast);
+  transition-duration: 150ms;
+}
+
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+/* ─── prefers-reduced-motion (WCAG 2.3.3) ─────────────────────
+   Framer Motion se desactiva vía <MotionConfig reducedMotion="user">
+   en main.tsx. Esto cubre el resto: transiciones CSS, el scroll
+   suave y cualquier @keyframes de librería (react-type-animation). */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

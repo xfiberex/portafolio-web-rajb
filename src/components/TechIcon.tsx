@@ -475,6 +475,9 @@ const FallbackGlyph = () => (
 // - label: optional text next to the icon
 // - labelClassName, wrapperClassName: styling hooks
 // - title: accessible label (defaults to name)
+// - decorative: hides the icon from screen readers. Use when the tech
+//   name is already rendered as visible text next to the icon —
+//   otherwise it gets announced twice ("React React").
 interface TechIconProps {
   name?: string;
   size?: number;
@@ -484,6 +487,7 @@ interface TechIconProps {
   labelClassName?: string;
   wrapperClassName?: string;
   title?: string;
+  decorative?: boolean;
 }
 
 export default function TechIcon(props: TechIconProps) {
@@ -496,6 +500,7 @@ export default function TechIcon(props: TechIconProps) {
     labelClassName = "ml-2 text-sm",
     wrapperClassName = "inline-flex items-center",
     title,
+    decorative = false,
   } = props || {}
   const color = pickColor(name)
   const px = typeof size === "number" ? size : undefined
@@ -503,8 +508,7 @@ export default function TechIcon(props: TechIconProps) {
   const svgProps = {
     viewBox: "0 0 24 24",
     xmlns: "http://www.w3.org/2000/svg",
-    role: "img",
-    "aria-label": title || name,
+    ...(decorative ? { "aria-hidden": true } : { role: "img", "aria-label": title || name }),
     width: px,
     height: px,
     className,
