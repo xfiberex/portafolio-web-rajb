@@ -28,12 +28,16 @@ jobs:
           # por extensión conocida y se saltea los .ts, así que no revisaba
           # ninguno de los enlaces de src/data (repos, demos, certificados).
           #
-          # --root-dir resuelve los enlaces root-relative de archivos locales,
-          # como el /favicon.svg de index.html.
+          # --scheme limita el chequeo a http/https, o sea sólo enlaces
+          # externos, que es el propósito del workflow. Sin esto intenta
+          # resolver rutas locales como el /favicon.svg de index.html, y no
+          # existe un --root-dir que sirva para las dos: el favicon se sirve
+          # desde public/ y el /src/main.tsx desde la raíz del repo.
           args: >-
             --config lychee.toml
             --no-progress
-            --root-dir "$GITHUB_WORKSPACE"
+            --scheme http
+            --scheme https
             index.html
             'src/**/*.ts'
             'src/**/*.tsx'
