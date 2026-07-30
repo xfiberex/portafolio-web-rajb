@@ -1,0 +1,39 @@
+name: Enlaces
+
+# Cron y no en cada PR a propósito: los enlaces externos flaquean por
+# motivos ajenos al commit, y romper PRs por eso entrena a ignorar el CI.
+on:
+  schedule:
+    - cron: "0 9 * * 1" # lunes 09:00 UTC
+  workflow_dispatch: # también a mano, desde la pestaña Actions
+
+# Necesario para que el paso de crear issue pueda escribir.
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    name: Verificar enlaces externos
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Revisar enlaces
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # Los datos viven en src/data/*.ts (repos, demos, certificados);
+          # index.html tiene las meta og: y el JSON-LD; src/components los
+          # perfiles de GitHub y LinkedIn.
+          args: --config lychee.toml --no-progress src/ index.html
+          fail: false # no falla el job: el reporte se convierte en issue
+
+      - name: Abrir issue si hay enlaces rotos
+        if: steps.lychee.outputs.exit_code != 0
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: Enlaces rotos detectados en el portafolio
+          content-filepath: ./lychee/out.md
+          labels: mantenimiento

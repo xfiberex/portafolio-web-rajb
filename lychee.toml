@@ -1,0 +1,39 @@
+# =============================================================================
+# LYCHEE - Verificación de enlaces externos
+# El peor fallo posible de un portafolio es un reclutador haciendo clic en
+# una demo caída. Esto revisa los repos, las demos y los certificados.
+# =============================================================================
+
+# Las demos viven en tiers gratuitos que duermen el contenedor: la primera
+# petición puede tardar decenas de segundos en despertarlo.
+timeout = 45
+max_retries = 3
+retry_wait_time = 5
+
+# Varios sitios responden distinto a clientes que no parecen navegador.
+user_agent = "Mozilla/5.0 (compatible; lychee; +https://github.com/lycheeverse/lychee)"
+
+# Un 403 o 429 significa que el servidor respondió: el enlace existe y es
+# antibot o rate limiting, no un enlace roto. Hoy ninguno de los destinos
+# los devuelve (verificado: GitHub, Netlify, Vercel y ude.my dan 200), pero
+# las IPs de los runners de Actions se bloquean con frecuencia, así que esto
+# es un seguro contra falsos positivos futuros.
+accept = ["200..=299", "403", "429"]
+
+exclude_path = ["node_modules", "dist", ".agents", ".claude", ".codegraph"]
+
+exclude = [
+  # LinkedIn devuelve 999 a todo cliente sin sesión de navegador.
+  # Sería un falso positivo permanente.
+  "^https?://(www\\.)?linkedin\\.com/",
+
+  # URIs de namespace XML: identifican un esquema, no son páginas que
+  # deban responder 200. Aparecen en el xmlns de cada SVG de TechIcon.
+  "^http://www\\.w3\\.org/",
+
+  # Orígenes de <link rel="preconnect">: sirven para abrir la conexión
+  # TCP/TLS antes de pedir la fuente, no son documentos. Verificado: la
+  # raíz de ambos devuelve 404. El ancla /?$ deja que sí se compruebe la
+  # URL real del CSS de Inter, que devuelve 200 y conviene vigilar.
+  "^https://fonts\\.(googleapis|gstatic)\\.com/?$",
+]
