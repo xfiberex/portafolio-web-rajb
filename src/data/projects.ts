@@ -6,7 +6,7 @@ export const projects: Project[] = [
     subtitle: "ASP.NET Core 10 + React 19 · Seguimiento de anime, manga y manhwa",
     description:
       "Aplicación full-stack para gestionar y descubrir contenido multimedia, con catálogo personal por usuario y búsqueda externa contra la API de Jikan. Backend en capas y frontend SPA en repositorios separados.",
-    image: "/placeholder.svg",
+    image: "/projects/TrackerMultimedia.png",
     features: [
       "Autenticación JWT con refresh rotativo y detección de reúso de token",
       "OAuth con Google y GitHub implementando PKCE",
@@ -32,7 +32,7 @@ export const projects: Project[] = [
     subtitle: "Express 5 + React · Inventario con órdenes de compra y venta",
     description:
       "Sistema de gestión de inventario con control de existencias, órdenes de compra y venta, proveedores y auditoría. Construido con atención al comportamiento bajo concurrencia y a la operación en producción.",
-    image: "/placeholder.svg",
+    image: "/projects/Stockly.png",
     features: [
       "Control de concurrencia en stock mediante decremento condicional en una sola sentencia",
       "Decisiones de arquitectura registradas y versionadas como ADRs",
