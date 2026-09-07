@@ -2,6 +2,60 @@ import type { Project } from "../types";
 
 export const projects: Project[] = [
   {
+    title: "TrackerMultimedia",
+    subtitle: "ASP.NET Core 10 + React 19 · Seguimiento de anime, manga y manhwa",
+    description:
+      "Aplicación full-stack para gestionar y descubrir contenido multimedia, con catálogo personal por usuario y búsqueda externa contra la API de Jikan. Backend en capas y frontend SPA en repositorios separados.",
+    image: "/placeholder.svg",
+    features: [
+      "Autenticación JWT con refresh rotativo y detección de reúso de token",
+      "OAuth con Google y GitHub implementando PKCE",
+      "API organizada en capas (Domain, Contracts, Services, Infrastructure) con EF Core y migraciones versionadas",
+      "Suite de tests que cubre aislamiento entre usuarios, autorización y endpoints operativos",
+    ],
+    tags: [
+      "ASP.NET Core 10",
+      "C#",
+      "Entity Framework Core",
+      "PostgreSQL",
+      "React 19",
+      "TypeScript",
+      "TanStack Query",
+      "Tailwind CSS",
+      "xUnit",
+    ],
+    frontend: "https://github.com/xfiberex/TrackerMultimedia_Frontend",
+    backend: "https://github.com/xfiberex/TrackerMultimedia_Backend",
+  },
+  {
+    title: "Stockly",
+    subtitle: "Express 5 + React · Inventario con órdenes de compra y venta",
+    description:
+      "Sistema de gestión de inventario con control de existencias, órdenes de compra y venta, proveedores y auditoría. Construido con atención al comportamiento bajo concurrencia y a la operación en producción.",
+    image: "/placeholder.svg",
+    features: [
+      "Control de concurrencia en stock mediante decremento condicional en una sola sentencia",
+      "Decisiones de arquitectura registradas y versionadas como ADRs",
+      "Observabilidad con Prometheus, Alertmanager y logs estructurados",
+      "Suite de tests con umbrales de cobertura, contratos de OpenAPI y pruebas de carga propias",
+    ],
+    tags: [
+      "Node.js",
+      "Express 5",
+      "TypeScript",
+      "Prisma",
+      "PostgreSQL",
+      "React",
+      "TanStack Query",
+      "Tailwind CSS",
+      "Jest",
+      "Prometheus",
+      "Docker",
+    ],
+    frontend: "https://github.com/xfiberex/Stockly-F",
+    backend: "https://github.com/xfiberex/Stockly-B",
+  },
+  {
     title: "KiosGo - Sistema de Kiosko de Comida",
     subtitle: "Next.js 16 · Sistema de punto de venta tipo kiosko para restaurantes",
     description:
@@ -16,22 +70,6 @@ export const projects: Project[] = [
     tags: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS 4", "PostgreSQL", "Prisma 7", "Zustand", "Zod", "Cloudinary", "SWR"],
     github: "https://github.com/xfiberex/kiosgo",
     demo: "https://kiosgo-two.vercel.app",
-  },
-  {
-    title: "Gestor de Tareas",
-    subtitle: "Full Stack MERN · Gestión de tareas con cuentas de Usuario y Perfil",
-    description:
-      "Aplicación web para gestión personal de tareas con autenticación completa y interfaz responsiva optimizada para móviles.",
-    image: "/projects/GestorTareasMERN.png",
-    features: [
-      "Sistema completo de autenticación de usuarios",
-      "CRUD de tareas con filtros avanzados por prioridad y fechas",
-      "Interfaz responsiva con FABs optimizada para móvil"
-    ],
-    tags: ["React", "Node.js", "Express", "MongoDB", "JWT", "TailwindCSS", "JavaScript"],
-    frontend: "https://github.com/xfiberex/todolist-frontend",
-    backend: "https://github.com/xfiberex/todolist-backend",
-    demo: "https://gestor-tareas-mern-rajb.netlify.app",
   },
   {
     title: "Sistema de Ventas WEB",
@@ -68,21 +106,6 @@ export const projects: Project[] = [
     ],
     tags: ["Blazor", ".NET 9", "WebAssembly", "EF Core", "SQL Server", "Swagger/OpenAPI", "Background Services"],
     github: "https://github.com/xfiberex/S_Blazor_TDApp",
-  },
-  {
-    title: "Sistema de Ventas Desktop",
-    subtitle: "C# · Windows Forms · Arquitectura en capas con SQL Server",
-    description:
-      "Sistema integral de gestión de ventas con arquitectura n-tier, desarrollado desde cero con Windows Forms. Incluye gestión completa de usuarios, inventario, ventas y reportes financieros.",
-    image: "/projects/SistemaVentasDesktop.png",
-    features: [
-      "Arquitectura en 4 capas (Datos, Entidades, Negocio, Presentación)",
-      "Sistema de autenticación con roles y permisos de usuario",
-      "Gestión completa de inventario, clientes, proveedores y ventas",
-      "Módulo de reportes detallados y análisis financiero"
-    ],
-    tags: ["C#", ".NET Framework", "Windows Forms", "SQL Server", "Arquitectura en capas"],
-    github: "https://github.com/xfiberex/Sistema_Ventas_Completo",
   },
   {
     title: "Portafolio Web — RAJB",
