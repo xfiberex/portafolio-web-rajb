@@ -5,8 +5,8 @@ import { fadeUpVariant, staggerContainer } from "../lib/animations";
 import { toAssetUrl } from "../lib/assets";
 import Section from "./ui/Section";
 
-const CV_URL = toAssetUrl("assets/CV-Ricky Angel Jiménez Bueno-27-02-2026.pdf");
-const CV_ATS_URL = toAssetUrl("assets/ATS-CV-Ricky Angel Jiménez Bueno-27-02-2026.pdf");
+const CV_URL = toAssetUrl("assets/CV-Ricky Angel Jiménez Bueno-07-09-2026.pdf");
+const CV_ATS_URL = toAssetUrl("assets/ATS-CV-Ricky Angel Jiménez Bueno-07-09-2026.pdf");
 
 /** py suficiente para el mínimo táctil de 44px sobre un texto de 20px de alto. */
 const socialLinkClass =

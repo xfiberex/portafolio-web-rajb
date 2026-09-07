@@ -16,11 +16,20 @@ const About = () => (
       className="max-w-[65ch] space-y-4"
     >
       <motion.p variants={fadeUpVariant} className="leading-relaxed text-muted">
-        Desarrollador Full-Stack con enfoque especializado en el stack MERN/PERN y .NET. Mi carrera en TI me ha
-        proporcionado una sólida base técnica, la cual he expandido de forma proactiva hacia el desarrollo de software a
-        través de proyectos personales. Poseo experiencia práctica demostrable en la construcción de aplicaciones web
-        completas, desde la creación de APIs REST con Node.js hasta el desarrollo de interfaces de usuario interactivas
-        con React o Blazor.
+        Desarrollador Full-Stack con dos ecosistemas completos: .NET (ASP.NET Core, Blazor, aplicaciones de escritorio)
+        y TypeScript (React, Next.js, Node/Express).
+      </motion.p>
+
+      <motion.p variants={fadeUpVariant} className="leading-relaxed text-muted">
+        Llevo dos años en operaciones de TI en banca, realizando cierres bancarios, monitoreo y escalamiento de
+        incidentes. Es una perspectiva poco habitual para escribir software: he estado del lado que recibe los sistemas
+        cuando ya fallaron, y eso condiciona cómo los construyo.
+      </motion.p>
+
+      <motion.p variants={fadeUpVariant} className="leading-relaxed text-muted">
+        En paralelo he construido más de una docena de proyectos propios, con pruebas automatizadas, documentación de
+        decisiones técnicas y atención a seguridad y concurrencia. Todo lo que ves aquí está publicado y se puede
+        revisar.
       </motion.p>
     </motion.div>
   </Section>
