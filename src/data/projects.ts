@@ -3,14 +3,16 @@ import type { Project } from "../types";
 export const projects: Project[] = [
   {
     title: "TrackerMultimedia",
-    subtitle: "ASP.NET Core 10 + React 19 · Seguimiento de anime, manga y manhwa",
+    subtitle: "ASP.NET Core 10 + React 19 · Biblioteca personal de seguimiento y progreso",
     description:
-      "Aplicación full-stack para gestionar y descubrir contenido multimedia, con catálogo personal por usuario y búsqueda externa contra la API de Jikan. Backend en capas y frontend SPA en repositorios separados.",
+      "Aplicación full-stack para llevar el registro y el progreso de lo que ves, lees o juegas: series, películas, libros, cómics, videojuegos y más. Cada elemento guarda estado, progreso en su propia unidad, puntuación y notas. Backend en capas y frontend SPA en repositorios separados.",
     image: "/projects/TrackerMultimedia.png",
     features: [
       "Autenticación JWT con refresh rotativo y detección de reúso de token",
       "OAuth con Google y GitHub implementando PKCE",
       "API organizada en capas (Domain, Contracts, Services, Infrastructure) con EF Core y migraciones versionadas",
+      "Modelo con categorías y formatos definidos por el usuario, y unidad de progreso según el tipo de contenido",
+      "Importación y exportación de la biblioteca completa en JSON y CSV",
       "Suite de tests que cubre aislamiento entre usuarios, autorización y endpoints operativos",
     ],
     tags: [
@@ -36,7 +38,7 @@ export const projects: Project[] = [
     features: [
       "Control de concurrencia en stock mediante decremento condicional en una sola sentencia",
       "Decisiones de arquitectura registradas y versionadas como ADRs",
-      "Observabilidad con Prometheus, Alertmanager y logs estructurados",
+      "Endpoint de métricas protegido por token y logs estructurados con pino",
       "Suite de tests con umbrales de cobertura, contratos de OpenAPI y pruebas de carga propias",
     ],
     tags: [
@@ -49,7 +51,6 @@ export const projects: Project[] = [
       "TanStack Query",
       "Tailwind CSS",
       "Jest",
-      "Prometheus",
       "Docker",
     ],
     frontend: "https://github.com/xfiberex/Stockly-F",
