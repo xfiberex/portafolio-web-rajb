@@ -24,15 +24,14 @@ elementos interactivos bajo 44 px, ciclo de foco del lightbox completo.
 
 ---
 
-## Tier 0 — Desbloquear
+## Tier 0 — Desbloquear ✅
 
-Los workflows no se ejecutan hasta que estén en GitHub.
+- [x] Commitear y pushear `docs/BACKLOG.md`, `.github/workflows/`, `lychee.toml` y `eslint.config.js` — PR #1
+- [x] Verificar que `ci.yml` pasa — verde en 36 s, 7 pasos, una sola corrida (sin duplicado push/PR)
+- [x] Disparar `links.yml` a mano y confirmar que no genera falsos positivos — 23 enlaces, 19 OK, 4 excluidos, **0 errores**
 
-- [ ] Commitear y pushear `docs/BACKLOG.md`, `.github/workflows/`, `lychee.toml` y `eslint.config.js`
-- [ ] Verificar en la pestaña **Actions** que la primera corrida de `ci.yml` pasa
-- [ ] Disparar `links.yml` a mano (`workflow_dispatch`) para confirmar que no genera falsos positivos
-
-**Esfuerzo:** XS
+La corrida manual encontró que el workflow estaba roto: sólo revisaba 3
+enlaces de 23. Corregido en PR #5 (ver *Trampas conocidas*).
 
 ---
 
@@ -178,6 +177,8 @@ Nada de tests de componentes que renderizan datos estáticos: es ceremonia.
 - **Los cron se apagan solos.** En repos públicos, GitHub desactiva los workflows programados después de **60 días sin commits**. Avisa por email y se reactivan con un clic desde Actions. Para un portafolio que puede quedarse quieto meses, el chequeo semanal de enlaces se apagaría justo cuando más se necesita — las demos en tiers gratuitos se caen sin que nadie esté mirando
 - **Actions es gratis acá.** El repo es público, así que los runners estándar no consumen minutos. La cuota de 2.000 min/mes del plan Free aplica sólo a repos privados (donde estos dos workflows gastarían ~50 min/mes, un 2,5 %). Los planes de GitHub cambian: confirmar en la página de billing antes de decidir en base a esto
 - **El link checker no corre en PR a propósito.** Los enlaces externos flaquean por causas ajenas al commit, y romper PRs por eso entrena a ignorar el CI
+- **lychee necesita globs explícitos, no directorios.** Pasándole `src/`, filtra por extensión conocida y se saltea los `.ts` — revisaba 3 enlaces de 23, sin verificar ni un repo, demo ni certificado. Hay que pasar `'src/**/*.ts'` y `'src/**/*.tsx'`. El workflow "pasaba en verde" mientras no comprobaba nada: el resumen de lychee (`Total`, `Excluded`) es lo que hay que mirar, no el check verde
+- **Los enlaces root-relative necesitan `--root-dir` *y* `--scheme` juntos.** El fallo ocurre al resolver el enlace, antes de que se aplique el filtro de esquema, así que `--scheme` solo no alcanza. `--root-dir` hace que resuelva (da igual a dónde apunte) y `--scheme http/https` deja el `file://` resultante fuera del chequeo
 - **`lychee.toml` tiene exclusiones deliberadas.** LinkedIn devuelve 999 a todo cliente sin sesión de navegador, y los orígenes de `preconnect` (`fonts.googleapis.com`, `fonts.gstatic.com`) devuelven 404 porque no son documentos. Ambas verificadas con `curl`. Sin esas exclusiones habría un issue de falsos positivos cada lunes
 - **Estado de los enlaces al último chequeo:** los 6 repos, 3 demos y 5 certificados devuelven 200. Simulación de la config final: 3 excluidos, 19 OK, 0 falsos fallos
 - **ESLint ignora las carpetas de herramientas IA.** El flat config no respeta `.gitignore`, así que `.agents`, `.claude` y `.codegraph` están en `globalIgnores`. Sin eso, el lint evaluaba scripts de terceros y un commit ajeno podía romper el CI
