@@ -16,19 +16,6 @@ export const experience: Experience[] = [
     ],
   },
   {
-    role: "Desarrollador Full-Stack — Proyectos propios",
-    company: "Independiente",
-    location: "Santo Domingo",
-    period: "Octubre 2023 - Presente",
-    achievements: [
-      "Desarrollo de aplicaciones full-stack de extremo a extremo: modelado de datos, API REST, frontend y distribución.",
-      "Backends en ASP.NET Core y en Node.js/Express con TypeScript, sobre SQL Server, PostgreSQL y MongoDB.",
-      "Autenticación y seguridad: JWT con refresh rotativo, OAuth 2.0 con PKCE, control de acceso, rate limiting y protección frente a XSS, CSRF e inyección SQL.",
-      "Aplicaciones de escritorio para Windows con WinUI 3, WPF y Tauri, distribuidas con instalador.",
-      "Pruebas automatizadas y documentación técnica de arquitectura y decisiones.",
-    ],
-  },
-  {
     role: "Técnico de soporte TI",
     company: "Profesional Independiente",
     location: "Santo Domingo Oeste",
