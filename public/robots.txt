@@ -1,0 +1,5 @@
+# https://portafolio-web-rajb.netlify.app/
+User-agent: *
+Allow: /
+
+Sitemap: https://portafolio-web-rajb.netlify.app/sitemap.xml

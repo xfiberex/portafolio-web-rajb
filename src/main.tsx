@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { MotionConfig } from "framer-motion";
 import "./index.css";
 import App from "./App.tsx";
+import ErrorBoundary from "./components/ui/ErrorBoundary";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -12,8 +13,10 @@ createRoot(document.getElementById("root")!).render(
       se aplican de golpe en su valor final, sin animar. Las
       transiciones CSS y el scroll suave los cubre index.css.
     */}
-    <MotionConfig reducedMotion="user">
-      <App />
-    </MotionConfig>
+    <ErrorBoundary>
+      <MotionConfig reducedMotion="user">
+        <App />
+      </MotionConfig>
+    </ErrorBoundary>
   </StrictMode>,
 );

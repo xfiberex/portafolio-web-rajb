@@ -105,7 +105,7 @@ const Lightbox = ({ src, alt, onClose }: LightboxProps) => {
           ref={closeRef}
           type="button"
           onClick={onClose}
-          className="absolute -top-4 -right-2 inline-flex h-12 w-12 items-center justify-center rounded-full border border-border-strong bg-elevated text-muted shadow-lg hover:bg-primary hover:text-primary-foreground sm:top-2 sm:right-2"
+          className="absolute -top-4 -right-2 inline-flex h-12 w-12 items-center justify-center rounded-full border border-border-strong bg-elevated text-muted shadow-lg hover:bg-primary-strong hover:text-primary-foreground sm:top-2 sm:right-2"
           aria-label="Cerrar visor de imagen"
         >
           <X size={22} />

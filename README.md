@@ -18,9 +18,9 @@ Un portafolio web moderno, seguro y responsivo construido con las últimas tecno
 - **🌟 Animaciones Interactivas**: Implementadas con Framer Motion
 - **⚡ Rendimiento Optimizado**: Construido con Vite 7 para carga ultrarrápida
 - **🛡️ Seguridad Reforzada**: Headers HTTP de seguridad, CSP estricto, protección anti-clickjacking
-- **🔒 Protección de Datos**: Email ofuscado contra bots, enlaces externos seguros
+- **🔒 Protección de Datos**: Email fuera del HTML servido, enlaces externos con `rel="noopener noreferrer"`
 - **🎯 Type-Safe**: Desarrollo con TypeScript para mayor confiabilidad
-- **📧 Contacto Seguro**: Sistema de contacto con protección anti-scraping
+- **📧 Email no incrustado**: la dirección no aparece en el HTML; la ensambla JavaScript
 - **🔍 SEO Optimizado**: Meta tags y estructura semántica
 
 ## 🛠️ Tecnologías Utilizadas
@@ -38,7 +38,7 @@ Un portafolio web moderno, seguro y responsivo construido con las últimas tecno
 
 ### Security & Best Practices
 - **Netlify Security Headers** - CSP, HSTS, X-Frame-Options, Permissions-Policy
-- **Email Obfuscation** - Protección contra scraping de bots
+- **Email ensamblado en JavaScript** - No aparece en el HTML servido
 - **Secure External Links** - rel="noopener noreferrer" en todos los enlaces
 
 ### Development Tools
@@ -49,7 +49,7 @@ Un portafolio web moderno, seguro y responsivo construido con las últimas tecno
 ## 🚀 Instalación y Uso
 
 ### Prerrequisitos
-- Node.js (versión 18 o superior)
+- Node.js **20.19+** o **22.12+** (recomendado: 22, la versión que usan CI y Netlify)
 - npm o yarn
 
 ### Instalación
@@ -150,7 +150,7 @@ portafolio-web/
 - **🛠️ Habilidades**: Tecnologías y herramientas
 - **🎓 Educación**: Formación académica
 - **📜 Certificaciones**: Cursos y certificaciones
-- **📞 Contacto**: Formulario de contacto y redes sociales
+- **📞 Contacto**: Email directo y redes sociales (no hay formulario)
 
 ## 🌐 Despliegue
 
@@ -163,7 +163,7 @@ Este proyecto está optimizado para Netlify con configuración de seguridad incl
 4. El archivo `netlify.toml` incluye:
    - Headers de seguridad HTTP
    - Cache optimizado para assets
-   - Redirects para SPA
+   - `Content-Type` explícito para `/sitemap.xml`
    - Configuración para deploy previews
 
 **Validar seguridad post-deploy:**
@@ -215,10 +215,12 @@ Los estilos están definidos en `src/index.css` y utilizan Tailwind CSS 4. Puede
 ## 📈 Características Técnicas
 
 ### Performance
-- Optimizado con lazy loading y code splitting
 - Build ultrarrápido con Vite 7
-- Cache inmutable para assets estáticos
-- Imágenes lazy loading nativas
+- Cache inmutable en `/assets/*` — pendiente acotarlo a los archivos con hash, que hoy
+  alcanza también a los PDF del CV (T2-06 no, **T2-20**)
+- Imágenes con `loading="lazy"` nativo
+- **Sin code splitting**: el build produce un único chunk (~124 kB gzip). Si conviene
+  dividirlo está por decidir — ver T2-06 en [ROADMAP.md](ROADMAP.md)
 
 ### Seguridad (Security Score: A+)
 - **Content Security Policy (CSP)** estricto pero funcional
@@ -226,7 +228,9 @@ Los estilos están definidos en `src/index.css` y utilizan Tailwind CSS 4. Puede
 - **X-Frame-Options: DENY** contra clickjacking
 - **Permissions-Policy** bloqueando APIs innecesarias
 - **Cross-Origin Policies** para protección adicional
-- Email ofuscado contra bots de scraping
+- Email ausente del HTML servido (0 ocurrencias en `dist/index.html`): lo ensambla el JS
+  a partir de sus partes. Frena a los scrapers que **no** ejecutan JavaScript; los que sí
+  lo ejecutan lo leen del DOM igualmente
 - Enlaces externos con `rel="noopener noreferrer"`
 
 ### Code Quality
@@ -234,7 +238,9 @@ Los estilos están definidos en `src/index.css` y utilizan Tailwind CSS 4. Puede
 - **Clean Code**: Estructura modular y componentes reutilizables
 - **Responsive**: Mobile-first design
 - **Animations**: Smooth animations con Framer Motion 12
-- **Accesibilidad**: Cumple con estándares WCAG 2.1
+- **Accesibilidad**: contraste AA verificado en botones, badges y texto de acento;
+  `prefers-reduced-motion` respetado también en el texto animado; skip link y foco
+  visible. **No hay auditoría completa todavía** — pendiente axe en CI (T2-09)
 - **SEO**: Meta tags optimizados y estructura semántica
 
 ## 🤝 Contribuciones

@@ -3,8 +3,7 @@ import { Mail, Send } from "lucide-react";
 import { fadeUpVariant, sectionViewport, staggerContainer } from "../lib/animations";
 import Section from "./ui/Section";
 import ObfuscatedEmail from "./ui/ObfuscatedEmail";
-
-const EMAIL_PARTS: [string, string, string] = ["rickyjimenez1820", "gmail", "com"];
+import { EMAIL_PARTS } from "../lib/contact";
 
 const Contact = () => (
   <Section id="contact">
@@ -32,7 +31,7 @@ const Contact = () => (
           {(_, handleClick) => (
             <button
               onClick={handleClick}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary-hover"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary-strong px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary-strong-hover"
             >
               <Send size={18} aria-hidden="true" />
               Enviar email

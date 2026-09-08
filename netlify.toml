@@ -131,22 +131,19 @@
   [headers.values]
     Cache-Control = "public, max-age=86400"
 
-# =============================================================================
-# REDIRECTS - SPA FALLBACK
-# Necesario para React Router (si lo usas) o navegación SPA
-# =============================================================================
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# El criterio de T2-13 exige application/xml. Se declara en vez de depender
+# de la tabla MIME por defecto de Netlify, que no es contrato publico.
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Content-Type = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=86400"
 
 # =============================================================================
-# CONTEXT: DEPLOY PREVIEWS (Menos restrictivo para testing)
+# CONTEXT: DEPLOY PREVIEWS
+# Sin overrides de entorno: el preview debe construirse igual que producción,
+# o cualquier medición (Lighthouse, tamaño de bundle) mide una app distinta.
 # =============================================================================
-[context.deploy-preview]
-  [context.deploy-preview.environment]
-    NODE_ENV = "development"
-
 [[context.deploy-preview.headers]]
   for = "/*"
   [context.deploy-preview.headers.values]
