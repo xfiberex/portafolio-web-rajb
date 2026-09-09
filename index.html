@@ -43,11 +43,17 @@
 
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Inter auto-hospedada. El preload importa: sin él la fuente no se
+         descubre hasta que el navegador parsea el CSS, que es justo el
+         retraso que hacia costoso servirla desde Google (T2-04).
+         Solo se precarga el subset `latin`: es el unico que necesita el
+         contenido actual (medido, 0 caracteres caen en latin-ext). -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="/fonts/inter-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
 
     <!-- ===================================================================

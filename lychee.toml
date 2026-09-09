@@ -31,9 +31,6 @@ exclude = [
   # deban responder 200. Aparecen en el xmlns de cada SVG de TechIcon.
   "^http://www\\.w3\\.org/",
 
-  # Orígenes de <link rel="preconnect">: sirven para abrir la conexión
-  # TCP/TLS antes de pedir la fuente, no son documentos. Verificado: la
-  # raíz de ambos devuelve 404. El ancla /?$ deja que sí se compruebe la
-  # URL real del CSS de Inter, que devuelve 200 y conviene vigilar.
-  "^https://fonts\\.(googleapis|gstatic)\\.com/?$",
+  # (La exclusión de fonts.googleapis/gstatic se retiró el 2026-09-08:
+  #  T2-04 auto-hospedó Inter y el sitio ya no enlaza a Google Fonts.)
 ]

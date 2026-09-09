@@ -26,8 +26,8 @@
     Content-Security-Policy = """
       default-src 'self';
       script-src 'self';
-      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-      font-src 'self' https://fonts.gstatic.com;
+      style-src 'self' 'unsafe-inline';
+      font-src 'self';
       img-src 'self' data: https:;
       connect-src 'self';
       frame-ancestors 'none';
@@ -130,6 +130,13 @@
   for = "/projects/*"
   [headers.values]
     Cache-Control = "public, max-age=86400"
+
+# Las fuentes no llevan hash en el nombre, pero un .woff2 de Inter no cambia
+# nunca: si algun dia se actualiza, se cambia el nombre del archivo.
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
 # El criterio de T2-13 exige application/xml. Se declara en vez de depender
 # de la tabla MIME por defecto de Netlify, que no es contrato publico.

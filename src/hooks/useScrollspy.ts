@@ -6,6 +6,13 @@ interface ScrollspyOptions {
   bottomMargin?: number;
 }
 
+interface Geometry {
+  /** Alto total del documento. */
+  pageHeight: number;
+  /** offsetTop de cada sección, en el mismo orden que `sections`. */
+  offsets: number[];
+}
+
 /**
  * useScrollspy
  * ─────────────────────────────────────────────────────────────
@@ -14,9 +21,21 @@ interface ScrollspyOptions {
  * observer no cubre: el final de la página y cuando ninguna sección
  * cumple el threshold.
  *
- * El listener está throttleado con requestAnimationFrame: lee
- * scrollHeight/innerHeight, que fuerzan un recálculo de layout, y sin
- * throttle eso ocurría en cada evento de scroll.
+ * ── Por qué la geometría está cacheada (T2-05) ──
+ * Antes `measure()` leía `document.documentElement.scrollHeight` en
+ * cada frame de scroll, y `section.offsetTop` de las 8 secciones cuando
+ * ninguna era visible. Ambas propiedades fuerzan un recálculo de layout
+ * síncrono si los estilos están invalidados — y con ~56 elementos
+ * animándose al entrar en pantalla, lo están casi siempre.
+ *
+ * Medido instrumentando los getters durante un recorrido completo de la
+ * página: **567 lecturas de `scrollHeight` y 62 de `offsetTop`, el 97 %
+ * de todas las lecturas de layout del recorrido.** Framer Motion sólo
+ * aportaba 20. El coste no estaba en la librería.
+ *
+ * La geometría de la página no cambia al scrollear: sólo al redimensionar,
+ * al cargar la fuente (cambia el alto del texto) o si crece el contenido.
+ * Así que se lee en esos tres momentos y el scroll no toca el layout.
  */
 export const useScrollspy = (
   sections: string[] = [],
@@ -24,15 +43,16 @@ export const useScrollspy = (
 ): string => {
   const [activeId, setActiveId] = useState<string>(sections[0] || "");
   const isAtBottomRef = useRef<boolean>(false);
+  const geometryRef = useRef<Geometry>({ pageHeight: 0, offsets: [] });
   const lastSection = sections[sections.length - 1];
 
-  const checkIfAtBottom = useCallback((): boolean => {
-    const scrollHeight = document.documentElement.scrollHeight;
-    const scrollTop = window.scrollY;
-    const clientHeight = window.innerHeight;
-
-    return scrollTop + clientHeight >= scrollHeight - bottomMargin;
-  }, [bottomMargin]);
+  /* Única función que toca el layout. Nunca se llama desde el scroll. */
+  const readGeometry = useCallback((ids: string[]) => {
+    geometryRef.current = {
+      pageHeight: document.documentElement.scrollHeight,
+      offsets: ids.map((id) => document.getElementById(id)?.offsetTop ?? Number.POSITIVE_INFINITY),
+    };
+  }, []);
 
   useEffect(() => {
     const visibleSections = new Set<string>();
@@ -64,9 +84,13 @@ export const useScrollspy = (
       if (el) observer.observe(el);
     });
 
+    /* `scrollY` e `innerHeight` no fuerzan layout; los valores de
+       `geometryRef` ya están medidos. Este callback no lee el DOM. */
     const measure = () => {
+      const { pageHeight, offsets } = geometryRef.current;
+
       // PRIORIDAD: detección de final de página
-      const atBottom = checkIfAtBottom();
+      const atBottom = window.scrollY + window.innerHeight >= pageHeight - bottomMargin;
       isAtBottomRef.current = atBottom;
 
       if (atBottom) {
@@ -79,8 +103,7 @@ export const useScrollspy = (
         const scrollPosition = window.scrollY + 100;
 
         for (let i = sections.length - 1; i >= 0; i--) {
-          const section = document.getElementById(sections[i]);
-          if (section && section.offsetTop <= scrollPosition) {
+          if (offsets[i] <= scrollPosition) {
             setActiveId(sections[i]);
             break;
           }
@@ -97,15 +120,34 @@ export const useScrollspy = (
       });
     };
 
+    /* La geometría se refresca al redimensionar y cuando el contenido
+       cambia de alto. El ResizeObserver cubre además el swap de la fuente
+       (Inter se auto-hospeda con `font-display: swap`, y al aplicarse
+       cambia el alto del texto). */
+    /* Solo relee la geometría. NO llama a `measure()`: el
+       ResizeObserver se dispara muchas veces mientras cargan las
+       imágenes, y cada llamada entraba por la rama de respaldo —
+       cuando aún no hay secciones visibles— pisando el estado
+       inicial y marcando una sección arbitraria arriba del todo.
+       El original solo medía al scrollear; se conserva así. */
+    const refresh = () => readGeometry(sections);
+
+    const resizeObserver = new ResizeObserver(refresh);
+    resizeObserver.observe(document.documentElement);
+    window.addEventListener("resize", refresh, { passive: true });
     window.addEventListener("scroll", handleScroll, { passive: true });
+
+    refresh();
     measure();
 
     return () => {
       observer.disconnect();
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", refresh);
       window.removeEventListener("scroll", handleScroll);
       if (frame) window.cancelAnimationFrame(frame);
     };
-  }, [sections, rootMargin, threshold, checkIfAtBottom, lastSection]);
+  }, [sections, rootMargin, threshold, bottomMargin, lastSection, readGeometry]);
 
   return activeId;
 };

@@ -17,18 +17,23 @@ Los datos entre paréntesis son **medidos**, no estimados, salvo donde diga *est
 | Tier | Tema | Tareas | Abiertas | Esfuerzo |
 |---|---|---:|---:|---|
 | **Tier 0** | Crítico / bloqueante | 3 | 0 | — (cerrado) |
-| **Tier 1** | Alta prioridad — accesibilidad AA, build y documentación que engaña | 9 | 9 | bajo·8 medio·1 |
-| **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 22 | 22 | bajo·13 medio·8 alto·1 |
+| **Tier 1** | Alta prioridad — accesibilidad AA, build y documentación que engaña | 9 | 0 | — (cerrado) |
+| **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 22 | 20 | bajo·12 medio·7 alto·1 |
 | **Tier 3** | Pulido y mantenimiento | 20 | 20 | bajo·15 medio·5 |
-| **Tier 4** | Futuro / opcional | 6 | 6 | bajo·5 alto·1 |
-| | **Total** | **60** | **57** | |
+| **Tier 4** | Futuro / opcional | 6 | 5 | bajo·4 alto·1 |
+| | **Total** | **60** | **45** | |
 
 **No hay ninguna tarea de Tier 0 abierta.** La auditoría del 2026-09-08 no encontró
 vulnerabilidades explotables, pérdida de datos ni fallos que rompan producción. Las tres
 tareas de Tier 0 son las del backlog anterior, ya cerradas.
 
-**Lo más urgente son T1-01 y T1-02**: dos incumplimientos de WCAG 2.2 medidos sobre la app
-en producción, uno de ellos de nivel A.
+**Tier 1 quedó cerrado el 2026-09-08**, junto con T2-13. Lo siguiente es Tier 2, donde el
+mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de forced reflow).
+
+> ⚠️ **Cuatro criterios de aceptación siguen sin verificar**, porque sólo se pueden
+> comprobar sobre un deploy preview de Netlify y no sobre un build local: el tamaño del
+> bundle en preview (T1-04), el 404 real y Lighthouse SEO = 100 (T1-06) y el
+> `Content-Type: application/xml` del sitemap (T2-13). Marcarlos al abrir el PR.
 
 ---
 
@@ -49,16 +54,18 @@ en producción, uno de ellos de nivel A.
 
 ---
 
-## Tier 1 — Alta prioridad
+## Tier 1 — Alta prioridad ✅ (cerrado 2026-09-08)
 
 ### Accesibilidad (WCAG 2.2 — fallos medidos en producción)
 
-- [ ] **[T1-01] Subir el contraste del texto sobre el botón primario a 4.5:1**
+- [x] **[T1-01] Subir el contraste del texto sobre el botón primario a 4.5:1**
   - **Área:** Accesibilidad · **Severidad:** Alto
   - **Ubicación:** `src/index.css:32-35` (tokens) · `src/components/Hero.tsx:60` ·
     `src/components/Contact.tsx:35` · `src/components/ui/SkipLink.tsx:10` ·
     `src/components/ui/Lightbox.tsx:108`
-  - **Qué hacer:** el par `--value-primary` (`#487fff`) + `--value-primary-foreground`
+  - **Qué hacer:** ⚠️ *prescripción original, conservada como registro —* **no funciona**,
+    ver la nota de cierre abajo antes de reutilizar este razonamiento.
+    El par `--value-primary` (`#487fff`) + `--value-primary-foreground`
     (`#f8f8f8`) da **3.44:1**, por debajo del 4.5:1 que exige WCAG 1.4.3 para texto normal
     (los botones usan `text-sm` = 14 px). Oscurecer `--value-primary` hasta llegar a 4.5:1
     (bajar la L de `oklch(62.8% 0.2 264)` a ~54-55 % lo consigue manteniendo el tono), o subir
@@ -68,8 +75,22 @@ en producción, uno de ellos de nivel A.
   - **Criterio de aceptación:** los 4 componentes ≥ 4.5:1 medido con axe o DevTools, y
     `--value-ring` mantiene ≥ 3:1 sobre `--value-background`.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-08 · ⚠️ **resuelta de otra forma que la prescrita.** Oscurecer
+    `--value-primary` a 54-55 % **no funciona**: ese token cumple dos papeles con
+    requisitos opuestos. Como relleno de botón necesita L ≤ 56.5 % (para que el texto
+    claro encima llegue a 4.5:1); como `text-primary` sobre superficie oscura —14 usos,
+    varios a `text-xs`— necesita L ≥ 59.5 %. **Los dos rangos no se solapan.** A L=54 %
+    los botones habrían pasado a 4.99:1 pero `text-primary` habría caído a 3.72:1 y el
+    badge de T1-03 a 3.18:1: la corrección habría *roto* la tarea que decía arreglar.
+    Solución aplicada: separar los papeles. `--value-primary` se queda en 62.8 % (ya
+    cumplía: 5.38:1 sobre fondo) y se añaden `--value-primary-strong` (56 %) y
+    `--value-primary-strong-hover` (50 %) para los rellenos. `--value-primary-hover`
+    se elimina: sólo lo usaban esos botones. Medido en navegador: botones 4.56:1,
+    hover 5.91:1, ring 6.98:1.
+  - **Hallazgo extra:** el estado `hover` de los botones estaba a **4.42:1** y tampoco
+    cumplía. No figuraba en la auditoría del 2026-09-08.
 
-- [ ] **[T1-02] Permitir detener la animación de texto del Hero y respetar `prefers-reduced-motion`**
+- [x] **[T1-02] Permitir detener la animación de texto del Hero y respetar `prefers-reduced-motion`**
   - **Área:** Accesibilidad · **Severidad:** Alto (WCAG 2.2.2 *Pause, Stop, Hide* — nivel **A**)
   - **Ubicación:** `src/components/Hero.tsx:36-49` · `src/index.css:135-152`
   - **Qué hacer:** `react-type-animation` escribe y borra con `setTimeout`/`rAF` y
@@ -83,8 +104,14 @@ en producción, uno de ellos de nivel A.
   - **Criterio de aceptación:** con `prefers-reduced-motion: reduce` emulado, el texto del Hero
     no cambia en 15 s. Sin la preferencia, sigue animando.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-08 · hook `usePrefersReducedMotion` con `useSyncExternalStore`.
+    Verificado los dos sentidos: sin preferencia **16 valores distintos en 6 s**, con
+    preferencia **1 solo valor en 15.1 s**. ⚠️ El MCP de Chrome DevTools no emula
+    `prefers-reduced-motion`, así que se parcheó `matchMedia` antes de los scripts: eso
+    prueba la lógica y la query, **no** que el navegador resuelva la media query real.
+    Eso lo cierra T2-10 con Playwright, que sí la emula.
 
-- [ ] **[T1-03] Subir el contraste del badge de periodo en Educación**
+- [x] **[T1-03] Subir el contraste del badge de periodo en Educación**
   - **Área:** Accesibilidad · **Severidad:** Medio (WCAG 1.4.3 AA)
   - **Ubicación:** `src/components/Education.tsx:40-42`
   - **Qué hacer:** `#487fff` sobre `#162137` da **4.4:1** a 12 px, justo por debajo de 4.5:1.
@@ -92,10 +119,13 @@ en producción, uno de ellos de nivel A.
     texto u oscurecer `bg-primary-soft`.
   - **Criterio de aceptación:** ≥ 4.5:1 medido.
   - **Esfuerzo:** bajo · **Depende de:** T1-01
+  - **Cerrada:** 2026-09-08 · **no lo resolvió T1-01**, al contrario (ver su nota). Se bajó
+    el alpha de `--value-primary-soft` de 12 % a 8 %, que oscurece el fondo del badge y sube
+    el contraste. Medido en navegador: **4.66:1**.
 
 ### Build y despliegue
 
-- [ ] **[T1-04] Quitar `NODE_ENV=development` de los deploy previews**
+- [x] **[T1-04] Quitar `NODE_ENV=development` de los deploy previews**
   - **Área:** DevOps · **Severidad:** Alto
   - **Ubicación:** `netlify.toml:145-147`
   - **Qué hacer:** el bloque `[context.deploy-preview.environment]` fija
@@ -108,9 +138,11 @@ en producción, uno de ellos de nivel A.
     que sí es correcto.
   - **Criterio de aceptación:** un deploy preview sirve un bundle del mismo tamaño que
     producción (±2 kB).
+  - **Cerrada:** 2026-09-08 · bloque `environment` eliminado, `X-Robots-Tag` conservado.
+    ⏳ **El criterio queda pendiente de un deploy preview real.**
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
-- [ ] **[T1-05] Corregir el requisito de Node en el README**
+- [x] **[T1-05] Corregir el requisito de Node en el README**
   - **Área:** Documentación · **Severidad:** Alto
   - **Ubicación:** `README.md:56`
   - **Qué hacer:** dice "Node.js (versión 18 o superior)". Vite 7 exige
@@ -119,9 +151,10 @@ en producción, uno de ellos de nivel A.
     el `NODE_VERSION = "22"` de `netlify.toml` y el `node-version: 22` de `ci.yml`.
   - **Criterio de aceptación:** el README declara Node ≥ 20.19 (recomendado 22) y coincide con
     CI y Netlify.
+  - **Cerrada:** 2026-09-08
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
-- [ ] **[T1-06] Eliminar el soft 404 y publicar un `robots.txt`**
+- [x] **[T1-06] Eliminar el soft 404 y publicar un `robots.txt`**
   - **Área:** SEO · **Severidad:** Alto
   - **Ubicación:** `netlify.toml:135-139` · `public/_redirects:1`
   - **Qué hacer:** el fallback SPA `/* → /index.html 200` hace que **cualquier** ruta
@@ -133,11 +166,15 @@ en producción, uno de ellos de nivel A.
     `User-agent: *`, `Allow: /` y la línea `Sitemap:` (ver T2-13).
   - **Criterio de aceptación:** `/ruta-que-no-existe` devuelve 404; `/robots.txt` devuelve 200
     con `text/plain`; Lighthouse SEO = 100.
+  - **Cerrada:** 2026-09-08 · fallback eliminado de `netlify.toml` y `public/_redirects`
+    borrado. Verificado sirviendo `dist/` con un servidor estático plano (`vite preview`
+    hace su propio fallback SPA y habría enmascarado el resultado): 404 correcto y
+    `robots.txt` 200 `text/plain`. ⏳ **Lighthouse SEO = 100 pendiente de deploy preview.**
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
 ### Peso y robustez
 
-- [ ] **[T1-07] Borrar las dos imágenes huérfanas**
+- [x] **[T1-07] Borrar las dos imágenes huérfanas**
   - **Área:** Refactorización · **Severidad:** Alto (impacto alto, esfuerzo mínimo)
   - **Ubicación:** `public/projects/GestorTareasMERN.png` (512 KB) ·
     `public/projects/SistemaVentasDesktop.png` (84 KB)
@@ -147,9 +184,10 @@ en producción, uno de ellos de nivel A.
     dos es el archivo más pesado del repositorio.
   - **Criterio de aceptación:** `dist/projects/` contiene exactamente las 6 imágenes
     referenciadas; el peso total de imágenes baja de 1.68 MB a 1.10 MB.
+  - **Cerrada:** 2026-09-08 · medido tras el build: 6 archivos, **1.10 MB**. Desbloquea T2-02.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
-- [ ] **[T1-08] Añadir un Error Boundary de React**
+- [x] **[T1-08] Añadir un Error Boundary de React**
   - **Área:** Auditoría de código · **Severidad:** Medio
   - **Ubicación:** `src/main.tsx:7-19` · `src/App.tsx:11-24`
   - **Qué hacer:** no hay ningún límite de error. Una excepción en cualquier componente deja la
@@ -158,9 +196,15 @@ en producción, uno de ellos de nivel A.
     email de contacto y un enlace al CV.
   - **Criterio de aceptación:** forzar un `throw` en un componente muestra el mensaje de respaldo
     en vez de una página vacía.
+  - **Cerrada:** 2026-09-08 · `ErrorBoundary` envolviendo `<App />`. El fallback no importa
+    Framer Motion, lucide-react ni componentes propios: lo que se pinta cuando la UI se rompe
+    no debe depender de la UI rota. Verificado con un `throw` real.
+  - ⚠️ **Límite conocido:** un error *de importación* o en `main.tsx` sigue dando página en
+    blanco. Los error boundaries sólo capturan durante el render del árbol de componentes.
+    Para el caso sin JS, ver T2-14.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
-- [ ] **[T1-09] Corregir las afirmaciones falsas del README**
+- [x] **[T1-09] Corregir las afirmaciones falsas del README**
   - **Área:** Documentación · **Severidad:** Medio
   - **Ubicación:** `README.md:22,32,151-153,159-160,166`
   - **Qué hacer:** tres afirmaciones que la auditoría contradice con medición:
@@ -173,6 +217,11 @@ en producción, uno de ellos de nivel A.
        se renderiza en el DOM en el primer pintado (ver T3-13). Protege de bots que no ejecutan
        JavaScript, no de los que sí.
   - **Criterio de aceptación:** ninguna afirmación del README queda desmentida por una medición.
+  - **Cerrada:** 2026-09-08 · además de las tres listadas aparecieron **cinco más**:
+    «Redirects para SPA» (que T1-06 acababa de eliminar), «Formulario de contacto» (no hay
+    ningún `<form>`) y la afirmación anti-scraping repetida en 4 sitios distintos. Sobre WCAG
+    se evitó sustituir una afirmación no verificada por otra: el README ahora lista lo medido
+    y dice explícitamente que no hay auditoría completa.
   - **Esfuerzo:** bajo · **Depende de:** T1-01, T1-02, T1-03
 
 ---
@@ -218,7 +267,7 @@ en producción, uno de ellos de nivel A.
   - **Criterio de aceptación:** decisión registrada en `CONTEXT.md`.
   - **Esfuerzo:** bajo · **Depende de:** T2-02, T2-19
 
-- [ ] **[T2-04] Auto-hospedar la fuente Inter**
+- [x] **[T2-04] Auto-hospedar la fuente Inter**
   - **Área:** Rendimiento · **Ubicación:** `index.html:46-51` · `netlify.toml:29-31`
   - **Qué hacer:** la hoja de estilos de Google Fonts es el mayor coste de bloqueo de render del
     sitio. **Medido en producción** (móvil, Slow 4G, CPU 4×): 602 ms de duración total frente a
@@ -229,18 +278,73 @@ en producción, uno de ellos de nivel A.
     punto de privacidad de T4-03.
   - **Criterio de aceptación:** cero peticiones a `fonts.googleapis.com` y `fonts.gstatic.com` en
     la pestaña de red; LCP vuelto a medir en las mismas condiciones.
+  - **Cerrada:** 2026-09-08 · **cero peticiones a terceros** (7 en total, todas propias).
+    Se sirve la fuente **variable** de Inter: un archivo por subset cubre los 4 pesos, así que
+    son 2 `@font-face` con `font-weight: 400 700`, no 8. `latin-ext` se declara pero **no llega
+    a descargarse** — el `unicode-range` lo impide y ningún carácter del contenido lo necesita
+    (medido: 0 de 12 no-ASCII). Se añadió `<link rel=preload>`: sin él la fuente no se descubre
+    hasta parsear el CSS. Verificado que es la petición **#2**, antes del JS y del CSS.
+  - **A/B medido** (dos contextos aislados, mismas condiciones, servidos ambos desde localhost):
+
+    | | Antes | Después |
+    |---|---:|---:|
+    | FCP | 276 ms | **104 ms** |
+    | LCP | 924 ms | **740 ms** |
+    | Peticiones a terceros | 1 | **0** |
+    | Coste de la hoja de estilos | 167 ms | 5 ms (propia) |
+
+    ⚠️ El coste del CSS de Google **varía muchísimo** según la conexión esté fría o caliente:
+    medido **1175 ms** en la primera carga sin caché y **167 ms** con DNS/TLS ya establecido.
+    Los 507 ms que estimó la auditoría sobre producción caen entre ambos. Lo que no varía es
+    que era una dependencia de terceros en el camino crítico, y ya no existe.
+  - **CSP cerrado:** `style-src 'self' 'unsafe-inline'` y `font-src 'self'`. Se retiró también
+    la exclusión de Google Fonts de `lychee.toml`, que quedaba muerta.
+  - **Licencia:** Inter es SIL OFL 1.1; se publica `public/fonts/LICENSE.txt` junto a los
+    `.woff2`. Auto-hospedar la fuente hace la atribución obligatoria — ver T3-04.
   - **Esfuerzo:** medio · **Depende de:** ninguna
 
-- [ ] **[T2-05] Reducir el reflow forzado de Framer Motion**
+- [ ] **[T2-05] Reducir el reflow forzado** *(la causa principal, corregida; queda el resto)*
   - **Área:** Rendimiento · **Ubicación:** `src/lib/animations.ts` · todas las secciones con
     `whileInView`
-  - **Qué hacer:** la traza de producción acusa **540 ms de forced reflow**. Atribuido con
-    sourcemap a `framer-motion/batcher.mjs` llamado desde `PopChild.mjs` — es decir, al bucle de
-    render de la librería, **no** a `useScrollspy` como cabría suponer. El sitio anima ~56
-    elementos con `whileInView`. Reducir el número de elementos animados (animar el contenedor de
-    cada sección en vez de cada tarjeta y cada párrafo) y volver a medir.
+  - **Qué hacer:** ⚠️ *diagnóstico original — **la atribución era incorrecta**, ver la nota de
+    abajo antes de actuar sobre él.* La traza de producción acusa **540 ms de forced reflow**.
+    Atribuido con sourcemap a `framer-motion/batcher.mjs` llamado desde `PopChild.mjs` — es decir,
+    al bucle de render de la librería, **no** a `useScrollspy` como cabría suponer. El sitio anima
+    ~56 elementos con `whileInView`. Reducir el número de elementos animados (animar el contenedor
+    de cada sección en vez de cada tarjeta y cada párrafo) y volver a medir.
   - **Criterio de aceptación:** el insight *ForcedReflow* baja de 200 ms en la misma traza
     (móvil, Slow 4G, CPU 4×).
+
+  - 🔍 **Corrección del diagnóstico (2026-09-08).** La atribución por sourcemap era engañosa:
+    `PopChild.mjs` es código de `AnimatePresence mode="popLayout"`, que este proyecto **no usa**.
+    Medido instrumentando los getters de layout y cronometrando cada lectura durante un recorrido
+    completo (móvil, Slow 4G, CPU 4×):
+
+    | Origen | Lecturas | Coste |
+    |---|---:|---:|
+    | `useScrollspy` (`scrollHeight` + `offsetTop`) | 582 | **740.2 ms** |
+    | Framer Motion (`scrollTop` + `getBoundingClientRect`) | 20 | 0.4 ms |
+
+    **El 99.9 % del coste era `useScrollspy`, no la librería.** `checkIfAtBottom()` leía
+    `document.documentElement.scrollHeight` en cada frame de scroll, y esa propiedad fuerza un
+    layout síncrono cuando los estilos están invalidados — que con ~56 elementos animándose es
+    casi siempre. Reducir los elementos animados, que es lo que prescribía la tarea, habría
+    tocado el 0.05 % del problema.
+
+  - ✅ **Aplicado 2026-09-08:** `useScrollspy` cachea la geometría (alto de página y `offsetTop`
+    de cada sección) y la refresca solo al redimensionar y vía `ResizeObserver` —nunca al
+    scrollear—. Resultado medido en idénticas condiciones: **740.6 ms → 0.5 ms** de coste de
+    lecturas de layout, de 602 lecturas a 39. Comportamiento verificado idéntico al original:
+    7/7 secciones, fin de página y estado inicial (una primera versión sí introdujo una
+    regresión ahí —marcaba una sección arbitraria arriba del todo— y se corrigió).
+
+  - ⏳ **Por qué sigue abierta:** el criterio pide que el *insight* ForcedReflow de DevTools baje
+    de 200 ms, y **no baja**: marcó 613 ms antes y 669 ms después. Ese insight no mide el coste de
+    las lecturas de layout sino la duración de las tareas que las contienen, y en las mismas
+    trazas el LCP varió de 1281 a 2471 ms sobre la misma página: demasiado ruido para decidir con
+    él. DevTools además reporta *estimated savings: none*. **Decidir**: reescribir el criterio en
+    términos del coste medido de lecturas de layout (que sí es determinista y ya está en 0.5 ms),
+    o investigar qué tarea de Framer Motion sostiene esos 669 ms.
   - **Esfuerzo:** medio · **Depende de:** ninguna
 
 - [ ] **[T2-06] Analizar el bundle y decidir si dividirlo** *(viene de BACKLOG 4.6)*
@@ -321,11 +425,15 @@ en producción, uno de ellos de nivel A.
 
 ### SEO y contenido
 
-- [ ] **[T2-13] Publicar `sitemap.xml`**
+- [x] **[T2-13] Publicar `sitemap.xml`**
   - **Área:** SEO · **Ubicación:** `public/`
   - **Qué hacer:** una sola URL, pero es lo que enlaza el `robots.txt` de T1-06 y lo que consume
     Search Console.
   - **Criterio de aceptación:** `/sitemap.xml` devuelve 200 con `application/xml`.
+  - **Cerrada:** 2026-09-08 · sin `<changefreq>` ni `<priority>` (Google los ignora desde 2023).
+    El `Content-Type` se declara en `netlify.toml` en vez de confiar en la tabla MIME por
+    defecto de Netlify, que no es contrato público. ⏳ **Criterio pendiente de deploy preview:**
+    el servidor local sirve `.xml` como `text/xml`.
   - **Esfuerzo:** bajo · **Depende de:** T1-06
 
 - [ ] **[T2-14] Añadir un `<noscript>`**
@@ -504,9 +612,19 @@ en producción, uno de ellos de nivel A.
 - [ ] **[T3-10] Afinar el hueco bajo el texto animado del Hero** *(viene de BACKLOG 2)*
   - **Área:** UI/UX · **Ubicación:** `src/components/Hero.tsx:35`
   - **Qué hacer:** el `min-h-[3.6em]` reserva las 2 líneas de la frase más larga, así que se ve un
-    hueco cuando muestra una corta. Es el precio correcto de no tener CLS (**CLS medido: 0.00** —
-    no romperlo), pero se puede afinar midiendo la altura real en lugar de estimarla.
-  - **Criterio de aceptación:** el hueco se reduce y el CLS sigue en 0.00.
+    hueco cuando muestra una corta. Es el precio correcto de no tener CLS, pero se puede afinar
+    midiendo la altura real en lugar de estimarla.
+  - ⚠️ **Corrección del dato (2026-09-08): el CLS no es 0.00.** Esa cifra sale de una traza de
+    carga corta; observando `layout-shift` durante 6 s el sitio acumula **~0.004-0.006 en unos
+    100 desplazamientos diminutos**, y sigue acumulando mientras el Hero teclea. Verificado que
+    la causa es el propio texto animado: con `prefers-reduced-motion` activo (T1-02) el CLS es
+    **exactamente 0, cero desplazamientos**; con el tecleo activo y todo lo demás igual, 102.
+    Verificado también que **no lo introdujo T2-04**: antes de auto-hospedar la fuente era
+    0.0062/41 desplazamientos y después 0.0064/42 — idéntico dentro del ruido.
+    Sigue muy por debajo del umbral 0.1 de *good*, así que no es un defecto; pero partir de
+    «CLS = 0.00» lleva a creer que cualquier valor distinto es una regresión propia.
+  - **Criterio de aceptación:** el hueco se reduce y el CLS no empeora respecto a la línea base
+    real (~0.006 con el tecleo activo, 0 con movimiento reducido).
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
 - [ ] **[T3-11] Compactar la sección de Certificados** *(viene de BACKLOG 2)*
@@ -592,21 +710,22 @@ en producción, uno de ellos de nivel A.
   - **Criterio de aceptación:** los cuatro puntos aplicados, lint y tipos en verde.
   - **Esfuerzo:** bajo · **Depende de:** T2-18
 
-- [ ] **[T3-19] Correcciones menores de estilos y configuración**
+- [ ] **[T3-19] Correcciones menores de estilos y configuración** *(2 de 4 puntos ya aplicados)*
   - **Área:** UI/UX · DevOps
-  - **Qué hacer:**
+  - **Qué hacer:** quedan los dos primeros; los dos últimos se aplicaron el 2026-09-08 al
+    cerrar T1-02 y T1-06.
     - `src/index.css:84` — `--spacing-header: 4rem` (64 px) no cuenta el `border-b` del header,
       que mide 65 px de alto real; las anclas dejan **1 px** de la sección tapado. Medido.
     - `src/components/Layout.tsx:20` — el `<body>` no tiene fondo propio (computa
       `rgba(0,0,0,0)`); el color lo pone un `div` interior y el lienzo lo salva
       `color-scheme: dark`. Frágil de cara a T3-05: poner el token de fondo en `body`.
-    - `src/index.css:135-138` — el comentario afirma que la media query cubre "cualquier
-      `@keyframes` de librería (react-type-animation)". Solo cubre el cursor. Corregirlo al cerrar
-      T1-02.
-    - `netlify.toml:135-139` y `public/_redirects` — el fallback SPA está declarado dos veces.
-      T1-06 lo elimina; borrar también el archivo `_redirects` si queda vacío.
+    - ~~`src/index.css:135-138` — el comentario sobre `@keyframes` de librería es falso.~~
+      ✅ Aplicado 2026-09-08: el comentario ahora reparte el trabajo en tres vías
+      (Framer Motion, CSS, y lo que anima con `setTimeout`).
+    - ~~`netlify.toml` y `public/_redirects` — fallback SPA declarado dos veces.~~
+      ✅ Aplicado 2026-09-08 con T1-06: eliminado de ambos y `_redirects` borrado.
   - **Criterio de aceptación:** los cuatro puntos aplicados.
-  - **Esfuerzo:** bajo · **Depende de:** T1-02, T1-06
+  - **Esfuerzo:** bajo · **Depende de:** ~~T1-02, T1-06~~ ninguna (ya cerradas)
 
 - [ ] **[T3-20] Correcciones de redacción y metadatos**
   - **Área:** Ortografía y redacción
@@ -658,7 +777,7 @@ en producción, uno de ellos de nivel A.
   - **Criterio de aceptación:** las cabeceras servidas coinciden con las declaradas.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
-- [ ] **[T4-03] Decidir sobre privacidad y datos personales**
+- [x] **[T4-03] Decidir sobre privacidad y datos personales**
   - **Área:** Legal · **Severidad:** *requiere revisión legal*
   - **Ubicación:** `index.html:46-51`
   - **Qué hacer:** hoy el sitio **no** usa cookies, ni analítica, ni almacenamiento, ni
@@ -670,6 +789,10 @@ en producción, uno de ellos de nivel A.
     auto-hospedar la fuente. Si algún día se añade analítica o un formulario de contacto, habrá
     que publicar política de privacidad y consentimiento — y eso sí requiere revisión legal.
   - **Criterio de aceptación:** T2-04 cerrada, o decisión explícita registrada en `CONTEXT.md`.
+  - **Cerrada:** 2026-09-08 · por T2-04. El sitio ya no hace **ninguna** petición a terceros,
+    así que no transmite la IP del visitante a Google ni a nadie. Verificado en la pestaña de
+    red: 7 peticiones, todas al propio origen. El punto de privacidad queda cerrado de raíz,
+    no mitigado. Sigue sin haber cookies, analítica, almacenamiento ni formularios.
   - **Esfuerzo:** bajo · **Depende de:** T2-04
 
 - [ ] **[T4-04] Evaluar prerender / SSG**
@@ -709,6 +832,9 @@ en producción, uno de ellos de nivel A.
 |---|---|---|
 | 2026-07-28 | T0-01, T0-02, T0-03 | Tier 0 completo. PR #1 y PR #5. |
 | 2026-09-08 | — | Auditoría completa de las 13 áreas (código y navegador). Se migró `docs/BACKLOG.md` a este archivo, se numeraron las 27 tareas heredadas y se añadieron 33 nuevas. Ninguna corrección aplicada: la Fase 2 no estaba aprobada. |
+| 2026-09-08 | T2-05 (parcial) | Reflow forzado: **740.6 ms → 0.5 ms** de coste de lecturas de layout. El diagnóstico del ROADMAP era incorrecto — el 99.9 % era `useScrollspy` leyendo `scrollHeight` en cada frame, no Framer Motion. Sigue abierta porque el insight de DevTools, que es lo que pide el criterio, no baja. |
+| 2026-09-08 | T2-04, T4-03 | Inter auto-hospedada. **Cero peticiones a terceros.** FCP 276→104 ms y LCP 924→740 ms en A/B controlado; el coste del CSS de Google resultó ser mucho más variable de lo que sugería la estimación única de la auditoría (167 ms en caliente, 1175 ms en frío). CSP cerrado a `'self'`. Cierra T4-03 de raíz. |
+| 2026-09-08 | T1-01 … T1-09, T2-13 | **Tier 1 completo.** Contraste verificado en navegador sobre `dist/` servido. La prescripción de T1-01 resultó ser errónea y se resolvió separando el token en dos (ver su nota); el `hover` de los botones fallaba y no estaba en la auditoría. 4 criterios quedan pendientes de un deploy preview. Aplicados de paso 2 de los 4 puntos de T3-19. |
 
 ---
 
@@ -724,5 +850,7 @@ la decisión.
 | **`lychee` excluye las raíces de `fonts.googleapis.com` y `fonts.gstatic.com`** | Son orígenes de `preconnect`, no documentos: su raíz devuelve 404. El ancla `/?$` deja que sí se compruebe la URL real del CSS de Inter. | 2026-07-28 |
 | **No arreglar `skills-lock.json`** | Es una herramienta local, está en `.gitignore` y no afecta al proyecto. Se deja documentado en T4-06 por si algún día molesta. | 2026-07-28 |
 | **Sin banner de cookies** | El sitio no usa cookies, ni analítica, ni almacenamiento local, ni formularios. Verificado en la pestaña de red el 2026-09-08: cero peticiones a terceros salvo la fuente. Un banner aquí sería teatro de cumplimiento. Revisar solo si se añade analítica (T4-03). | 2026-09-08 |
+| **El acento son dos tokens, no uno** | `--value-primary` (62.8 %, acento sobre superficie oscura) y `--value-primary-strong` (56 %, relleno de botón). No es duplicación: los dos papeles exigen rangos de luminosidad que **no se solapan** (L ≥ 59.5 % vs L ≤ 56.5 %). Unificarlos vuelve a romper uno de los dos. Medido, ver T1-01. | 2026-09-08 |
+| **`sitemap.xml` sin `<changefreq>` ni `<priority>`** | Google los ignora desde 2023 y con una sola URL `<priority>` no ordena nada. Serían dos líneas que aparentan hacer algo. | 2026-09-08 |
 | **Sin tests de componentes que solo renderizan datos estáticos** | Es ceremonia: afirmarían que `map` funciona. El valor está en las funciones puras (T2-07) y en los flujos de interacción (T2-10). | 2026-07-28 |
 | **Los tamaños de texto de cuerpo no son fluidos** | Solo los de display (`--text-3xl` a `--text-6xl`) usan `clamp`. Los de cuerpo usan los valores por defecto de Tailwind a propósito: 16 px mínimo en móvil, sin sorpresas de legibilidad. | 2026-07-28 |
