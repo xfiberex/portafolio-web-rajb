@@ -20,6 +20,17 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 
 ### Añadido
 
+- **Los primeros tests del repositorio**: 87 unitarios con Vitest, integrados en CI antes del build.
+  Solo funciones puras, que es donde está el valor: la resolución de iconos (~90 heurísticas
+  regex donde el orden importa) y los helpers de URL. El test de tabla recorre los 78 tags
+  reales de `src/data/` y **falla si se añade una tecnología sin icono** — hasta ahora ese
+  fallo era silencioso: salía el glifo genérico y nadie se enteraba.
+- **Accesibilidad automatizada en CI**: Playwright + `@axe-core/playwright` audita el build con
+  la página completamente revelada — **1586 nodos, 37 reglas**— y falla ante cualquier violación
+  *serious* o *critical*. Un test previo se niega a auditar si queda algo a opacidad < 1, porque
+  entonces axe mezcla los colores con el fondo y el resultado no significaría nada.
+- **`browserslist`** en `package.json`: Chrome/Edge 111, Safari/iOS 16.4, Firefox 128. El
+  mínimo lo fija Tailwind CSS 4; no es una elección del proyecto.
 - **Error boundary** (`src/components/ui/ErrorBoundary.tsx`). Sin él, una excepción en cualquier
   componente dejaba la página en blanco y sin mensaje. El fallback no importa Framer Motion,
   lucide-react ni componentes propios: lo que se pinta cuando la UI se rompe no debe depender de
@@ -52,6 +63,8 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 
 ### Corregido
 
+- **El icono de WinForms nunca se mostraba**: la regla era `/windows.*forms/i` y el dato dice
+  `"WinForms"`, que no contiene «windows». El icono existía desde el principio.
 - **El texto animado del Hero ignoraba `prefers-reduced-motion`** (WCAG 2.2.2, nivel **A**).
   Ninguna regla CSS podía pararlo: `react-type-animation` teclea con `setTimeout`. Ahora se
   renderiza texto fijo. Efecto colateral: con movimiento reducido el CLS pasa a ser exactamente 0.
@@ -71,6 +84,8 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 
 ### Interno
 
+- El verificador de enlaces (`links.yml`) ahora cubre `README.md`, `ROADMAP.md`, `CONTEXT.md`,
+  `CHANGELOG.md` y `docs/**/*.md`: las URLs vigiladas pasan de 21 a 42.
 - Auditoría técnica completa de las 13 áreas, con verificación sobre la aplicación desplegada
   (Chrome DevTools + Lighthouse) además de la revisión de código. Se midieron por primera vez
   Core Web Vitals, contraste real, áreas táctiles, peso de bundle y comportamiento con

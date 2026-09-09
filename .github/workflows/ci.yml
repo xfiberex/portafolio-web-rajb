@@ -41,5 +41,31 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # Solo funciones puras: la resolución de iconos (~90 heurísticas regex
+      # donde el orden importa) y los helpers de URL. El test de tabla falla
+      # si se añade una tecnología a src/data/ sin icono, que hasta ahora era
+      # un fallo silencioso.
+      - name: Tests
+        run: npm test
+
       - name: Build de producción
         run: npm run build
+
+      # Después del build a propósito: los e2e corren contra `vite preview`,
+      # es decir contra lo que se publica, no contra el servidor de desarrollo.
+      - name: Instalar Chromium para Playwright
+        run: npx playwright install --with-deps chromium
+
+      # axe sobre la página REVELADA. El test se niega a auditar si queda
+      # algún elemento a opacidad < 1, porque entonces axe mezcla los colores
+      # con el fondo y el resultado no significa nada (ver CONTEXT.md).
+      - name: Accesibilidad (axe-core)
+        run: npm run test:e2e
+
+      - name: Guardar el informe si falla
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

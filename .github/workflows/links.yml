@@ -46,6 +46,11 @@ jobs:
             index.html
             'src/**/*.ts'
             'src/**/*.tsx'
+            README.md
+            ROADMAP.md
+            CONTEXT.md
+            CHANGELOG.md
+            'docs/**/*.md'
           fail: false # no falla el job: el reporte se convierte en issue
 
       - name: Abrir issue si hay enlaces rotos

@@ -93,11 +93,35 @@ npm run lint
 # Verificar tipos TypeScript
 npm run type-check
 
+# Tests unitarios (Vitest). Solo funciones puras; corre tambien en CI
+npm test
+npm run test:watch
+
+# Accesibilidad end-to-end (Playwright + axe-core) sobre el build
+npm run build && npm run test:e2e
+
 # Convertir a WebP las capturas nuevas de public/projects/
 # (se corre a mano al añadir una captura, no en cada build)
 npm run images:webp
 npm run images:webp -- --clean   # y borra los PNG de origen
 ```
+
+## 🌐 Navegadores soportados
+
+| Navegador | Mínimo |
+|---|---|
+| Chrome / Edge | **111** (marzo 2023) |
+| Safari / iOS Safari | **16.4** (marzo 2023) |
+| Firefox | **128** (julio 2024) |
+
+Declarado en `browserslist` (`package.json`). El mínimo **lo fija Tailwind CSS 4**, que depende de
+`@property` y `color-mix()` y no funciona por debajo de esos números; no es una elección del
+proyecto. Por eso tampoco hay respaldo PNG para las imágenes WebP: cualquier navegador de este
+rango las soporta desde hace años.
+
+> Ojo: ni Vite ni Tailwind leen ese `browserslist` — Tailwind tiene sus objetivos fijos y Vite usa
+> su propio `build.target`. Sirve para **declarar el soporte**, que es lo que permite decidir si un
+> fallo reportado es un bug o un navegador fuera de alcance.
 
 ## 📁 Estructura del Proyecto
 
@@ -112,6 +136,8 @@ portafolio-web/
 │   ├── placeholder.svg             Reemplazo si falla la carga de una captura
 │   ├── robots.txt
 │   └── sitemap.xml
+├── e2e/
+│   └── a11y.spec.ts                axe-core sobre la página revelada (Playwright)
 ├── scripts/
 │   └── images-to-webp.mjs          Conversión con sharp (npm run images:webp)
 ├── src/
@@ -138,7 +164,8 @@ portafolio-web/
 │   │   ├── Navbar.tsx
 │   │   ├── Projects.tsx
 │   │   ├── Skills.tsx
-│   │   └── TechIcon.tsx            Colores de marca, rutas SVG y resolución por heurística
+│   │   ├── TechIcon.tsx            Colores de marca, rutas SVG y resolución por heurística
+│   │   └── TechIcon.test.ts        Test de tabla: cada tag de src/data/ debe resolver
 │   ├── data/                       Contenido tipado: editar aquí, no en los componentes
 │   │   ├── certificates.ts
 │   │   ├── education.ts
@@ -151,12 +178,14 @@ portafolio-web/
 │   ├── lib/
 │   │   ├── animations.ts           Variantes de Framer Motion
 │   │   ├── assets.ts               toAssetUrl y safeExternalUrl
+│   │   ├── assets.test.ts          Casos borde de ambos helpers
 │   │   └── contact.ts              Email y rutas de los CV
 │   ├── types/index.ts
 │   ├── App.tsx
 │   ├── index.css                   Design system en dos capas
 │   └── main.tsx
 ├── index.html
+├── playwright.config.ts
 ├── netlify.toml
 ├── lychee.toml
 ├── eslint.config.js

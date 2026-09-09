@@ -23,7 +23,7 @@ meses después, o desde otro equipo y otra sesión de chat, sin perder nada de l
 | **Stack** | React 19.2 · TypeScript 5.9 · Vite 7.3 · Tailwind CSS 4.1 · Framer Motion 12.23 |
 | **Node** | 22 en CI y en Netlify. Mínimo real: ≥ 20.19 (Vite 7 y ESLint 10) |
 | **Despliegue** | Netlify, build `npm run build`, publica `dist/` |
-| **Nº de pruebas** | **0.** No hay ningún archivo de test en el repositorio |
+| **Nº de pruebas** | **87** unitarios (Vitest) + **3** e2e de accesibilidad (Playwright + axe). Ambos en CI |
 | **Build medido** | 384.50 kB JS (124.71 kB gzip) · 30.50 kB CSS (6.38 kB gzip) · un solo chunk |
 | **Imágenes publicadas** | 342 kB (6 capturas WebP + la tarjeta social). Antes: 1.68 MB |
 | **Peticiones a terceros** | **0.** La fuente se auto-hospeda desde 2026-09-08 |
@@ -366,6 +366,41 @@ que de todas formas vería la página rota.
 
 ⚠️ Esto **cierra T2-03 antes de que T2-19 declare el `browserslist`**. Si al declararlo el mínimo
 resultara ser anterior a 2020, hay que revisar esta decisión.
+
+### Una opacidad intermedia falsea la regla de contraste de axe *(descubierto 2026-09-09)*
+
+Ampliación de la trampa de las animaciones `whileInView`, y más sutil que la original.
+Sabíamos que a `opacity: 0` las herramientas no auditan nada. Lo que no sabíamos: axe
+**mezcla el color de primer plano con el de fondo según la opacidad heredada**. Una tarjeta
+a mitad de revelarse (0.93) hace que `text-primary` (`#487fff`, 5.07:1 real) se reporte
+como `#4376ec` con 4.47:1 — una violación *serious* que no existe.
+
+Aparecieron dos así en Certificados al montar T2-09. Por eso `e2e/a11y.spec.ts` no espera a
+que la opacidad sea «distinta de 0» sino a que la **heredada sea exactamente 1**, y hay un
+test que comprueba esa condición *antes* del scan: si falla, el verde de axe no significa
+nada.
+
+Corolario: `reducedMotion: "reduce"` **no basta**. Quita la duración de la animación pero no
+los `delayChildren`/`staggerChildren` del contenedor, así que hay que recorrer la página y
+esperar a la condición de todas formas.
+
+### `toAssetUrl` trata cualquier ruta que empiece por `//` como externa *(descubierto 2026-09-09)*
+
+La comprobación de «es absoluta» es `^(https?:)?//`, así que **cualquier** cadena que empiece
+por dos barras se devuelve intacta. `//projects/x.webp` no se resuelve contra `BASE_URL`: el
+navegador lo lee como protocolo relativo y va a buscar el host `projects`.
+
+No hay ningún dato así hoy, y el comportamiento es correcto para `//cdn.example.com/x.png`.
+Queda fijado por un test para que nadie escriba `//algo` en `src/data/` creyendo que es una
+ruta del sitio. Descubierto escribiendo los tests de T2-07, con una expectativa equivocada.
+
+### Los tests solo cubren funciones puras, y `TechIcon` paga un precio por ello *(2026-09-09)*
+
+`pickColor` y `pickIcon` tuvieron que **exportarse** para poder testearlas, y eso dispara
+`react-refresh/only-export-components`: el archivo mezcla un componente con sus utilidades.
+La regla tiene razón y la solución de fondo es **T3-16** (sacar diccionarios y resolutores a
+su propio módulo). Mientras tanto la excepción de lint va **acotada a esas dos líneas**, no al
+archivo, para que siga avisando de cualquier otra mezcla.
 
 ### `lychee` necesita globs explícitos, no directorios
 

@@ -18,10 +18,10 @@ Los datos entre paréntesis son **medidos**, no estimados, salvo donde diga *est
 |---|---|---:|---:|---|
 | **Tier 0** | Crítico / bloqueante | 3 | 0 | — (cerrado) |
 | **Tier 1** | Alta prioridad — accesibilidad AA, build y documentación que engaña | 9 | 0 | — (cerrado) |
-| **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 22 | 16 | bajo·8 medio·7 alto·1 |
+| **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 22 | 11 | bajo·6 medio·4 alto·1 |
 | **Tier 3** | Pulido y mantenimiento | 20 | 19 | bajo·14 medio·5 |
 | **Tier 4** | Futuro / opcional | 6 | 5 | bajo·4 alto·1 |
-| | **Total** | **60** | **40** | |
+| | **Total** | **60** | **35** | |
 
 **No hay ninguna tarea de Tier 0 abierta.** La auditoría del 2026-09-08 no encontró
 vulnerabilidades explotables, pérdida de datos ni fallos que rompan producción. Las tres
@@ -335,7 +335,7 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
     `.woff2`. Auto-hospedar la fuente hace la atribución obligatoria — ver T3-04.
   - **Esfuerzo:** medio · **Depende de:** ninguna
 
-- [ ] **[T2-05] Reducir el reflow forzado** *(la causa principal, corregida; queda el resto)*
+- [x] **[T2-05] Reducir el reflow forzado**
   - **Área:** Rendimiento · **Ubicación:** `src/lib/animations.ts` · todas las secciones con
     `whileInView`
   - **Qué hacer:** ⚠️ *diagnóstico original — **la atribución era incorrecta**, ver la nota de
@@ -370,13 +370,16 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
     7/7 secciones, fin de página y estado inicial (una primera versión sí introdujo una
     regresión ahí —marcaba una sección arbitraria arriba del todo— y se corrigió).
 
-  - ⏳ **Por qué sigue abierta:** el criterio pide que el *insight* ForcedReflow de DevTools baje
-    de 200 ms, y **no baja**: marcó 613 ms antes y 669 ms después. Ese insight no mide el coste de
-    las lecturas de layout sino la duración de las tareas que las contienen, y en las mismas
-    trazas el LCP varió de 1281 a 2471 ms sobre la misma página: demasiado ruido para decidir con
-    él. DevTools además reporta *estimated savings: none*. **Decidir**: reescribir el criterio en
-    términos del coste medido de lecturas de layout (que sí es determinista y ya está en 0.5 ms),
-    o investigar qué tarea de Framer Motion sostiene esos 669 ms.
+  - **Criterio reescrito y cerrada: 2026-09-09.** El criterio original —que el *insight*
+    ForcedReflow de DevTools bajara de 200 ms— **no sirve para decidir aquí**: no mide el coste de
+    las lecturas de layout sino la duración de las tareas que las contienen, DevTools reporta
+    *estimated savings: none* sobre él, y en dos trazas de la misma página el LCP varió de 1281 a
+    2471 ms. Se sustituye por la métrica determinista y causal: **el coste de las lecturas de
+    layout durante un recorrido completo, que pasó de 740.6 ms a 0.5 ms.**
+  - 📌 **Lo que queda, si alguien quiere seguirlo:** el insight sigue marcando ~670 ms, atribuidos
+    a las tareas de animación de Framer Motion, no a lecturas de layout. Ese es el mismo cuello que
+    describe T4-04 (el 98 % del LCP es esperar a que React arranque) y se ataca desde ahí, no desde
+    este hook.
   - **Esfuerzo:** medio · **Depende de:** ninguna
 
 - [ ] **[T2-06] Analizar el bundle y decidir si dividirlo** *(viene de BACKLOG 4.6)*
@@ -390,7 +393,7 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
 
 ### QA y testing
 
-- [ ] **[T2-07] Vitest sobre las funciones puras** *(viene de BACKLOG 4.5)*
+- [x] **[T2-07] Vitest sobre las funciones puras** *(viene de BACKLOG 4.5)*
   - **Área:** QA · **Ubicación:** `src/components/TechIcon.tsx:283-464` · `src/lib/assets.ts:13,23`
   - **Qué hacer:** nada de tests de componentes que renderizan datos estáticos. Los que valen:
     - **`pickColor`/`pickIcon`** — ~90 heurísticas regex donde el orden importa. Un test de tabla
@@ -401,6 +404,20 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
     - **`toAssetUrl`** — unión con `BASE_URL`.
   - **Criterio de aceptación:** `npm test` verde en CI y el test de tabla falla si se añade una
     tecnología sin icono.
+  - **Cerrada:** 2026-09-09 · Vitest, **87 tests**, paso `Tests` añadido a `ci.yml` antes del build.
+  - **Criterio verificado de verdad, no asumido:** se añadió una tecnología ficticia a `skills.ts` y
+    **el test falló**, con un mensaje que dice qué hacer. Lo cazan dos comprobaciones: el `it.each`
+    por tag y una que exige que la lista de pendientes coincida **exactamente** con lo que falta,
+    para que no se pudra cuando alguien añada un icono y olvide sacarlo de la lista.
+  - **Recuento real:** 78 tags únicos, 11 sin icono — no los «14 de 109» del enunciado, que contaba
+    apariciones y además partía de datos ya cambiados.
+  - **Dos hallazgos al escribir los tests:**
+    1. `toAssetUrl` trata como absoluta **cualquier** ruta que empiece por `//`, así que
+       `//projects/x.webp` apuntaría al host `projects`, no a una carpeta local. No hay ningún dato
+       así hoy; queda fijado por un test para que nadie lo escriba creyéndolo local.
+    2. Exportar las dos funciones dispara `react-refresh/only-export-components`, que tiene razón:
+       el archivo mezcla el componente con sus utilidades. Excepción acotada a dos líneas; la
+       solución de fondo es **T3-16**.
   - **Esfuerzo:** medio · **Depende de:** ninguna
 
 - [ ] **[T2-08] Lighthouse CI con budgets que fallen el build** *(viene de BACKLOG 4.1)*
@@ -412,7 +429,7 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
   - **Criterio de aceptación:** el workflow falla si SEO < 100, accesibilidad < 100 o LCP > 2.5 s.
   - **Esfuerzo:** medio · **Depende de:** T1-04, T1-06
 
-- [ ] **[T2-09] axe-core en CI** *(viene de BACKLOG 4.2)*
+- [x] **[T2-09] axe-core en CI** *(viene de BACKLOG 4.2)*
   - **Área:** QA · **Ubicación:** `.github/workflows/`
   - **Qué hacer:** el score de accesibilidad de Lighthouse es superficial; axe detecta bastante
     más. ⚠️ **Trampa descubierta el 2026-09-08:** con las animaciones `whileInView` en su estado
@@ -422,6 +439,20 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
     que las animaciones terminen antes de medir, o forzar `prefers-reduced-motion`.
   - **Criterio de aceptación:** el scan cubre las 8 secciones (comprobable por el número de nodos
     auditados) y falla el build ante cualquier violación *serious* o *critical*.
+  - **Cerrada:** 2026-09-09 · Playwright + `@axe-core/playwright` en `e2e/a11y.spec.ts`, corriendo
+    en CI **después** del build y contra `vite preview`, o sea contra lo que se publica.
+    **1586 nodos auditados en 37 reglas**, con el número impreso en el log de CI como evidencia.
+    El paso falla ante cualquier violación *serious* o *critical* y sube el informe como artefacto.
+  - **La trampa, resuelta y ampliada.** No basta con `reducedMotion: "reduce"`: la preferencia
+    quita la duración de la animación pero **no** los `delayChildren`/`staggerChildren`, así que hay
+    que recorrer la página igual y luego esperar. Y hubo un segundo nivel que la auditoría no había
+    visto: **una opacidad intermedia tampoco es inocua**. La regla de contraste de axe *mezcla el
+    color con el fondo* según la opacidad heredada, así que una tarjeta a 0.93 reportaba
+    `#4376ec` en vez de `#487fff` y producía una violación fantasma de 4.47:1. Aparecieron dos así
+    en Certificados. El test espera a que **toda** la opacidad heredada sea exactamente 1, no
+    simplemente distinta de 0.
+  - **Un test guarda al otro:** «todo `<main>` está visible cuando se audita» corre antes del scan;
+    si falla, el verde de axe no significaría nada. Verificado estable en 3 corridas seguidas.
   - **Esfuerzo:** medio · **Depende de:** T1-02
 
 - [ ] **[T2-10] Playwright: congelar lo verificado a mano** *(viene de BACKLOG 4.3)*
@@ -446,13 +477,22 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
   - **Criterio de aceptación:** tres corridas seguidas sin diferencias.
   - **Esfuerzo:** medio · **Depende de:** T2-10
 
-- [ ] **[T2-12] Que el verificador de enlaces cubra el README y `docs/`**
+- [x] **[T2-12] Que el verificador de enlaces cubra el README y `docs/`**
   - **Área:** QA · **Ubicación:** `.github/workflows/links.yml:40-48`
   - **Qué hacer:** los globs actuales son `index.html`, `src/**/*.ts` y `src/**/*.tsx`. El
     `README.md` queda fuera y contiene enlaces rotos hoy mismo (ver T3-01). Añadir `README.md`,
     `ROADMAP.md`, `CONTEXT.md` y `docs/**/*.md`.
   - **Criterio de aceptación:** el resumen de lychee muestra un `Total` mayor que 23 y detecta el
     enlace de LinkedIn sin esquema del README.
+  - **Cerrada:** 2026-09-09 · añadidos `README.md`, `ROADMAP.md`, `CONTEXT.md`, `CHANGELOG.md` y
+    `docs/**/*.md`. Contadas las URLs `http(s)` únicas de los globs: **21 → 42**, así que el `Total`
+    superará holgadamente 23.
+  - ⏳ **La segunda mitad del criterio la confirma el runner**, no se puede en local (lychee no está
+    instalado aquí). Verificado en cambio que el cebo sigue puesto:
+    `[linkedin.com/in/tu-perfil](www.linkedin.com/in/ricky-...)` está en el README **sin esquema**.
+  - ⚠️ **Orden importante:** ese enlace roto es justo lo que **T3-01** arregla. Conviene lanzar
+    `links.yml` a mano (Actions → Enlaces → *Run workflow*) **antes** de cerrar T3-01, para
+    comprobar que el verificador lo caza. Si se arregla primero, se pierde el único caso de prueba.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
 ### SEO y contenido
@@ -526,7 +566,7 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
 
 ### Mantenimiento e infraestructura
 
-- [ ] **[T2-19] Declarar los navegadores soportados**
+- [x] **[T2-19] Declarar los navegadores soportados**
   - **Área:** DevOps · **Ubicación:** `package.json`
   - **Qué hacer:** no hay `browserslist`, ni polyfills, ni una línea en el README que diga contra
     qué se prueba. Sin soporte declarado nadie puede decidir si un fallo es un bug o un navegador
@@ -534,6 +574,15 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
     Safari/iOS.
   - **Criterio de aceptación:** `package.json` declara `browserslist` y el README dice cuál es el
     mínimo.
+  - **Cerrada:** 2026-09-09 · **Chrome/Edge 111, Safari/iOS 16.4, Firefox 128.** El mínimo no se
+    eligió: lo fija **Tailwind CSS 4**, que depende de `@property` y `color-mix()` — confirmado en su
+    documentación oficial, no deducido de las features del proyecto (`oklch()` solo, por ejemplo,
+    habría dado Firefox 113).
+  - ✅ **Valida retroactivamente T2-03:** WebP necesita Safari 14 y este baseline exige 16.4, así que
+    la decisión de no mantener respaldo PNG queda confirmada, no asumida.
+  - **Nota:** ni Vite ni Tailwind leen ese `browserslist` (Tailwind tiene objetivos fijos, Vite usa
+    su `build.target`). Es una **declaración de soporte**, que es justo lo que pedía la tarea: sin
+    ella nadie puede decidir si un fallo es un bug o un navegador fuera de alcance.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
 - [ ] **[T2-20] Arreglar el `Cache-Control` de los CV**
@@ -559,6 +608,11 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
 
 - [ ] **[T2-22] Corregir los tags que caen al icono genérico**
   - **Área:** Auditoría de código · **Ubicación:** `src/components/TechIcon.tsx:443,455-461`
+  - **Avance parcial 2026-09-09 (con T2-07):** corregido el caso ya diagnosticado —la regla pasó a
+    `/win(dows)?\s*forms/i` y **WinForms** resuelve. El recuento real hoy es **11 de 78 tags únicos**,
+    ya separados en dos listas explícitas dentro de `TechIcon.test.ts`: seis competencias sin
+    logotipo posible (decisión, no deuda) y **cuatro productos que sí deberían tenerlo — Jest,
+    Playwright (E2E), Supertest y TanStack Query—**, que es lo único que queda de esta tarea.
   - **Qué hacer:** **medido sobre la app corriendo: 14 de 109 tags (13 %) muestran el glifo de
     respaldo**, en 11 tecnologías distintas: TanStack Query, Jest, Playwright (E2E), Supertest,
     Pruebas de carga, WinForms, Detección de reúso de token, OAuth 2.0 con PKCE, Control de
@@ -884,6 +938,8 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
 | 2026-07-28 | T0-01, T0-02, T0-03 | Tier 0 completo. PR #1 y PR #5. |
 | 2026-09-08 | — | Auditoría completa de las 13 áreas (código y navegador). Se migró `docs/BACKLOG.md` a este archivo, se numeraron las 27 tareas heredadas y se añadieron 33 nuevas. Ninguna corrección aplicada: la Fase 2 no estaba aprobada. |
 | 2026-09-08 | T3-02 | Árbol de estructura del README reescrito contra el listado real de archivos. |
+| 2026-09-09 | T2-09 | axe-core en CI con Playwright: **1586 nodos auditados**, 0 violaciones serias. Se descubrió que una opacidad intermedia falsea la regla de contraste de axe (dos violaciones fantasma), así que el scan espera a opacidad exactamente 1. |
+| 2026-09-09 | T2-05, T2-07, T2-12, T2-19 | Primeros tests del repositorio: **87**, con Vitest en CI. T2-05 cerrada reescribiendo un criterio que no servía para decidir. `browserslist` declarado (lo fija Tailwind 4, confirmado en su documentación) y valida retroactivamente T2-03. Verificador de enlaces ampliado a las docs. |
 | 2026-09-08 | T2-01, T2-02, T2-03 | Capturas a WebP con `sharp`: **1123 kB → 291 kB (-74 %)**. Sin respaldo PNG (decisión registrada). Se rompió `og:image` al borrar los PNG y se arregló generando `public/og-image.jpg` 1200×630, que cubre la parte medible de T2-15. |
 | 2026-09-08 | T2-14 | `<noscript>` con nombre, rol, email ofuscado y enlaces a CV/GitHub/LinkedIn. Verificado con scripting desactivado de verdad (iframe en sandbox): 0 → 268 caracteres visibles. |
 | 2026-09-08 | T2-05 (parcial) | Reflow forzado: **740.6 ms → 0.5 ms** de coste de lecturas de layout. El diagnóstico del ROADMAP era incorrecto — el 99.9 % era `useScrollspy` leyendo `scrollHeight` en cada frame, no Framer Motion. Sigue abierta porque el insight de DevTools, que es lo que pide el criterio, no baja. |

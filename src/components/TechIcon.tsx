@@ -279,7 +279,14 @@ const ICONS: Record<string, React.ReactElement> = {
   ),
 }
 
-function pickColor(name?: string): string {
+/* Exportadas para poder testearlas (T2-07): son ~90 heurísticas regex
+   evaluadas en orden y su único punto de fallo es silencioso.
+   El lint protesta con razón — este archivo mezcla el componente con sus
+   utilidades— y la solución de fondo es sacar los diccionarios y los
+   resolutores a su propio módulo, que es **T3-16**. Hasta entonces, la
+   excepción va acotada a estas dos líneas y no al archivo entero. */
+// eslint-disable-next-line react-refresh/only-export-components -- ver T3-16
+export function pickColor(name?: string): string {
   if (!name) return FALLBACK_COLOR;
   const n = String(name);
   // Exact match first (case-insensitive, no regex pitfalls)
@@ -348,7 +355,7 @@ function pickColor(name?: string): string {
   if (/zod/i.test(n)) return BRAND_COLORS.Zod
   if (/cloudinary/i.test(n)) return BRAND_COLORS.Cloudinary
   if (/swr/i.test(n)) return BRAND_COLORS.SWR
-  if (/windows.*forms/i.test(n)) return BRAND_COLORS["Windows Forms"]
+  if (/win(dows)?\s*forms/i.test(n)) return BRAND_COLORS["Windows Forms"]
   if (/\.net.*framework/i.test(n)) return BRAND_COLORS[".NET Framework"]
   if (/\.net.*9/i.test(n)) return BRAND_COLORS[".NET 9"]
   if (/\.net.*8/i.test(n)) return BRAND_COLORS[".NET 8"]
@@ -372,7 +379,8 @@ function pickColor(name?: string): string {
   return FALLBACK_COLOR
 }
 
-function pickIcon(name?: string): React.ReactElement | null {
+// eslint-disable-next-line react-refresh/only-export-components -- ver T3-16
+export function pickIcon(name?: string): React.ReactElement | null {
   if (!name) return null;
   const n = String(name);
   // Exact key match (case-insensitive)
@@ -440,7 +448,7 @@ function pickIcon(name?: string): React.ReactElement | null {
   if (/zod/i.test(n)) return ICONS.Zod
   if (/cloudinary/i.test(n)) return ICONS.Cloudinary
   if (/swr/i.test(n)) return ICONS.SWR
-  if (/windows.*forms/i.test(n)) return ICONS["Windows Forms"]
+  if (/win(dows)?\s*forms/i.test(n)) return ICONS["Windows Forms"]
   if (/\.net.*framework/i.test(n)) return ICONS[".NET Framework"]
   if (/\.net.*9/i.test(n)) return ICONS.DotNet
   if (/\.net.*8/i.test(n)) return ICONS.DotNet
