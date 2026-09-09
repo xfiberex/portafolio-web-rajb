@@ -18,10 +18,10 @@ Los datos entre paréntesis son **medidos**, no estimados, salvo donde diga *est
 |---|---|---:|---:|---|
 | **Tier 0** | Crítico / bloqueante | 3 | 0 | — (cerrado) |
 | **Tier 1** | Alta prioridad — accesibilidad AA, build y documentación que engaña | 9 | 0 | — (cerrado) |
-| **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 22 | 20 | bajo·12 medio·7 alto·1 |
-| **Tier 3** | Pulido y mantenimiento | 20 | 20 | bajo·15 medio·5 |
+| **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 22 | 16 | bajo·8 medio·7 alto·1 |
+| **Tier 3** | Pulido y mantenimiento | 20 | 19 | bajo·14 medio·5 |
 | **Tier 4** | Futuro / opcional | 6 | 5 | bajo·4 alto·1 |
-| | **Total** | **60** | **45** | |
+| | **Total** | **60** | **40** | |
 
 **No hay ninguna tarea de Tier 0 abierta.** La auditoría del 2026-09-08 no encontró
 vulnerabilidades explotables, pérdida de datos ni fallos que rompan producción. Las tres
@@ -30,10 +30,13 @@ tareas de Tier 0 son las del backlog anterior, ya cerradas.
 **Tier 1 quedó cerrado el 2026-09-08**, junto con T2-13. Lo siguiente es Tier 2, donde el
 mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de forced reflow).
 
-> ⚠️ **Cuatro criterios de aceptación siguen sin verificar**, porque sólo se pueden
-> comprobar sobre un deploy preview de Netlify y no sobre un build local: el tamaño del
-> bundle en preview (T1-04), el 404 real y Lighthouse SEO = 100 (T1-06) y el
-> `Content-Type: application/xml` del sitemap (T2-13). Marcarlos al abrir el PR.
+> ✅ **Verificado en producción el 2026-09-08:** `/ruta-que-no-existe` → **404**, `/robots.txt`
+> 200 `text/plain`, `/sitemap.xml` 200 **`application/xml`**, Lighthouse móvil **SEO 100 ·
+> Accesibilidad 100 · Buenas prácticas 100** (48 auditorías, 0 fallos) y consola limpia con el
+> CSP cerrado a `'self'`. Cierra los criterios de **T1-06** y **T2-13**.
+>
+> ⚠️ **Queda solo T1-04**: el tamaño del bundle en un *deploy preview*, que necesita una pull
+> request — el contexto `deploy-preview` no existe ni en producción ni en un build local.
 
 ---
 
@@ -169,7 +172,9 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
   - **Cerrada:** 2026-09-08 · fallback eliminado de `netlify.toml` y `public/_redirects`
     borrado. Verificado sirviendo `dist/` con un servidor estático plano (`vite preview`
     hace su propio fallback SPA y habría enmascarado el resultado): 404 correcto y
-    `robots.txt` 200 `text/plain`. ⏳ **Lighthouse SEO = 100 pendiente de deploy preview.**
+    `robots.txt` 200 `text/plain`.
+  - ✅ **Confirmado en producción 2026-09-08:** `/ruta-que-no-existe` devuelve 404 y
+    **Lighthouse SEO = 100** (móvil, 48 auditorías, 0 fallos). Criterio completo.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
 ### Peso y robustez
@@ -230,14 +235,20 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
 
 ### Rendimiento
 
-- [ ] **[T2-01] Elegir herramienta de conversión a WebP** *(viene de BACKLOG 1.1)*
+- [x] **[T2-01] Elegir herramienta de conversión a WebP** *(viene de BACKLOG 1.1)*
   - **Área:** Rendimiento · **Ubicación:** `package.json`, `vite.config.ts`
   - **Qué hacer:** decidir entre `sharp` (script de build) y `vite-imagetools` (transforma en el
     import). Registrar la decisión y la alternativa descartada en `CONTEXT.md`.
   - **Criterio de aceptación:** decisión escrita en `CONTEXT.md` y dependencia instalada.
+  - **Cerrada:** 2026-09-08 · **`sharp`** en `scripts/images-to-webp.mjs` (`npm run images:webp`).
+    `vite-imagetools` queda descartado por arquitectura, no por gusto: transforma en el *import*, y
+    aquí las capturas viven en `public/` referenciadas como cadenas que `toAssetUrl` resuelve en
+    runtime. Habría exigido moverlas a `src/`, pasar la capa de datos a `import.meta.glob` y tocar
+    `ProjectCard` y `Lightbox` — un refactor para una conversión que se hace una vez. El script no
+    corre en el build: ni build ni CI pagan la conversión.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
-- [ ] **[T2-02] Convertir a WebP las 6 imágenes que sí se usan** *(corrige BACKLOG 1.1)*
+- [x] **[T2-02] Convertir a WebP las 6 imágenes que sí se usan** *(corrige BACKLOG 1.1)*
   - **Área:** Rendimiento · **Ubicación:** `public/projects/` ·
     `src/data/projects.ts:9,37,64,80,102,116`
   - **Qué hacer:** ⚠️ **la tabla del backlog anterior estaba desactualizada**: listaba
@@ -258,13 +269,34 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
     Reducción esperada en WebP: 60-80 % (*estimado*).
   - **Criterio de aceptación:** las 6 rutas de `projects.ts` apuntan a WebP y el peso total baja
     al menos un 50 %, vuelto a medir.
+  - **Cerrada:** 2026-09-08 · **1123 kB → 291 kB (-74 %)**, muy por encima del 50 % pedido. Calidad
+    85, elegida midiendo; verificado en el lightbox a escala casi 1:1 (1150×765 sobre un original de
+    1304×867) que el texto de las capturas sigue nítido. Las 6 cargan, ninguna rota.
+  - **Actualización 2026-09-08:** se reemplazó la captura del propio portafolio por una del diseño
+    nuevo (1120×848) y se convirtió con el mismo script: **281 kB → 74 kB (-74 %)**. `og-image.jpg`
+    se regeneró desde ella, porque deriva de esa captura y si no la tarjeta social seguiría
+    mostrando el diseño anterior. Total de imágenes publicadas: **342 kB** (6 WebP + la OG).
+  - ⚠️ **Rompí la tarjeta social y lo arreglé en el acto:** `og:image` apuntaba a
+    `projects/Porfolio-web-rajb.png`, que este cambio borra. Se generó `public/og-image.jpg`
+    **1200×630** (90 kB) y se apuntaron ahí `og:image` y `twitter:image`, añadiendo
+    `og:image:width/height`. Eso cubre la parte medible de **T2-15** (proporción correcta, sin
+    recorte en LinkedIn) pero **no su intención de diseño**: sigue siendo una captura recortada, no
+    una pieza con nombre, rol y stack. T2-15 queda abierta para eso. De paso, la URL pública deja de
+    arrastrar la errata «Porfolio» (T3-20).
+  - **Nota:** el banner del README también apuntaba al PNG borrado. Corregido. Es exactamente el
+    fallo que T2-12 quiere que el verificador de enlaces detecte solo.
   - **Esfuerzo:** bajo · **Depende de:** T1-07, T2-01
 
-- [ ] **[T2-03] Decidir sobre el respaldo PNG** *(viene de BACKLOG 1.1)*
+- [x] **[T2-03] Decidir sobre el respaldo PNG** *(viene de BACKLOG 1.1)*
   - **Área:** Rendimiento · **Ubicación:** `src/components/projects/ProjectCard.tsx:66,94`
   - **Qué hacer:** mantener un `<picture>` con respaldo PNG, o confirmar que el soporte de WebP
     alcanza al mínimo de navegadores declarado (ver T2-19, que es quien lo declara).
   - **Criterio de aceptación:** decisión registrada en `CONTEXT.md`.
+  - **Cerrada:** 2026-09-08 · **sin respaldo PNG.** WebP es universal desde Safari 14 (2020);
+    un navegador sin WebP tampoco ejecuta React 19, Tailwind 4 ni `oklch()`. Mantener el respaldo
+    duplicaba el peso publicado para cubrir un navegador que vería la página rota igualmente.
+  - ⚠️ **Se cierra antes que T2-19**, de la que depende formalmente. Si al declarar el
+    `browserslist` el mínimo resultara anterior a 2020, hay que revisar esta decisión.
   - **Esfuerzo:** bajo · **Depende de:** T2-02, T2-19
 
 - [x] **[T2-04] Auto-hospedar la fuente Inter**
@@ -432,17 +464,31 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
   - **Criterio de aceptación:** `/sitemap.xml` devuelve 200 con `application/xml`.
   - **Cerrada:** 2026-09-08 · sin `<changefreq>` ni `<priority>` (Google los ignora desde 2023).
     El `Content-Type` se declara en `netlify.toml` en vez de confiar en la tabla MIME por
-    defecto de Netlify, que no es contrato público. ⏳ **Criterio pendiente de deploy preview:**
-    el servidor local sirve `.xml` como `text/xml`.
+    defecto de Netlify, que no es contrato público.
+  - ✅ **Confirmado en producción 2026-09-08:** `/sitemap.xml` responde 200 con
+    **`application/xml; charset=utf-8`**. Criterio completo. Declararlo fue acertado: el
+    servidor estático local lo servía como `text/xml`.
   - **Esfuerzo:** bajo · **Depende de:** T1-06
 
-- [ ] **[T2-14] Añadir un `<noscript>`**
+- [x] **[T2-14] Añadir un `<noscript>`**
   - **Área:** SEO / UX · **Ubicación:** `index.html:96-99`
   - **Qué hacer:** el `<body>` solo contiene `<div id="root"></div>`. Sin JavaScript el visitante
     ve una página **completamente en blanco**, sin una sola palabra. Añadir un `<noscript>` con
     el nombre, el rol, el email y los enlaces al CV, GitHub y LinkedIn — lo mínimo para que un
     reclutador con un proxy corporativo restrictivo siga teniendo cómo contactar.
   - **Criterio de aceptación:** con JavaScript desactivado se ve nombre, rol y datos de contacto.
+  - **Cerrada:** 2026-09-08 · verificado renderizando la página dentro de un `<iframe sandbox>`
+    **sin** `allow-scripts`, que es la condición real que activa `<noscript>`: 268 caracteres
+    visibles donde antes había 0, con `<h1>`, rol y los 3 enlaces (CV 200 `application/pdf`,
+    GitHub, LinkedIn). Con JS activo el bloque no renderiza nada: un solo `<h1>` y cero
+    duplicación de contenido.
+  - ⚠️ **Desvío deliberado del enunciado:** la tarea pedía incluir «el email», pero un `mailto:`
+    aquí se lo entregaría en bandeja justo a los bots que **no** ejecutan JavaScript — que son
+    exactamente de los que protege `ObfuscatedEmail` (T3-13). Va como texto ofuscado
+    (`[at]`/`[dot]`), legible para una persona y sin enlace. La dirección literal sigue teniendo
+    **0 ocurrencias** en `dist/index.html`. El README se ajustó para no volver a afirmar de más.
+  - **Estilos en línea** a propósito: no dependen de que Tailwind escanee `index.html`. El CSP
+    ya permite `'unsafe-inline'` en `style-src` por Framer Motion.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
 - [ ] **[T2-15] Imagen Open Graph propia de 1200×630** *(viene de BACKLOG 1.2)*
@@ -539,11 +585,14 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
     con `https://`.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
-- [ ] **[T3-02] Actualizar el árbol de estructura del README**
+- [x] **[T3-02] Actualizar el árbol de estructura del README**
   - **Área:** Documentación · **Ubicación:** `README.md:98-140`
   - **Qué hacer:** el árbol omite la carpeta `components/projects/`, `lib/assets.ts` y 5 de los 6
     componentes de `components/ui/`; dice `hooks/useScrollspy.tsx` cuando el archivo es `.ts`.
   - **Criterio de aceptación:** el árbol coincide con `src/`.
+  - **Cerrada:** 2026-09-08 · reescrito entero contra un listado real de archivos, no a ojo.
+    Incluye lo añadido en esta tanda (`ui/ErrorBoundary.tsx`, `hooks/usePrefersReducedMotion.ts`,
+    `lib/contact.ts`, `public/fonts/`, `scripts/`) y corrige la extensión de `useScrollspy`.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
 - [ ] **[T3-03] Limpiar la documentación muerta del README**
@@ -807,7 +856,9 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
 
 - [ ] **[T4-05] Publicar un `llms.txt`**
   - **Área:** SEO · **Ubicación:** `public/`
-  - **Qué hacer:** la categoría *Agentic Browsing* de Lighthouse puntúa 67 y señala la ausencia de
+  - **Qué hacer:** ⚠️ **premisa desfasada (2026-09-08): esa categoría ya puntúa 100 en producción
+    sin `llms.txt`**, así que el motivo original desapareció; reevaluar antes de hacerla. Decía:
+    la categoría *Agentic Browsing* de Lighthouse puntúa 67 y señala la ausencia de
     `llms.txt`. Es una convención emergente, no un estándar; para un portafolio que cada vez leen
     más herramientas de reclutamiento automatizadas, tiene sentido. Bajo impacto, coste mínimo.
   - **Criterio de aceptación:** `/llms.txt` existe con un H1 y enlaces.
@@ -832,6 +883,9 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
 |---|---|---|
 | 2026-07-28 | T0-01, T0-02, T0-03 | Tier 0 completo. PR #1 y PR #5. |
 | 2026-09-08 | — | Auditoría completa de las 13 áreas (código y navegador). Se migró `docs/BACKLOG.md` a este archivo, se numeraron las 27 tareas heredadas y se añadieron 33 nuevas. Ninguna corrección aplicada: la Fase 2 no estaba aprobada. |
+| 2026-09-08 | T3-02 | Árbol de estructura del README reescrito contra el listado real de archivos. |
+| 2026-09-08 | T2-01, T2-02, T2-03 | Capturas a WebP con `sharp`: **1123 kB → 291 kB (-74 %)**. Sin respaldo PNG (decisión registrada). Se rompió `og:image` al borrar los PNG y se arregló generando `public/og-image.jpg` 1200×630, que cubre la parte medible de T2-15. |
+| 2026-09-08 | T2-14 | `<noscript>` con nombre, rol, email ofuscado y enlaces a CV/GitHub/LinkedIn. Verificado con scripting desactivado de verdad (iframe en sandbox): 0 → 268 caracteres visibles. |
 | 2026-09-08 | T2-05 (parcial) | Reflow forzado: **740.6 ms → 0.5 ms** de coste de lecturas de layout. El diagnóstico del ROADMAP era incorrecto — el 99.9 % era `useScrollspy` leyendo `scrollHeight` en cada frame, no Framer Motion. Sigue abierta porque el insight de DevTools, que es lo que pide el criterio, no baja. |
 | 2026-09-08 | T2-04, T4-03 | Inter auto-hospedada. **Cero peticiones a terceros.** FCP 276→104 ms y LCP 924→740 ms en A/B controlado; el coste del CSS de Google resultó ser mucho más variable de lo que sugería la estimación única de la auditoría (167 ms en caliente, 1175 ms en frío). CSP cerrado a `'self'`. Cierra T4-03 de raíz. |
 | 2026-09-08 | T1-01 … T1-09, T2-13 | **Tier 1 completo.** Contraste verificado en navegador sobre `dist/` servido. La prescripción de T1-01 resultó ser errónea y se resolvió separando el token en dos (ver su nota); el `hover` de los botones fallaba y no estaba en la auditoría. 4 criterios quedan pendientes de un deploy preview. Aplicados de paso 2 de los 4 puntos de T3-19. |

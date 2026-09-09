@@ -6,7 +6,7 @@ export const projects: Project[] = [
     subtitle: "ASP.NET Core 10 + React 19 · Biblioteca personal de seguimiento y progreso",
     description:
       "Aplicación full-stack para llevar el registro y el progreso de lo que ves, lees o juegas: series, películas, libros, cómics, videojuegos y más. Cada elemento guarda estado, progreso en su propia unidad, puntuación y notas. Backend en capas y frontend SPA en repositorios separados.",
-    image: "/projects/TrackerMultimedia.png",
+    image: "/projects/TrackerMultimedia.webp",
     features: [
       "Autenticación JWT con refresh rotativo y detección de reúso de token",
       "OAuth con Google y GitHub implementando PKCE",
@@ -34,7 +34,7 @@ export const projects: Project[] = [
     subtitle: "Express 5 + React · Inventario con órdenes de compra y venta",
     description:
       "Sistema de gestión de inventario con control de existencias, órdenes de compra y venta, proveedores y auditoría. Construido con atención al comportamiento bajo concurrencia y a la operación en producción.",
-    image: "/projects/Stockly.png",
+    image: "/projects/Stockly.webp",
     features: [
       "Control de concurrencia en stock mediante decremento condicional en una sola sentencia",
       "Decisiones de arquitectura registradas y versionadas como ADRs",
@@ -61,7 +61,7 @@ export const projects: Project[] = [
     subtitle: "Next.js 16 · Sistema de punto de venta tipo kiosko para restaurantes",
     description:
       "Aplicación web completa que permite a clientes realizar pedidos de forma autónoma desde un kiosko, con panel de administración en tiempo real para gestión de productos y órdenes.",
-    image: "/projects/kiosgo-uno.png",
+    image: "/projects/kiosgo-uno.webp",
     features: [
       "Navegación por categorías con carrito de compras (Zustand)",
       "Panel de administración completo con CRUD de productos",
@@ -77,7 +77,7 @@ export const projects: Project[] = [
     subtitle: "ASP.NET Core MVC · Gestión de ventas con arquitectura en capas",
     description:
       "Sistema integral de gestión comercial con dashboard ejecutivo, control de inventario y generación automática de reportes.",
-    image: "/projects/SistemasVenta-ASPNET-Core-MVC.png",
+    image: "/projects/SistemasVenta-ASPNET-Core-MVC.webp",
     features: [
       "Dashboard ejecutivo con métricas en tiempo real",
       "Gestión completa de usuarios, productos e inventario",
@@ -99,7 +99,7 @@ export const projects: Project[] = [
     subtitle: ".NET Blazor · Aplicación Web Full-Stack con Blazor WebAssembly y .NET 9",
     description:
       "Aplicación empresarial para gestión de tareas recurrentes con calendario interactivo y servicios automatizados.",
-    image: "/projects/S-Blazor-TDApp.png",
+    image: "/projects/S-Blazor-TDApp.webp",
     features: [
       "Calendario interactivo con programación de tareas por días específicos",
       "Panel de reportes y seguimiento de procesos completados",
@@ -113,7 +113,7 @@ export const projects: Project[] = [
     subtitle: "Sitio personal",
     description:
       "Portafolio profesional con diseño moderno, animaciones fluidas y secciones completas para mostrar habilidades, experiencia, proyectos, educación y certificaciones.",
-    image: "/projects/Porfolio-web-rajb.png",
+    image: "/projects/Porfolio-web-rajb.webp",
     features: [
       "Animaciones y transiciones suaves con Framer Motion",
       "Diseño responsive mobile-first y accesible",

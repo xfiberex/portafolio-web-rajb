@@ -18,6 +18,57 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 
 ## [Sin publicar]
 
+### Añadido
+
+- **Error boundary** (`src/components/ui/ErrorBoundary.tsx`). Sin él, una excepción en cualquier
+  componente dejaba la página en blanco y sin mensaje. El fallback no importa Framer Motion,
+  lucide-react ni componentes propios: lo que se pinta cuando la UI se rompe no debe depender de
+  la UI rota. Cubre el árbol de componentes, **no** los errores de importación ni de `main.tsx`.
+- **`<noscript>`** en `index.html` con nombre, rol, email ofuscado y enlaces a CV, GitHub y
+  LinkedIn. Sin JavaScript la página pasa de **0 a 268 caracteres** visibles.
+- **`public/robots.txt`** y **`public/sitemap.xml`**, con el `Content-Type` del sitemap declarado
+  en `netlify.toml` en vez de depender del MIME por defecto de Netlify.
+- **Inter auto-hospedada** en `public/fonts/` (fuente variable, subsets `latin` y `latin-ext`) con
+  `@font-face` y `<link rel="preload">`. Licencia SIL OFL incluida.
+- **`public/og-image.jpg`** 1200×630 para las tarjetas sociales, más `og:image:width/height`.
+- **`usePrefersReducedMotion`** (`useSyncExternalStore` sobre `matchMedia`).
+- **`src/lib/contact.ts`**: email y rutas de los CV en un solo sitio. El nombre de los PDF lleva la
+  fecha dentro, así que duplicarlos garantizaba enlaces rotos al actualizarlos.
+- **`scripts/images-to-webp.mjs`** y `npm run images:webp` (dependencia nueva: `sharp`).
+
+### Cambiado
+
+- **Contraste WCAG AA.** El acento se separó en dos tokens porque cumplía dos papeles con
+  requisitos opuestos: `--value-primary` (62.8 %, acento sobre superficie oscura) y
+  `--value-primary-strong` (56 %, relleno de botón). Botones **3.45 → 4.56:1**, estado *hover*
+  **4.42 → 5.91:1**, badge de Educación **4.43 → 4.66:1**.
+- **Capturas de proyecto a WebP**: **1123 kB → 291 kB (-74 %)**, sin respaldo PNG.
+- **`useScrollspy`** cachea la geometría de la página en vez de leer `scrollHeight` en cada frame
+  de scroll: coste de lecturas de layout **740.6 ms → 0.5 ms** (móvil, Slow 4G, CPU 4×).
+- **CSP** cerrado a `style-src 'self' 'unsafe-inline'` y `font-src 'self'` al desaparecer Google
+  Fonts. Cero peticiones a terceros.
+- Requisito de Node en el README: de «18 o superior» a **≥ 20.19 (recomendado 22)**, que es lo que
+  exigen Vite 7 y ESLint 10 y lo que ya usaban CI y Netlify.
+
+### Corregido
+
+- **El texto animado del Hero ignoraba `prefers-reduced-motion`** (WCAG 2.2.2, nivel **A**).
+  Ninguna regla CSS podía pararlo: `react-type-animation` teclea con `setTimeout`. Ahora se
+  renderiza texto fijo. Efecto colateral: con movimiento reducido el CLS pasa a ser exactamente 0.
+- **Soft 404 en todo el dominio.** El fallback SPA `/* → /index.html 200` estaba declarado dos
+  veces y el sitio no usa router. Cualquier ruta inexistente devolvía 200 con la página completa.
+- **Los deploy previews servían la build de desarrollo de React** (66 % más de JS), así que
+  cualquier medición sobre una URL de preview medía otra aplicación.
+- **Ocho afirmaciones falsas del README**, entre ellas «code splitting» (no hay ningún `import()`
+  dinámico), «cumple WCAG 2.1» y «formulario de contacto» (no existe ningún `<form>`).
+
+### Eliminado
+
+- `public/_redirects` y el bloque `[[redirects]]` de `netlify.toml`.
+- Dos capturas huérfanas (0.58 MB) que ya no referenciaba ningún proyecto pero se seguían
+  publicando.
+- `--value-primary-hover`, que solo usaban los botones ahora migrados a `primary-strong`.
+
 ### Interno
 
 - Auditoría técnica completa de las 13 áreas, con verificación sobre la aplicación desplegada
@@ -28,10 +79,12 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
   `T{tier}-{nn}` por severidad. 27 tareas heredadas + 33 nuevas.
 - Añadidos [CHANGELOG.md](CHANGELOG.md) y [CONTEXT.md](CONTEXT.md).
 - Capturas de evidencia de la auditoría en `docs/auditoria-2026-09-08/`.
+- **Dos diagnósticos de la auditoría resultaron incorrectos al aplicarlos** y están corregidos en
+  `CONTEXT.md`: la solución prescrita para el contraste habría roto `text-primary`, y el reflow
+  forzado venía del scrollspy, no de Framer Motion.
 
-**Sin cambios de código.** La auditoría se entregó como informe; las correcciones están
-pendientes de aprobación (Fase 2).
-
+> **Pendiente de verificar en un deploy preview** (no se puede en local): tamaño del bundle en
+> preview, 404 real, Lighthouse SEO = 100 y `Content-Type: application/xml` del sitemap.
 ---
 
 ## [2.0.0] — 2026-09-07

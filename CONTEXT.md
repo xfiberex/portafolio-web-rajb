@@ -24,8 +24,10 @@ meses después, o desde otro equipo y otra sesión de chat, sin perder nada de l
 | **Node** | 22 en CI y en Netlify. Mínimo real: ≥ 20.19 (Vite 7 y ESLint 10) |
 | **Despliegue** | Netlify, build `npm run build`, publica `dist/` |
 | **Nº de pruebas** | **0.** No hay ningún archivo de test en el repositorio |
-| **Build medido** | 382.32 kB JS (124.06 kB gzip) · 29.36 kB CSS (6.02 kB gzip) · un solo chunk |
-| **Planificación** | [ROADMAP.md](ROADMAP.md) — 57 tareas abiertas, ninguna de Tier 0 |
+| **Build medido** | 384.50 kB JS (124.71 kB gzip) · 30.50 kB CSS (6.38 kB gzip) · un solo chunk |
+| **Imágenes publicadas** | 342 kB (6 capturas WebP + la tarjeta social). Antes: 1.68 MB |
+| **Peticiones a terceros** | **0.** La fuente se auto-hospeda desde 2026-09-08 |
+| **Planificación** | [ROADMAP.md](ROADMAP.md) — 40 tareas abiertas; Tier 0 y Tier 1 cerrados |
 | **Historial** | [CHANGELOG.md](CHANGELOG.md) |
 | **Última actualización** | 2026-09-08 |
 
@@ -64,12 +66,16 @@ portafolio-web-rajb/
 ├── public/
 │   ├── assets/                 Los dos PDF del CV. ⚠️ Netlify les aplica cache immutable
 │   │                           a un año (ver Trampas conocidas).
-│   ├── projects/               Capturas de los proyectos.
+│   ├── projects/               Capturas de los proyectos, en WebP (ver decisiones).
+│   ├── fonts/                  Inter auto-hospedada (variable, subsets latin y latin-ext)
+│   │                           y su licencia SIL OFL.
+│   ├── og-image.jpg            Tarjeta social 1200×630.
+│   ├── robots.txt              Enlaza el sitemap.
+│   ├── sitemap.xml             Una sola URL; su Content-Type se declara en netlify.toml.
 │   ├── favicon.svg
-│   ├── placeholder.svg         Imagen de reemplazo cuando falla la carga de una captura.
-│   └── _redirects              Fallback SPA duplicado con netlify.toml. Ninguno hace falta.
+│   └── placeholder.svg         Imagen de reemplazo cuando falla la carga de una captura.
 ├── src/
-│   ├── main.tsx                Monta React. Envuelve la app en <MotionConfig reducedMotion=
+│   ├── main.tsx                Monta React. ErrorBoundary + <MotionConfig reducedMotion=
 │   │                           "user">, que solo cubre Framer Motion (ver Trampas conocidas).
 │   ├── App.tsx                 Compone las 8 secciones en orden. Nada más.
 │   ├── index.css               Design system. Dos capas a propósito: valores crudos en
@@ -94,14 +100,21 @@ portafolio-web-rajb/
 │   │       ├── SkipLink.tsx       Salta los 8 enlaces del nav. Invisible hasta recibir foco.
 │   │       ├── TechTags.tsx       Lista de tecnologías, compartida por proyectos y competencias.
 │   │       ├── Lightbox.tsx       Visor modal con el contrato completo de diálogo.
+│   │       ├── ErrorBoundary.tsx   Fallback sin dependencias cuando el árbol React revienta.
 │   │       └── ObfuscatedEmail.tsx  ⚠️ Su rama de render por defecto es código muerto.
 │   ├── data/                   Contenido del portafolio, tipado. Editar aquí, no en los
 │   │                           componentes.
-│   ├── hooks/useScrollspy.ts   IntersectionObserver + listener de scroll throttleado con rAF.
+│   ├── hooks/
+│   │   ├── useScrollspy.ts     IntersectionObserver + scroll con rAF. Cachea la geometría
+│   │   │                       para no leer layout al scrollear (ver Trampas conocidas).
+│   │   └── usePrefersReducedMotion.ts   useSyncExternalStore sobre matchMedia.
 │   ├── lib/
 │   │   ├── animations.ts       Variantes de Framer Motion. Fuente única de verdad.
-│   │   └── assets.ts           toAssetUrl (BASE_URL) y safeExternalUrl (bloquea javascript:).
+│   │   ├── assets.ts           toAssetUrl (BASE_URL) y safeExternalUrl (bloquea javascript:).
+│   │   └── contact.ts          Email y rutas de los CV, en un solo sitio.
 │   └── types/index.ts          Las 5 interfaces de datos.
+├── scripts/
+│   └── images-to-webp.mjs      Conversión con sharp. Se corre a mano, no en el build.
 ├── docs/
 │   ├── BACKLOG.md              Superado por ROADMAP.md el 2026-09-08.
 │   └── auditoria-2026-09-08/   Capturas de evidencia de la auditoría.
@@ -114,21 +127,56 @@ portafolio-web-rajb/
 
 ## Estado actual
 
-**Recién cerrado (2026-09-08):** auditoría técnica completa de las 13 áreas, con verificación
-sobre la aplicación desplegada además de la revisión de código. Es la primera vez que se **miden**
-Core Web Vitals, contraste, peso real y comportamiento con `prefers-reduced-motion` en vez de
-estimarlos.
+**Recién cerrado (2026-09-08):** la auditoría técnica de las 13 áreas **y la primera tanda de
+correcciones**. Tier 0 y **Tier 1 completos**, más T2-01…T2-05, T2-13, T2-14, T3-02 y T4-03.
 
-**Abierto:** las 57 tareas de [ROADMAP.md](ROADMAP.md). Ninguna es de Tier 0. Lo más urgente:
+Lo medido antes y después, en las mismas condiciones:
 
-- **T1-01** — contraste 3.44:1 en el botón primario (WCAG 1.4.3 AA).
-- **T1-02** — el texto animado del Hero ignora `prefers-reduced-motion` (WCAG 2.2.2, nivel A).
-- **T1-04** — los deploy previews sirven la build de desarrollo de React (66 % más de JS).
-- **T1-06** — cualquier ruta inexistente devuelve 200 con la página completa.
-- **T1-07** — 0.58 MB de imágenes huérfanas que se siguen publicando.
+| | Antes | Ahora |
+|---|---|---|
+| Contraste del botón primario | 3.45:1 ❌ | **4.56:1** ✅ |
+| Contraste en `hover` | 4.42:1 ❌ | **5.91:1** ✅ |
+| `prefers-reduced-motion` en el Hero | ignorado (WCAG A) | respetado; CLS pasa a **0** |
+| Peticiones a terceros | 1 (Google Fonts) | **0** |
+| Peso de las imágenes | 1.68 MB | **342 kB** |
+| Coste de lecturas de layout al scrollear | 740.6 ms | **0.5 ms** |
+| Ruta inexistente | 200 con la página completa | **404** |
+| Contenido sin JavaScript | 0 caracteres | **268** |
 
-**No empezado:** la Fase 2 (aplicar correcciones). La auditoría entregó el informe y los tres
-archivos; no se tocó ni una línea de código de la aplicación.
+**Abierto:** las 40 tareas restantes de [ROADMAP.md](ROADMAP.md). Ninguna de Tier 0 ni Tier 1.
+Lo siguiente por valor medido:
+
+- **T2-06** — el LCP sigue dominado por el arranque de React, no por la red. Falta correr el
+  analizador de bundle antes de decidir nada.
+- **T2-07 / T2-09 / T2-10** — no hay **ni un test**. Todo lo verificado en esta sesión se
+  comprobó a mano y hoy no tiene red de seguridad.
+- **T2-15** — la tarjeta social ya tiene la proporción correcta, pero sigue siendo una captura
+  recortada, no una pieza diseñada.
+- **T2-19** — sin `browserslist` declarado; T2-03 se cerró asumiendo un mínimo de 2020.
+
+✅ **Verificado en producción el 2026-09-08**, tras desplegar Tier 1 y T2-04/05/13/14:
+
+| Comprobación | Resultado |
+|---|---|
+| `/ruta-que-no-existe` | **404** (era 200 con la página completa) |
+| `/robots.txt` | 200 `text/plain` |
+| `/sitemap.xml` | 200 **`application/xml; charset=utf-8`** |
+| Lighthouse móvil | SEO **100**, Accesibilidad **100**, Buenas prácticas **100** — 48 auditorías, 0 fallos |
+| CSP servido | cerrado a `'self'`; **cero errores y cero avisos** en consola |
+| Fuente | `/fonts/inter-latin.woff2`; ninguna referencia a Google |
+
+Con eso quedan cerrados los criterios de **T1-06** y **T2-13**.
+
+⚠️ **Queda uno solo sin verificar: T1-04**, el tamaño del bundle en un deploy preview. Ese sí
+necesita una *pull request*, porque el contexto `deploy-preview` de Netlify no existe en
+producción ni en un build local.
+
+📌 **Dos cifras de la auditoría quedaron desfasadas al alza:** la accesibilidad de Lighthouse
+subió de 96 a 100, y *Agentic Browsing* de 67 a 100 — esta última **sin** publicar `llms.txt`,
+así que la premisa de T4-05 ya no se sostiene tal como está escrita. Ojo igualmente: sigue en pie
+la trampa de que las animaciones `whileInView` dejan invisible buena parte de `<main>` cuando
+estas herramientas miden (T2-09), así que ese 100 de accesibilidad **no** es una medida del sitio
+completo.
 
 ---
 
@@ -165,7 +213,12 @@ Reserva el alto de las dos líneas que llega a ocupar la frase más larga del te
 hueco visible cuando muestra una frase corta.
 **Problema que lo provocó:** sin él, el texto que se escribe y se borra empujaba todo el contenido
 de abajo en cada ciclo, justo sobre el fold.
-**Resultado medido (2026-09-08): CLS = 0.00.** Se puede afinar (T3-10), pero no a costa del CLS.
+**Resultado medido (2026-09-08): CLS ≈ 0.006**, no 0.00 como se anotó primero. Ese 0.00 salía de
+una traza de carga corta; observando `layout-shift` durante 6 s se acumulan ~100 desplazamientos
+diminutos, y se siguen acumulando mientras el Hero teclea. Verificado que la causa es el propio
+texto animado: con `prefers-reduced-motion` el CLS es **exactamente 0**. Sigue muy por debajo
+del umbral 0.1, pero partir de «CLS = 0.00» hace creer que cualquier valor distinto es una
+regresión propia. Se puede afinar (T3-10), sin empeorar esa línea base real.
 
 ### El verificador de enlaces no corre en cada PR
 
@@ -202,9 +255,12 @@ del proceso de auditoría, y cada tarea heredada indica su origen (`viene de BAC
 
 Las que costaron un fallo real. Leer antes de tocar la zona correspondiente.
 
-### `prefers-reduced-motion` NO detiene el texto del Hero *(descubierto 2026-09-08)*
+### `prefers-reduced-motion` no detenía el texto del Hero ✅ *(resuelto 2026-09-08, T1-02)*
 
-Hay tres mecanismos y **ninguno cubre el caso**:
+> **Corregido.** `usePrefersReducedMotion` desmonta `<TypeAnimation>` y renderiza texto fijo.
+> Se conserva el diagnóstico porque explica por qué no bastaba con CSS.
+
+Había tres mecanismos y **ninguno cubría el caso**:
 
 1. `<MotionConfig reducedMotion="user">` en `main.tsx` — solo cubre Framer Motion.
 2. La media query de `index.css:139` con `animation-duration: .01ms !important` — solo apaga
@@ -231,18 +287,24 @@ animación no ha acabado y las medidas de tamaño y posición **no valen**. Dura
 produjo dos falsos positivos (desbordamiento horizontal y áreas táctiles de 41 px) que
 desaparecieron al dejar que las animaciones terminaran.
 
-### `NODE_ENV=development` en los deploy previews infla el bundle un 66 % *(descubierto 2026-09-08)*
+### `NODE_ENV=development` inflaba el bundle de los previews un 66 % ✅ *(resuelto 2026-09-08, T1-04)*
 
-`netlify.toml` lo fija en `[context.deploy-preview.environment]` con el comentario "menos
+> **Corregido:** el bloque `[context.deploy-preview.environment]` ya no existe. Se conserva
+> porque explica por qué las mediciones sobre previews anteriores a esta fecha no valen.
+
+`netlify.toml` lo fijaba en `[context.deploy-preview.environment]` con el comentario "menos
 restrictivo para testing", que sugiere que solo afecta a cabeceras. **No:** hace que Vite empaquete
 la build de desarrollo de React.
 
 Medido: **635.58 kB** en preview frente a **382.32 kB** en producción. Cualquier Lighthouse sobre
 una URL de preview mide una aplicación que no es la que se publica. Ver T1-04.
 
-### El fallback SPA convierte todo el dominio en un soft 404
+### El fallback SPA convertía todo el dominio en un soft 404 ✅ *(resuelto 2026-09-08, T1-06)*
 
-`/* → /index.html 200` está declarado **dos veces** (`netlify.toml` y `public/_redirects`) y el
+> **Corregido:** eliminado de `netlify.toml` y `public/_redirects` borrado. Ahora una ruta
+> inexistente devuelve 404 y existen `robots.txt` y `sitemap.xml`.
+
+`/* → /index.html 200` estaba declarado **dos veces** (`netlify.toml` y `public/_redirects`) y el
 sitio **no usa router**. Consecuencia verificada en producción: `/robots.txt`, `/sitemap.xml`,
 `/ruta-que-no-existe` y hasta `/assets/index-*.js.map` devuelven todos `200 text/html`. Lighthouse
 puntúa `robots-txt` = 0 por eso. Ver T1-06.
@@ -250,12 +312,60 @@ puntúa `robots-txt` = 0 por eso. Ver T1-06.
 *(Efecto secundario benigno: los sourcemaps no están expuestos — no existen. Lo que devuelve 200 es
 la página, no un mapa.)*
 
-### El reflow forzado viene de Framer Motion, no del scrollspy
+### El reflow forzado SÍ venía del scrollspy *(corregido 2026-09-08)*
 
-La traza de producción acusa 540 ms de *forced reflow*. La sospecha natural es `useScrollspy`, que
-lee `scrollHeight`/`innerHeight`. **No es él.** Atribuido con sourcemap a
-`framer-motion/batcher.mjs` llamado desde `PopChild.mjs`. El hook ya está throttleado con `rAF`
-justamente por eso. Ver T2-05.
+> **Esta entrada decía lo contrario y estaba equivocada.** Se conserva el error porque explica
+> por qué la tarea T2-05 prescribía la solución incorrecta.
+
+La versión anterior afirmaba: *«la sospecha natural es `useScrollspy`. **No es él.** Atribuido con
+sourcemap a `framer-motion/batcher.mjs` llamado desde `PopChild.mjs`»*.
+
+**Por qué era falso.** `PopChild.mjs` es código de `AnimatePresence mode="popLayout"`, que este
+proyecto no usa en ninguna parte: la atribución por sourcemap sobre un bundle minificado había
+caído en un tramo de la librería que no se ejecuta. La lección general: en un bundle de una sola
+línea, resolver una columna a un archivo de `node_modules` no prueba que ese código corriera.
+
+**Lo que sí ocurría**, medido instrumentando los getters de layout y cronometrando cada lectura
+durante un recorrido completo (móvil, Slow 4G, CPU 4×):
+
+| Origen | Lecturas | Coste |
+|---|---:|---:|
+| `useScrollspy` (`scrollHeight` + `offsetTop`) | 582 | **740.2 ms** |
+| Framer Motion (`scrollTop` + `getBoundingClientRect`) | 20 | 0.4 ms |
+
+El `rAF` throttle no ayudaba: limita a una lectura *por frame*, pero `scrollHeight` fuerza un
+layout síncrono en **cada** una de esas lecturas mientras haya estilos invalidados — y con ~56
+elementos animándose los hay casi siempre. Corregido cacheando la geometría y refrescándola solo
+al redimensionar y vía `ResizeObserver`: **740.6 ms → 0.5 ms**. Ver T2-05.
+
+### Convertir imágenes: `sharp` en un script, no `vite-imagetools` *(2026-09-08)*
+
+**Decisión:** `sharp` en `scripts/images-to-webp.mjs`, ejecutado a mano (`npm run images:webp`),
+con los `.webp` commiteados.
+
+**Por qué no `vite-imagetools`**, que era la alternativa: transforma en el *import*, y aquí las
+capturas viven en `public/` y se referencian como **cadenas** en `src/data/projects.ts`, que
+`toAssetUrl` resuelve en runtime. Usarlo obligaba a mover las imágenes a `src/`, convertir la capa
+de datos a imports estáticos o `import.meta.glob`, y tocar `ProjectCard` y `Lightbox` — un
+refactor de la capa de datos para obtener una conversión que se hace una vez. No lo descarta el
+gusto, lo descarta la arquitectura.
+
+Como el script no corre en el build, ni el build ni el CI pagan la conversión, y el resultado se
+revisa en el diff. Calidad 85, elegida midiendo sobre una captura real de 1919×918: 80 % menos que
+el PNG y el texto de las UI sigue nítido a escala 1:1 en el lightbox (verificado). Por debajo de 80
+aparecen artefactos en los bordes del texto.
+
+### Sin respaldo PNG para las imágenes WebP *(2026-09-08)*
+
+**Decisión:** no hay `<picture>` con respaldo. Los PNG se borraron; siguen en el historial de git.
+
+WebP es universal desde Safari 14 (2020): Chrome 32, Firefox 65, Edge 18. Un navegador sin WebP
+tampoco ejecuta este sitio, que usa React 19, Tailwind 4 y `oklch()`. Mantener un respaldo
+duplicaría el peso publicado —1.10 MB de PNG que ya nadie descargaría— para cubrir un navegador
+que de todas formas vería la página rota.
+
+⚠️ Esto **cierra T2-03 antes de que T2-19 declare el `browserslist`**. Si al declararlo el mínimo
+resultara ser anterior a 2020, hay que revisar esta decisión.
 
 ### `lychee` necesita globs explícitos, no directorios
 
@@ -274,9 +384,11 @@ El fallo ocurre al *resolver* el enlace, antes de que se aplique el filtro de es
 
 ### `lychee.toml` tiene exclusiones deliberadas
 
-LinkedIn devuelve **999** a todo cliente sin sesión de navegador, y los orígenes de `preconnect`
-(`fonts.googleapis.com`, `fonts.gstatic.com`) devuelven 404 porque no son documentos. Ambas
-verificadas con `curl`. Sin esas exclusiones habría un issue de falsos positivos cada lunes.
+LinkedIn devuelve **999** a todo cliente sin sesión de navegador; verificado con `curl`. Sin esa
+exclusión habría un issue de falsos positivos cada lunes.
+
+La exclusión de `fonts.googleapis.com` y `fonts.gstatic.com` **se retiró el 2026-09-08**: eran
+orígenes de `preconnect` y el sitio ya no enlaza a Google Fonts (T2-04).
 
 ### ESLint ignora las carpetas de herramientas IA
 

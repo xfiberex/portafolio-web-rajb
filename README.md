@@ -9,7 +9,7 @@ Un portafolio web moderno, seguro y responsivo construido con las últimas tecno
 ![Security](https://img.shields.io/badge/Security-A+-success?logo=netlify&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-![Portafolio-web-rajb](public/projects/Porfolio-web-rajb.png)
+![Portafolio-web-rajb](public/projects/Porfolio-web-rajb.webp)
 
 ## ✨ Características - [Demostración](https://portafolio-web-rajb.netlify.app/)
 
@@ -18,9 +18,9 @@ Un portafolio web moderno, seguro y responsivo construido con las últimas tecno
 - **🌟 Animaciones Interactivas**: Implementadas con Framer Motion
 - **⚡ Rendimiento Optimizado**: Construido con Vite 7 para carga ultrarrápida
 - **🛡️ Seguridad Reforzada**: Headers HTTP de seguridad, CSP estricto, protección anti-clickjacking
-- **🔒 Protección de Datos**: Email fuera del HTML servido, enlaces externos con `rel="noopener noreferrer"`
+- **🔒 Protección de Datos**: Email sin `mailto:` en el HTML, enlaces externos con `rel="noopener noreferrer"`
 - **🎯 Type-Safe**: Desarrollo con TypeScript para mayor confiabilidad
-- **📧 Email no incrustado**: la dirección no aparece en el HTML; la ensambla JavaScript
+- **📧 Email no rastreable a la primera**: lo ensambla JavaScript; en el `<noscript>` va ofuscado
 - **🔍 SEO Optimizado**: Meta tags y estructura semántica
 
 ## 🛠️ Tecnologías Utilizadas
@@ -38,7 +38,7 @@ Un portafolio web moderno, seguro y responsivo construido con las últimas tecno
 
 ### Security & Best Practices
 - **Netlify Security Headers** - CSP, HSTS, X-Frame-Options, Permissions-Policy
-- **Email ensamblado en JavaScript** - No aparece en el HTML servido
+- **Email ensamblado en JavaScript** - Sin `mailto:` ni dirección literal en el HTML
 - **Secure External Links** - rel="noopener noreferrer" en todos los enlaces
 
 ### Development Tools
@@ -92,6 +92,11 @@ npm run lint
 
 # Verificar tipos TypeScript
 npm run type-check
+
+# Convertir a WebP las capturas nuevas de public/projects/
+# (se corre a mano al añadir una captura, no en cada build)
+npm run images:webp
+npm run images:webp -- --clean   # y borra los PNG de origen
 ```
 
 ## 📁 Estructura del Proyecto
@@ -99,12 +104,29 @@ npm run type-check
 ```
 portafolio-web/
 ├── public/
-│   ├── assets/           # CVs y documentos
-│   ├── projects/         # Imágenes de proyectos
-│   ├── favicon.svg       # Icono del sitio
-│   └── _redirects        # Configuración de redirects
+│   ├── assets/                     Los dos PDF del CV
+│   ├── fonts/                      Inter auto-hospedada (.woff2) + licencia SIL OFL
+│   ├── projects/                   Capturas de los proyectos (.webp)
+│   ├── favicon.svg
+│   ├── og-image.jpg                Tarjeta social 1200×630
+│   ├── placeholder.svg             Reemplazo si falla la carga de una captura
+│   ├── robots.txt
+│   └── sitemap.xml
+├── scripts/
+│   └── images-to-webp.mjs          Conversión con sharp (npm run images:webp)
 ├── src/
-│   ├── components/       # Componentes de React (TypeScript)
+│   ├── components/
+│   │   ├── projects/
+│   │   │   ├── ProjectCard.tsx     Dos disposiciones: "featured" y "row"
+│   │   │   └── ProjectLinks.tsx    Repo, ampliar, frontend, backend, demo
+│   │   ├── ui/
+│   │   │   ├── ErrorBoundary.tsx   Fallback cuando el árbol React revienta
+│   │   │   ├── Lightbox.tsx        Visor modal con contrato de diálogo
+│   │   │   ├── ObfuscatedEmail.tsx Ensambla el email en JavaScript
+│   │   │   ├── Section.tsx         Ritmo vertical, ancho y scroll-margin del navbar
+│   │   │   ├── SectionHeader.tsx   h2 + subtítulo
+│   │   │   ├── SkipLink.tsx        Salta la navegación; visible al recibir foco
+│   │   │   └── TechTags.tsx        Lista de tecnologías
 │   │   ├── About.tsx
 │   │   ├── Certificates.tsx
 │   │   ├── Contact.tsx
@@ -116,29 +138,29 @@ portafolio-web/
 │   │   ├── Navbar.tsx
 │   │   ├── Projects.tsx
 │   │   ├── Skills.tsx
-│   │   ├── TechIcon.tsx
-│   │   └── ui/           # Componentes UI reutilizables
-│   │       └── ObfuscatedEmail.tsx  # Protección de email
-│   ├── data/             # Datos tipados
+│   │   └── TechIcon.tsx            Colores de marca, rutas SVG y resolución por heurística
+│   ├── data/                       Contenido tipado: editar aquí, no en los componentes
 │   │   ├── certificates.ts
 │   │   ├── education.ts
 │   │   ├── experience.ts
 │   │   ├── projects.ts
 │   │   └── skills.ts
-│   ├── hooks/            # Hooks personalizados
-│   │   └── useScrollspy.tsx
-│   ├── lib/              # Utilidades y configuraciones
-│   │   └── animations.ts
-│   ├── types/            # Definiciones de tipos TypeScript
-│   │   └── index.ts
-│   ├── App.tsx           # Componente principal
-│   ├── main.tsx          # Punto de entrada
-│   └── index.css         # Estilos globales
-├── netlify.toml          # Configuración de seguridad Netlify
-├── eslint.config.js      # Configuración de ESLint
-├── tsconfig.json         # Configuración de TypeScript
-├── vite.config.ts        # Configuración de Vite (TypeScript)
-└── package.json          # Dependencias del proyecto
+│   ├── hooks/
+│   │   ├── usePrefersReducedMotion.ts
+│   │   └── useScrollspy.ts
+│   ├── lib/
+│   │   ├── animations.ts           Variantes de Framer Motion
+│   │   ├── assets.ts               toAssetUrl y safeExternalUrl
+│   │   └── contact.ts              Email y rutas de los CV
+│   ├── types/index.ts
+│   ├── App.tsx
+│   ├── index.css                   Design system en dos capas
+│   └── main.tsx
+├── index.html
+├── netlify.toml
+├── lychee.toml
+├── eslint.config.js
+└── vite.config.ts
 ```
 
 ## 🎨 Secciones del Portfolio
@@ -151,6 +173,8 @@ portafolio-web/
 - **🎓 Educación**: Formación académica
 - **📜 Certificaciones**: Cursos y certificaciones
 - **📞 Contacto**: Email directo y redes sociales (no hay formulario)
+- **🚫 Sin JavaScript**: un bloque `<noscript>` con nombre, rol, email y enlaces a CV, GitHub
+  y LinkedIn, para que la página nunca quede en blanco
 
 ## 🌐 Despliegue
 
@@ -228,9 +252,10 @@ Los estilos están definidos en `src/index.css` y utilizan Tailwind CSS 4. Puede
 - **X-Frame-Options: DENY** contra clickjacking
 - **Permissions-Policy** bloqueando APIs innecesarias
 - **Cross-Origin Policies** para protección adicional
-- Email ausente del HTML servido (0 ocurrencias en `dist/index.html`): lo ensambla el JS
-  a partir de sus partes. Frena a los scrapers que **no** ejecutan JavaScript; los que sí
-  lo ejecutan lo leen del DOM igualmente
+- La dirección literal no está en el HTML servido (0 ocurrencias de `usuario@dominio` en
+  `dist/index.html`): el JS la ensambla a partir de sus partes, y el bloque `<noscript>` la
+  muestra ofuscada (`[at]`/`[dot]`) y sin `mailto:`. Frena a los scrapers que **no** ejecutan
+  JavaScript; los que sí lo ejecutan la leen del DOM igualmente
 - Enlaces externos con `rel="noopener noreferrer"`
 
 ### Code Quality
