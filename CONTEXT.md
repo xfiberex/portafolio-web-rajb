@@ -23,7 +23,7 @@ meses después, o desde otro equipo y otra sesión de chat, sin perder nada de l
 | **Stack** | React 19.2 · TypeScript 5.9 · Vite 7.3 · Tailwind CSS 4.1 · Framer Motion 12.23 |
 | **Node** | 22 en CI y en Netlify. Mínimo real: ≥ 20.19 (Vite 7 y ESLint 10) |
 | **Despliegue** | Netlify, build `npm run build`, publica `dist/` |
-| **Nº de pruebas** | **87** unitarios (Vitest) + **21** e2e (Playwright: axe-core, foco, navegación, reflow, movimiento reducido). Ambos en CI |
+| **Nº de pruebas** | **93** unitarios (Vitest) + **24** e2e + **3** snapshots visuales (Playwright). Todos en CI |
 | **Build medido** | 384.50 kB JS (124.71 kB gzip) · 30.50 kB CSS (6.38 kB gzip) · un solo chunk |
 | **Imágenes publicadas** | 342 kB (6 capturas WebP + la tarjeta social). Antes: 1.68 MB |
 | **Peticiones a terceros** | **0.** La fuente se auto-hospeda desde 2026-09-08 |
@@ -563,6 +563,73 @@ distingue no es evidencia de nada.
 
 Esto también explica por qué `e2e/a11y.spec.ts` tiene que esperar a opacidad exactamente 1
 aunque los tests corran con movimiento reducido: la preferencia no quita esos fundidos.
+
+### Un `maxDiffPixelRatio` que suena pequeño es un colador *(T2-11, 2026-09-10)*
+
+Los snapshots se escribieron con `maxDiffPixelRatio: 0.002` pensando que era un margen
+mínimo para el antialias. Sobre una captura de página completa a 1440 px son ~23.000 píxeles
+de tolerancia. Comprobado con un sabotaje: cambiar «Contactar» por «Contáctame» **pasó sin
+rechistar**. Sin tolerancia, el mismo cambio falla señalando **67 píxeles**.
+
+La lección es que un *ratio* escala con el tamaño de la imagen, así que en capturas grandes
+esconde justo los cambios pequeños — que son los que se escapan al revisar a ojo, y por
+tanto los únicos para los que sirve un snapshot. La comparación exacta es viable porque la
+página es determinista con `prefers-reduced-motion`.
+
+### Las líneas base visuales son por plataforma *(T2-11, 2026-09-10)*
+
+Playwright pone el sistema en el nombre del archivo (`-chromium-win32` /
+`-chromium-linux`) porque el renderizado de fuentes difiere lo bastante como para que una
+imagen de Windows no case nunca en Linux. Las de Linux se generan en el contenedor oficial,
+y **el volumen anónimo sobre `node_modules` no es opcional**:
+
+```bash
+docker run --rm -v "$(pwd -W):/work" -v /work/node_modules -w /work \
+  mcr.microsoft.com/playwright:v1.63.0-noble \
+  bash -c "npm ci && npm run build && npm run test:visual:update"
+```
+
+Sin ese `-v /work/node_modules`, el `npm ci` de dentro instala binarios de Linux encima de
+los de Windows (`@esbuild/win32-x64`, `sharp`) y deja el entorno del host roto. Con él, se
+verificó después que `sharp` seguía cargando y que `npm run build` seguía pasando.
+
+El coste: **cada cambio de diseño intencionado rompe CI** hasta regenerar las dos líneas
+base. Por eso los visuales viven en `npm run test:visual`, fuera de `npm run test:e2e`, y
+por eso se captura solo el pliegue: con `fullPage`, añadir un proyecto también las rompería.
+
+### Tailwind 4 poda del `:root` los tokens que solo usan las utilidades *(2026-09-10)*
+
+Con `@theme inline`, las variables del tema **no** están todas disponibles en runtime. Solo
+sobreviven en `:root` las que algún CSS propio referencia con `var()`; las que se consumen
+únicamente a través de utilidades (`bg-background`, `text-muted`…) se inlinean en las clases
+y desaparecen. Medido en el navegador:
+
+```
+getPropertyValue('--color-ring')        → "oklch(70% .18 264)"   (lo usa index.css)
+getPropertyValue('--color-background')  → ""                     (solo vía utilidades)
+getPropertyValue('--value-background')  → "oklch(15.1% .013 256)"
+```
+
+Costó una tarjeta social en blanco sobre blanco: el generador leía `--color-*` y recibía
+cadenas vacías. **Regla:** cualquier JS que necesite un color del tema debe leer el
+`getComputedStyle` de un elemento real —`.bg-background`, `h1`, `.text-primary`— y no la
+custom property. Es además más fiel: lee lo que se ve, no lo que se declaró.
+
+### `<summary>` no lleva `aria-expanded` en el DOM *(T2-16, 2026-09-10)*
+
+El disclosure «Descargar CV» del Hero es un `<details>` nativo. Al escribir su prueba di por
+hecho que el navegador pondría `aria-expanded` en el `<summary>`, y no lo hace: el atributo
+**no existe en el DOM**. El estado se publica solo en el árbol de accesibilidad, como
+`DisclosureTriangle` con `expanded` y `focusable` (verificado por CDP), así que un lector de
+pantalla sí lo anuncia correctamente, pero `toHaveAttribute("aria-expanded", …)` falla
+siempre. Las pruebas comprueban la propiedad `open` del `<details>`, que es la fuente de
+verdad. Tampoco vale `getByRole("button", { expanded })`: Playwright no mapea
+`DisclosureTriangle` a `button`.
+
+Lo que `<details>` **no** trae y hubo que añadir: cerrar con Escape (devolviendo el foco al
+`<summary>`) y al pulsar fuera. Se añadió para que siga el mismo contrato que el menú móvil
+y el lightbox, y `summary` se sumó al selector de `:focus-visible` de `index.css`, donde
+faltaba: sin eso el control no mostraba anillo de foco al tabular.
 
 ### El elemento LCP cambia con el viewport *(T2-23/T2-08, 2026-09-09)*
 

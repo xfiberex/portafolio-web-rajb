@@ -34,6 +34,8 @@ const main = async () => {
 
   let antes = 0;
   let despues = 0;
+  let borrados = 0;
+  const conservados = [];
 
   for (const file of files) {
     const src = join(DIR, file);
@@ -50,12 +52,31 @@ const main = async () => {
     const ahorro = ((1 - salida / origen) * 100).toFixed(0);
     console.log(`${file.padEnd(38)} ${String(width)}×${height}  ${kb(origen)} → ${kb(salida)}  (-${ahorro} %)`);
 
-    if (clean) await unlink(src);
+    /* `--clean` borra el original y eso no tiene vuelta atrás, así que se
+       exige que la conversión haya salido bien de verdad: un archivo con
+       contenido y más pequeño que el origen. Si el WebP saliera mayor —pasa
+       con capturas de pocos colores o ya muy optimizadas— el PNG es la
+       versión buena y borrarlo sería perder calidad y espacio a la vez. */
+    if (clean) {
+      if (salida > 0 && salida < origen) {
+        await unlink(src);
+        borrados += 1;
+      } else {
+        conservados.push(file);
+      }
+    }
   }
 
   console.log("");
   console.log(`TOTAL: ${kb(antes)} → ${kb(despues)}  (-${((1 - despues / antes) * 100).toFixed(0)} %)`);
-  if (clean) console.log("Originales borrados (--clean).");
+
+  if (clean) {
+    console.log(`Originales borrados: ${borrados} de ${files.length}.`);
+    if (conservados.length > 0) {
+      console.log(`CONSERVADOS por seguridad (el WebP no salió más pequeño): ${conservados.join(", ")}`);
+      process.exitCode = 1;
+    }
+  }
 };
 
 main().catch((error) => {

@@ -18,10 +18,10 @@ Los datos entre paréntesis son **medidos**, no estimados, salvo donde diga *est
 |---|---|---:|---:|---|
 | **Tier 0** | Crítico / bloqueante | 3 | 0 | — (cerrado) |
 | **Tier 1** | Alta prioridad — accesibilidad AA, build y documentación que engaña | 9 | 0 | — (cerrado) |
-| **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 23 | 6 | bajo·5 medio·1 |
+| **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 23 | 1 | bajo·1 |
 | **Tier 3** | Pulido y mantenimiento | 20 | 19 | bajo·14 medio·5 |
 | **Tier 4** | Futuro / opcional | 6 | 5 | bajo·4 alto·1 |
-| | **Total** | **61** | **30** | |
+| | **Total** | **61** | **25** | |
 
 **No hay ninguna tarea de Tier 0 abierta.** La auditoría del 2026-09-08 no encontró
 vulnerabilidades explotables, pérdida de datos ni fallos que rompan producción. Las tres
@@ -581,13 +581,39 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     enlaces marcados arriba del todo, así que cuando **T3-18** lo arregle, fallará y
     obligará a actualizarla en vez de quedar el arreglo sin cobertura.
 
-- [ ] **[T2-11] Snapshots visuales** *(viene de BACKLOG 4.4)*
+- [x] **[T2-11] Snapshots visuales** *(viene de BACKLOG 4.4)*
   - **Área:** QA · **Ubicación:** `e2e/`
   - **Qué hacer:** `toHaveScreenshot()` a 375 / 768 / 1440. **Requisito:** forzar reduced-motion
     y enmascarar la línea de texto animado, o los snapshots serán inestables por Framer Motion y
     `react-type-animation`.
   - **Criterio de aceptación:** tres corridas seguidas sin diferencias.
   - **Esfuerzo:** medio · **Depende de:** T2-10 ✅ (desbloqueada el 2026-09-09)
+  - **Cerrada:** 2026-09-10 · `e2e/visual.spec.ts`, 3 snapshots a 375/768/1440.
+    Criterio cumplido **por duplicado**: tres corridas idénticas en Windows y otras tres en
+    Linux, dentro del contenedor oficial de Playwright.
+
+    Tres decisiones que se apartan del enunciado, todas por un motivo medido:
+
+    1. **No se enmascara la línea de texto animado.** El requisito daba por hecho que
+       `react-type-animation` seguiría corriendo, pero desde **T1-02** el Hero no la monta
+       con `prefers-reduced-motion`, que es como corre toda la suite. Enmascararla solo
+       escondería regresiones reales.
+    2. **Se captura el pliegue, no la página entera.** Con `fullPage`, añadir un proyecto o
+       un certificado —contenido que sale de `src/data/`— pondría en rojo los tres
+       snapshots. Una suite que falla por lo que se espera que pase se acaba ignorando.
+       De paso, las imágenes bajan de **5,9 MB a 332 kB**.
+       Contrapartida asumida: no cubre regresiones por debajo del pliegue.
+    3. **Sin `maxDiffPixelRatio`.** Se probó con 0.002 —que suena a margen mínimo— y era un
+       colador: cambiar «Contactar» por «Contáctame» **pasó sin rechistar**, porque un
+       ratio sobre una imagen grande tolera miles de píxeles. Sin tolerancia, el mismo
+       sabotaje falla señalando 67 píxeles.
+
+    ⚠️ **Coste de mantenimiento, para tenerlo claro:** las líneas base son por plataforma
+    (`-chromium-win32` / `-chromium-linux`), así que **cada cambio de diseño intencionado
+    rompe CI** hasta regenerar las dos, y las de Linux necesitan Docker (imagen de 3,5 GB).
+    El procedimiento está en el README. Si estorba más de lo que aporta, pasar el paso a
+    `continue-on-error: true` es una línea.
+    Los visuales corren en `npm run test:visual`, **fuera** de `npm run test:e2e`.
 
 - [x] **[T2-12] Que el verificador de enlaces cubra el README y `docs/`**
   - **Área:** QA · **Ubicación:** `.github/workflows/links.yml:40-48`
@@ -643,7 +669,7 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     ya permite `'unsafe-inline'` en `style-src` por Framer Motion.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
-- [ ] **[T2-15] Imagen Open Graph propia de 1200×630** *(viene de BACKLOG 1.2)*
+- [x] **[T2-15] Imagen Open Graph propia de 1200×630** *(viene de BACKLOG 1.2)*
   - **Área:** SEO · **Ubicación:** `index.html:35,44`
   - **Qué hacer:** ⚠️ **medio hecha el 2026-09-09, sin querer.** Al pasar las capturas a WebP
     (T2-01) se borró el PNG al que apuntaba `og:image` y la etiqueta quedó rota; se generó
@@ -654,29 +680,58 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
   - **Criterio de aceptación:** validada con el post inspector de LinkedIn y el card validator de
     X, sin recorte.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-10 · tarjeta 1200×630 (41 kB) con nombre, rol, stack y dominio.
+    Generada **renderizando el sitio real** y leyendo los colores de elementos existentes, no
+    aproximándolos: así usa la Inter auto-hospedada y los tokens exactos y no puede
+    desviarse de la web. El primer intento salió en blanco sobre blanco por leer
+    `--color-*`, que Tailwind 4 no expone en runtime (ver CONTEXT.md).
+    ⏳ Queda validarla en los inspectores de LinkedIn y X, que necesitan la URL ya desplegada.
 
-- [ ] **[T2-16] Un solo CTA primario en el Hero** *(viene de BACKLOG 1.3)*
+- [x] **[T2-16] Un solo CTA primario en el Hero** *(viene de BACKLOG 1.3)*
   - **Área:** UI/UX · **Ubicación:** `src/components/Hero.tsx:57-104`
   - **Qué hacer:** hay 8 acciones compitiendo arriba del fold (Inicio, menú, Ver proyectos,
     Contactar, Descargar CV, CV-ATS, GitHub, LinkedIn). La regla es **un** CTA primario. Dejar
     "Ver proyectos" como único botón primario y bajar el resto a secundario o terciario.
   - **Criterio de aceptación:** un solo elemento con `bg-primary` sobre el fold.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-10 · ⚠️ **el criterio estaba mal formulado y ya se cumplía**:
+    `Contactar` solo tenía borde, así que `bg-primary` aparecía una sola vez desde el
+    principio. El problema real que describe la tarea son las **8 acciones compitiendo**, y
+    es contra eso que se cerró: **de 8 a 5, y de tres filas a una**.
+    Los dos CV se funden en un único disclosure `Descargar CV`; GitHub y LinkedIn pasan a
+    iconos de 44×44 **con borde**, en la misma fila; y `Contactar` baja de `border-2` a
+    `border`. Los cinco controles miden 44 px de alto, así que la línea alinea sin ajustes
+    y en móvil envuelve a dos filas por sí sola. Eran tres filas separadas —CTAs, CV,
+    sociales— y eso era justo lo que hacía que ocho acciones parecieran ocho decisiones.
 
-- [ ] **[T2-17] Renombrar "CV-ATS"** *(viene de BACKLOG 1.3)*
+- [x] **[T2-17] Renombrar "CV-ATS"** *(viene de BACKLOG 1.3)*
   - **Área:** Ortografía y redacción · **Ubicación:** `src/components/Hero.tsx:78-81`
   - **Qué hacer:** "CV-ATS" es jerga que un reclutador no descifra. Alternativa: un solo botón de
     CV con las dos variantes en un menú, o etiquetas explícitas ("CV en PDF" / "CV en texto
     plano").
   - **Criterio de aceptación:** ninguna etiqueta visible usa siglas sin explicar.
   - **Esfuerzo:** bajo · **Depende de:** T2-16
+  - **Cerrada:** 2026-09-10 · «CV-ATS» → **«CV en texto plano (ATS)»**, y el otro a «CV en
+    PDF». La sigla se conserva entre paréntesis porque quien la busca la reconoce, pero ya
+    no hay que saberla para entender el botón. Ambos dentro del disclosure de T2-16.
 
-- [ ] **[T2-18] Sustituir el wordmark "Inicio" por el nombre o un logo** *(viene de BACKLOG 1.3)*
+- [x] **[T2-18] Sustituir el wordmark "Inicio" por el nombre o un logo** *(viene de BACKLOG 1.3)*
   - **Área:** UI/UX · **Ubicación:** `src/components/Navbar.tsx:44-50`
   - **Qué hacer:** es el lugar de mayor jerarquía de marca de la página y está desperdiciado en
     una palabra genérica.
   - **Criterio de aceptación:** el wordmark muestra el nombre o un logo.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-10 · monograma **RAJB** sobre `bg-primary-strong` + **«Ricky
+    Jiménez»**. Se construyeron y capturaron tres variantes (nombre solo, monograma +
+    nombre, monograma solo) para decidir viéndolas, no describiéndolas.
+    Cumple el criterio por las dos vías: nombre **y** logo.
+    Se probó una cuarta, «RAJB Inicio», y se descartó: quita ruido visual pero deja el
+    nombre solo en el `<h1>`, y quien llega a una sección interna por un enlace directo no
+    lo ve. En el navbar el nombre sale gratis —cabe de sobra incluso a 390 px— así que no
+    había razón para sacrificarlo.
+    El monograma lleva `aria-hidden`: el nombre de al lado ya da el nombre accesible.
+    ⚠️ **No cambia el hueco de `aria-current` de T3-18**: `navItems` sigue sin incluir
+    `home`, y la prueba que lo congela sigue en verde.
 
 ### Mantenimiento e infraestructura
 

@@ -62,6 +62,15 @@ jobs:
       - name: Accesibilidad (axe-core)
         run: npm run test:e2e
 
+      # Comparacion EXACTA contra imagenes de referencia. Las lineas base
+      # llevan la plataforma en el nombre (-chromium-linux) porque el
+      # renderizado de fuentes difiere entre sistemas; las de Linux se
+      # generan en el contenedor oficial de Playwright, no a mano.
+      # Si este paso falla por un cambio de diseno INTENCIONADO, hay que
+      # regenerarlas: ver README, seccion de snapshots visuales.
+      - name: Snapshots visuales
+        run: npm run test:visual
+
       # Chrome viene preinstalado en la imagen ubuntu-latest. Se imprime la
       # version para que, si algun dia desaparece, el fallo diga por que en
       # vez de morir dentro de chrome-launcher.

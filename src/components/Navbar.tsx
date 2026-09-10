@@ -41,12 +41,25 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
       <nav className="mx-auto flex h-header max-w-6xl items-center justify-between px-gutter" aria-label="Navegación principal">
+        {/*
+          Sustituye al antiguo wordmark "Inicio" (T2-18). El monograma es
+          decorativo (`aria-hidden`): el nombre de al lado ya da el nombre
+          accesible del enlace, y anunciar "RAJB Ricky Jimenez" seria ruido.
+          El nombre va escrito y no solo las iniciales porque quien llega a
+          una seccion interna por un enlace directo no ve el <h1>.
+        */}
         <a
           href="#home"
-          className="-mx-2 inline-flex min-h-11 items-center rounded-md px-2 text-lg font-bold text-foreground hover:text-primary"
+          className="-mx-2 inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-lg font-bold text-foreground hover:text-primary"
           onClick={closeMenu}
         >
-          Inicio
+          <span
+            className="inline-flex h-8 items-center justify-center rounded-md bg-primary-strong px-2 text-xs font-bold tracking-wide text-primary-foreground"
+            aria-hidden="true"
+          >
+            RAJB
+          </span>
+          Ricky Jiménez
         </a>
 
         <div className="flex items-center gap-2">

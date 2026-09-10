@@ -8,6 +8,11 @@
  * auditoría de accesibilidad corría de verdad en el runner.
  *
  * No falla nunca: los umbrales los impone `lhci assert`, no este script.
+ *
+ * Ojo con el recuento: `lhci` deja CADA informe dos veces —el crudo en
+ * `.lighthouseci/lhr-*.json` y una copia volcada en el `outputDir`—, así
+ * que hay que deduplicar o se anuncian 6 corridas donde hubo 3. La mediana
+ * no se altera (los duplicados van en pares), pero el número mentía.
  */
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -45,6 +50,11 @@ if (informes.length === 0) {
   console.log(`(sin informes en ${RAIZ}/)`);
   process.exit(0);
 }
+
+// Deduplicar por `fetchTime`: identifica la corrida, no el archivo.
+const porCorrida = new Map();
+for (const r of informes) porCorrida.set(r.fetchTime, r);
+informes = [...porCorrida.values()];
 
 const mediana = (valores) => [...valores].sort((a, b) => a - b)[Math.floor(valores.length / 2)];
 const porCategoria = (id) => mediana(informes.map((r) => Math.round(r.categories[id].score * 100)));

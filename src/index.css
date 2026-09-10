@@ -168,10 +168,18 @@ h3 {
 /* ─── Foco visible ────────────────────────────────────────── */
 a:focus-visible,
 button:focus-visible,
+summary:focus-visible,
 [tabindex]:focus-visible {
   outline: 2px solid var(--color-ring);
   outline-offset: 3px;
   border-radius: 0.5rem;
+}
+
+/* El triangulito nativo de <summary>. `list-style: none` basta en
+   Chrome y Firefox; Safari necesita ademas el pseudo -webkit, y
+   el browserslist del proyecto baja hasta Safari 16.4. */
+summary::-webkit-details-marker {
+  display: none;
 }
 
 /* ─── Transiciones por defecto ────────────────────────────── */

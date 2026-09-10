@@ -101,6 +101,9 @@ npm run test:watch
 # del lightbox, menu movil, skip link, cero scroll horizontal y movimiento reducido
 npm run build && npm run test:e2e
 
+# Snapshots visuales del pliegue a 375/768/1440 (comparacion EXACTA)
+npm run test:visual
+
 # Presupuestos de Lighthouse: falla si a11y/SEO/buenas practicas bajan de 100,
 # si el LCP pasa de 2,5 s o si el JS transferido pasa de 160 kB. Corre en CI.
 npm run lighthouse
@@ -108,6 +111,7 @@ npm run lighthouse
 # Medir FCP/LCP/CLS del build (requiere `npm run preview` en otra terminal)
 npm run medir:lcp
 npm run medir:lcp -- --lento    # 4G lento + CPU x4
+npm run medir:lcp -- --movil    # viewport 412x823: el elemento LCP cambia con el ancho
 
 # Analizar el bundle: genera stats.html (treemap). Ver T2-06
 npm run analyze
@@ -115,7 +119,7 @@ npm run analyze
 # Convertir a WebP las capturas nuevas de public/projects/
 # (se corre a mano al añadir una captura, no en cada build)
 npm run images:webp
-npm run images:webp -- --clean   # y borra los PNG de origen
+npm run images:webp -- --clean   # y borra los PNG de origen, solo si el WebP salio menor
 ```
 
 ## 🌐 Navegadores soportados
@@ -135,6 +139,32 @@ rango las soporta desde hace años.
 > su propio `build.target`. Sirve para **declarar el soporte**, que es lo que permite decidir si un
 > fallo reportado es un bug o un navegador fuera de alcance.
 
+## 🖼️ Snapshots visuales
+
+`npm run test:visual` compara el pliegue a 375/768/1440 contra imágenes de referencia, **pixel a
+pixel y sin tolerancia**. Corren aparte de `npm run test:e2e` a propósito: son la única parte de
+la suite que depende de la plataforma.
+
+Las líneas base llevan el sistema en el nombre (`pliegue-1440-chromium-linux.png` frente a
+`-win32.png`) porque el renderizado de fuentes difiere lo bastante entre sistemas como para que
+una imagen de Windows nunca case en Linux. Hay **las dos**: las de Windows para trabajar en
+local, las de Linux porque es lo que corre CI.
+
+**Cuando cambies el diseño a propósito**, el paso de CI fallará hasta que regeneres las dos:
+
+```bash
+# 1. Las de tu maquina
+npm run test:visual:update
+
+# 2. Las de Linux, en el contenedor oficial de Playwright (misma version que
+#    @playwright/test). El volumen sobre node_modules es OBLIGATORIO: sin el,
+#    el `npm ci` de dentro pisa los binarios de Windows y rompe tu entorno.
+docker run --rm -v "$(pwd -W):/work" -v /work/node_modules -w /work   mcr.microsoft.com/playwright:v1.63.0-noble   bash -c "npm ci && npm run build && npm run test:visual:update"
+```
+
+Si el fallo **no** era intencionado, el informe con las tres imágenes —esperada, obtenida y
+diferencia— queda como artefacto de la corrida de CI.
+
 ## 📁 Estructura del Proyecto
 
 ```
@@ -148,15 +178,18 @@ portafolio-web/
 │   ├── placeholder.svg             Reemplazo si falla la carga de una captura
 │   ├── robots.txt
 │   └── sitemap.xml
-├── e2e/                            End-to-end con Playwright (21 pruebas)
+├── e2e/                            End-to-end con Playwright (24 + 3 visuales)
 │   ├── util/pagina.ts              Revelado de la página y detección de desbordes
 │   ├── a11y.spec.ts                axe-core sobre la página revelada
 │   ├── lightbox.spec.ts            Contrato de diálogo modal: foco, Tab, Escape, scroll
 │   ├── navegacion.spec.ts          Menú móvil, skip link y `aria-current`
 │   ├── responsive.spec.ts          Cero scroll horizontal a 320/360/768/1280/1440
-│   └── movimiento-reducido.spec.ts `prefers-reduced-motion` en los dos sentidos
+│   ├── movimiento-reducido.spec.ts `prefers-reduced-motion` en los dos sentidos
+│   └── visual.spec.ts              Snapshots del pliegue (npm run test:visual)
 ├── scripts/
-│   └── images-to-webp.mjs          Conversión con sharp (npm run images:webp)
+│   ├── images-to-webp.mjs          Conversión con sharp (npm run images:webp)
+│   ├── medir-lcp.mjs               FCP/LCP/CLS con cada candidato (npm run medir:lcp)
+│   └── resumen-lighthouse.mjs      Una línea con las métricas, para el log de CI
 ├── src/
 │   ├── components/
 │   │   ├── projects/

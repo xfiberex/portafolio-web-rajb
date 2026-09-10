@@ -99,7 +99,7 @@ test.describe("aria-current sigue a la sección activa", () => {
     });
   }
 
-  test("el wordmark «Inicio» nunca recibe aria-current — hueco conocido (T3-18)", async ({ page }) => {
+  test("el wordmark nunca recibe aria-current — hueco conocido (T3-18)", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("#home")).toBeInViewport();
 
@@ -112,5 +112,67 @@ test.describe("aria-current sigue a la sección activa", () => {
       page.locator('header a[aria-current="true"]'),
       "alguien añadió `home` al nav: T3-18 está resuelto, actualizar esta prueba",
     ).toHaveCount(0);
+  });
+});
+
+test.describe("Descargar CV (disclosure del Hero)", () => {
+  /* Es un <details> nativo, así que el navegador ya aporta el rol y el
+     estado expandido. Lo que NO aporta —y se añadió a mano— es cerrar con
+     Escape y al pulsar fuera; eso es lo que estas pruebas vigilan.
+
+     Ojo con cómo se comprueba el estado: <summary> **no** lleva un
+     atributo `aria-expanded` en el DOM. El navegador lo publica solo en el
+     árbol de accesibilidad, como `DisclosureTriangle` con `expanded`
+     (verificado por CDP), así que un lector de pantalla sí lo anuncia pero
+     `toHaveAttribute("aria-expanded", …)` falla siempre. Se comprueba la
+     propiedad `open` del <details>, que es la fuente de verdad. */
+  const RESUMEN = 'summary:has-text("Descargar CV")';
+  const DETALLES = 'details:has(summary:has-text("Descargar CV"))';
+
+  test("abre, ofrece los dos formatos y no empuja el contenido de abajo", async ({ page }) => {
+    await page.goto("/");
+
+    await expect(page.locator(DETALLES)).toHaveJSProperty("open", false);
+    await expect(page.getByRole("link", { name: "CV en PDF" })).toBeHidden();
+
+    /* El panel es `absolute` justamente para no desplazar nada: si alguien
+       lo devuelve al flujo, crecería la fila de acciones y empujaría todo
+       lo de debajo. Se ancla en la SECCIÓN siguiente y no en un hermano de
+       fila: desde que las acciones comparten una sola línea, un hermano ya
+       no prueba gran cosa. */
+    const antes = await page.locator("#about").boundingBox();
+
+    await page.locator(RESUMEN).click();
+
+    await expect(page.locator(DETALLES)).toHaveJSProperty("open", true);
+    await expect(page.getByRole("link", { name: "CV en PDF" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "CV en texto plano (ATS)" })).toBeVisible();
+
+    const despues = await page.locator("#about").boundingBox();
+    expect(despues?.y, "abrir el panel movió el contenido de abajo").toBe(antes?.y);
+  });
+
+  test("Escape cierra y devuelve el foco al disparador", async ({ page }) => {
+    await page.goto("/");
+
+    await page.locator(RESUMEN).click();
+    await expect(page.locator(DETALLES)).toHaveJSProperty("open", true);
+
+    await page.keyboard.press("Escape");
+
+    await expect(page.locator(DETALLES)).toHaveJSProperty("open", false);
+    await expect(page.locator(RESUMEN), "Escape cerró el panel pero perdió el foco").toBeFocused();
+  });
+
+  test("pulsar fuera cierra el panel", async ({ page }) => {
+    await page.goto("/");
+
+    await page.locator(RESUMEN).click();
+    await expect(page.locator(DETALLES)).toHaveJSProperty("open", true);
+
+    await page.locator("h1").click();
+
+    await expect(page.locator(DETALLES)).toHaveJSProperty("open", false);
+    await expect(page.getByRole("link", { name: "CV en PDF" })).toBeHidden();
   });
 });

@@ -20,6 +20,10 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 
 ### Añadido
 
+- **Snapshots visuales** del pliegue a 375/768/1440 (`npm run test:visual`), comparación
+  exacta y sin tolerancia. Corren en CI con líneas base de Linux generadas en el contenedor
+  oficial de Playwright; las de Windows se conservan para trabajar en local. Verificados con
+  tres corridas idénticas en cada plataforma.
 - **`npm run analyze`**: `rollup-plugin-visualizer` detrás de `vite build --mode analyze`, así
   que no entra ni en el build normal ni en CI. Informe y decisión en
   [docs/analisis-bundle-2026-09-09.md](docs/analisis-bundle-2026-09-09.md).
@@ -70,6 +74,19 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 
 ### Cambiado
 
+- **El Hero pasa de 8 acciones a 5, y de tres filas a una.** Los dos CV se funden en un solo
+  control «Descargar CV» —un `<details>` nativo, con Escape y clic fuera añadidos a mano— y
+  sus etiquetas dejan la jerga: «CV-ATS» ahora es **«CV en texto plano (ATS)»**. GitHub y
+  LinkedIn pasan a iconos de 44×44 con borde y nombre accesible, en la misma fila, y
+  `Contactar` baja de `border-2` a `border`.
+- **El wordmark «Inicio» pasa a un monograma RAJB + «Ricky Jiménez».** Era el sitio de mayor
+  jerarquía de marca de la página y estaba gastado en una palabra genérica. El nombre va
+  escrito, y no solo las iniciales, porque quien llega a una sección interna por un enlace
+  directo no ve el `<h1>`.
+- **Tarjeta social propia** de 1200×630 en vez del recorte de la captura del portafolio,
+  generada con la tipografía y los tokens reales del sitio.
+- `summary` se añade al selector de `:focus-visible`, donde faltaba.
+
 - **El `<h1>` del Hero ya no anima y `staggerContainer` solo orquesta.** El nombre aparece de
   inmediato y el resto del Hero sigue entrando en cascada a su alrededor. **LCP 748 → 108 ms**
   (−86 %); a 4G lento con CPU ×4, 2008 → 1656 ms, donde ya coincide con el FCP. El motivo es
@@ -92,6 +109,19 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
   exigen Vite 7 y ESLint 10 y lo que ya usaban CI y Netlify.
 
 ### Corregido
+
+- **El resumen de Lighthouse anunciaba el doble de corridas de las que hubo** (decía «mediana
+  de 6» con 3). `lhci` deja cada informe **dos veces** —el crudo en `.lighthouseci/` y una
+  copia en el `outputDir`— y el script los contaba por archivo. La mediana era correcta
+  igualmente, porque los duplicados van en pares, pero el número mentía. Deduplicado por
+  `fetchTime`.
+- **`npm run images:webp -- --clean` borraba el PNG original sin comprobar nada.** Ahora solo
+  lo borra si el WebP existe y **es más pequeño**; si no, lo conserva, lo dice y sale con
+  código 1. Con capturas de pocos colores el WebP puede salir mayor, y ahí el PNG es la
+  versión buena: borrarlo perdía calidad y espacio a la vez, y no tiene vuelta atrás.
+- **`npm run medir:lcp` solo medía en escritorio**, que es justo cómo se me coló el LCP móvil
+  en T2-23. Nueva bandera `--movil` (412×823). Y el navegador se cierra en un `finally`: si
+  `evaluate` lanzaba, quedaba un Chromium huérfano ocupando el puerto.
 
 - **El diagnóstico del LCP que arrastraban tres tareas del ROADMAP.** Se repetía que «el 98 %
   del LCP es esperar a que React arranque». Midiendo *cada candidato* de LCP en vez de solo el
