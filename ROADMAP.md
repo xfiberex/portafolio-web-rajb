@@ -18,17 +18,20 @@ Los datos entre paréntesis son **medidos**, no estimados, salvo donde diga *est
 |---|---|---:|---:|---|
 | **Tier 0** | Crítico / bloqueante | 3 | 0 | — (cerrado) |
 | **Tier 1** | Alta prioridad — accesibilidad AA, build y documentación que engaña | 9 | 0 | — (cerrado) |
-| **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 22 | 11 | bajo·6 medio·4 alto·1 |
+| **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 23 | 8 | bajo·6 medio·2 |
 | **Tier 3** | Pulido y mantenimiento | 20 | 19 | bajo·14 medio·5 |
 | **Tier 4** | Futuro / opcional | 6 | 5 | bajo·4 alto·1 |
-| | **Total** | **60** | **35** | |
+| | **Total** | **61** | **32** | |
 
 **No hay ninguna tarea de Tier 0 abierta.** La auditoría del 2026-09-08 no encontró
 vulnerabilidades explotables, pérdida de datos ni fallos que rompan producción. Las tres
 tareas de Tier 0 son las del backlog anterior, ya cerradas.
 
-**Tier 1 quedó cerrado el 2026-09-08**, junto con T2-13. Lo siguiente es Tier 2, donde el
-mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de forced reflow).
+**Tier 1 quedó cerrado el 2026-09-08.** El bloque de QA de Tier 2 quedó cerrado el
+2026-09-09 con T2-10: el repositorio pasó de **cero pruebas** a **87 unitarias + 21 e2e**,
+todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redacción
+(T2-15 a T2-18), infraestructura (T2-20, T2-21) y las dos que sí valen medida —T2-06
+(dividir el bundle) y T2-08 (budgets de Lighthouse que fallen el build)—.
 
 > ✅ **Verificado en producción el 2026-09-08:** `/ruta-que-no-existe` → **404**, `/robots.txt`
 > 200 `text/plain`, `/sitemap.xml` 200 **`application/xml`**, Lighthouse móvil **SEO 100 ·
@@ -112,7 +115,9 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
     preferencia **1 solo valor en 15.1 s**. ⚠️ El MCP de Chrome DevTools no emula
     `prefers-reduced-motion`, así que se parcheó `matchMedia` antes de los scripts: eso
     prueba la lógica y la query, **no** que el navegador resuelva la media query real.
-    Eso lo cierra T2-10 con Playwright, que sí la emula.
+    **Cerrado el 2026-09-09 por T2-10**: Playwright sí emula la preferencia de verdad, y
+    la prueba se validó por mutación —forzando `<TypeAnimation>` siempre— para comprobar
+    que falla cuando debe.
 
 - [x] **[T1-03] Subir el contraste del badge de periodo en Educación**
   - **Área:** Accesibilidad · **Severidad:** Medio (WCAG 1.4.3 AA)
@@ -382,7 +387,7 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
     este hook.
   - **Esfuerzo:** medio · **Depende de:** ninguna
 
-- [ ] **[T2-06] Analizar el bundle y decidir si dividirlo** *(viene de BACKLOG 4.6)*
+- [x] **[T2-06] Analizar el bundle y decidir si dividirlo** *(viene de BACKLOG 4.6)*
   - **Área:** Rendimiento · **Ubicación:** `vite.config.ts`
   - **Qué hacer:** 382.32 kB (124.06 kB gzip) en **un solo chunk** para un sitio estático. El LCP
     medido es de 3.011 s con **2.946 s de render delay** — el 98 % del LCP es esperar a que React
@@ -390,6 +395,34 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
     contribuyente antes de decidir — *no medido todavía, no asumir cuál es*.
   - **Criterio de aceptación:** informe del analizador guardado y decisión escrita en `CONTEXT.md`.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-09 · informe en [docs/analisis-bundle-2026-09-09.md](docs/analisis-bundle-2026-09-09.md),
+    reproducible con `npm run analyze`. **Decisión: no se divide.**
+    ⚠️ **La premisa de esta tarea era falsa.** No es cierto que el 98 % del LCP sea esperar a
+    React: capturando *cada candidato* de LCP y no solo el final, el navbar ya está pintado a
+    los **108 ms** y el H1 del Hero no aparece hasta los 776 ms. Los ~670 ms de en medio son la
+    **animación de entrada**; con las duraciones a cero el LCP cae a **148 ms (−81 %)**.
+    El mayor contribuyente del bundle, que la tarea pedía no asumir, es **Framer Motion
+    (33,6 %)**; `react-dom` pesa más (52,4 %) pero no es evitable. No se divide porque
+    `Hero.tsx` **y** `Navbar.tsx` importan Framer Motion, así que diferir lo de debajo del
+    pliegue no lo sacaría del camino crítico, y el código propio es solo el 9,3 % del total.
+    Abre **T2-23** para el coste real.
+
+- [ ] **[T2-23] Bajar el coste de la animación de entrada del Hero en el LCP**
+  - **Área:** Rendimiento · **Ubicación:** `src/lib/animations.ts` · `src/components/Hero.tsx`
+  - **Qué hacer:** medido en T2-06: la animación de entrada del Hero es **628 ms de los 776 ms**
+    de LCP en local, y el hueco FCP→LCP se mantiene con estrangulamiento (332 ms en local,
+    656 ms en producción, a 4G lento y CPU ×4). El `<h1>` es el elemento LCP y entra con
+    `fadeUpVariant` (opacidad + `y` + `blur`) detrás de un `staggerContainer`
+    (`delayChildren: 0.05`, `staggerChildren: 0.08`, `duration: 0.5`).
+    ⚠️ **`prefers-reduced-motion` no lo arregla**: `<MotionConfig reducedMotion="user">`
+    desactiva *transform* y *layout* pero **mantiene la opacidad**, que es lo que retiene al H1.
+    Opciones, de menos a más invasiva: excluir el `<h1>` del stagger y mostrarlo de entrada;
+    bajar `duration` en el Hero; o animar solo lo de debajo del pliegue. **No** hace falta
+    quitar la animación de la página entera.
+  - **Criterio de aceptación:** LCP del build local por debajo de **300 ms** sin estrangular,
+    midiendo con el mismo método de T2-06 (candidatos de LCP, mediana de 3 corridas), y el
+    Hero sigue teniendo animación de entrada visible.
+  - **Esfuerzo:** bajo · **Depende de:** T2-06
 
 ### QA y testing
 
@@ -423,9 +456,13 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
 - [ ] **[T2-08] Lighthouse CI con budgets que fallen el build** *(viene de BACKLOG 4.1)*
   - **Área:** QA · **Ubicación:** `.github/workflows/`
   - **Qué hacer:** `@lhci/cli` contra `vite preview` o la URL del deploy preview. **Budgets que
-    fallen**, no solo reporten. Línea base medida el 2026-09-08 en producción (móvil):
-    accesibilidad 96, buenas prácticas 100, SEO 92, LCP 3.011 s, CLS 0.00. Alternativa más
-    barata: `@netlify/plugin-lighthouse`.
+    fallen**, no solo reporten. Alternativa más barata: `@netlify/plugin-lighthouse`.
+    ⚠️ **La línea base de esta tarea está desfasada.** Decía accesibilidad 96, SEO 92 y LCP
+    3.011 s (2026-09-08); desde entonces se cerraron T1-06, T2-04, T2-05 y T2-13, y
+    producción da **accesibilidad 100, buenas prácticas 100, SEO 100**. **Volver a medir
+    antes de fijar los budgets**, o se fijarán contra una foto vieja.
+    Y ojo con el umbral de LCP: el método importa tanto como el número. Ver T2-06 —el LCP de
+    esta página lo domina la animación de entrada del Hero, que T2-23 va a cambiar—.
   - **Criterio de aceptación:** el workflow falla si SEO < 100, accesibilidad < 100 o LCP > 2.5 s.
   - **Esfuerzo:** medio · **Depende de:** T1-04, T1-06
 
@@ -459,7 +496,7 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
     conocidas* en CONTEXT.md.
   - **Esfuerzo:** medio · **Depende de:** T1-02
 
-- [ ] **[T2-10] Playwright: congelar lo verificado a mano** *(viene de BACKLOG 4.3)*
+- [x] **[T2-10] Playwright: congelar lo verificado a mano** *(viene de BACKLOG 4.3)*
   - **Área:** QA · **Ubicación:** nuevo `e2e/`
   - **Qué hacer:** todo esto se verificó funcionando el 2026-09-08 sobre producción y hoy no
     tiene red de seguridad:
@@ -472,6 +509,18 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
     - **`prefers-reduced-motion`** — Playwright sí puede emularlo. Es la prueba que cierra T1-02.
   - **Criterio de aceptación:** los 5 bloques en verde en CI.
   - **Esfuerzo:** alto · **Depende de:** T1-02
+  - **Cerrada:** 2026-09-09 · **18 pruebas nuevas** en `e2e/lightbox.spec.ts`,
+    `e2e/navegacion.spec.ts`, `e2e/responsive.spec.ts` y `e2e/movimiento-reducido.spec.ts`;
+    el helper de revelado se extrajo a `e2e/util/pagina.ts`. Total del repositorio: **87
+    unitarios + 21 e2e**.
+    Los cinco bloques **se validaron por mutación**, no solo por salir en verde: se rompió
+    a propósito el condicional del Hero, el retorno de foco y la trampa de Tab del
+    lightbox, y se inyectó un elemento de 2000 px — y en cada caso falló exactamente la
+    prueba que debía, con el diagnóstico útil. Tres corridas seguidas sin reintentos.
+    ⚠️ Se dejó **congelado un hueco conocido**: el wordmark «Inicio» nunca recibe
+    `aria-current` porque `navItems` no incluye `home`. La prueba afirma que hay **cero**
+    enlaces marcados arriba del todo, así que cuando **T3-18** lo arregle, fallará y
+    obligará a actualizarla en vez de quedar el arreglo sin cobertura.
 
 - [ ] **[T2-11] Snapshots visuales** *(viene de BACKLOG 4.4)*
   - **Área:** QA · **Ubicación:** `e2e/`
@@ -479,7 +528,7 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
     y enmascarar la línea de texto animado, o los snapshots serán inestables por Framer Motion y
     `react-type-animation`.
   - **Criterio de aceptación:** tres corridas seguidas sin diferencias.
-  - **Esfuerzo:** medio · **Depende de:** T2-10
+  - **Esfuerzo:** medio · **Depende de:** T2-10 ✅ (desbloqueada el 2026-09-09)
 
 - [x] **[T2-12] Que el verificador de enlaces cubra el README y `docs/`**
   - **Área:** QA · **Ubicación:** `.github/workflows/links.yml:40-48`
@@ -537,10 +586,12 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
 
 - [ ] **[T2-15] Imagen Open Graph propia de 1200×630** *(viene de BACKLOG 1.2)*
   - **Área:** SEO · **Ubicación:** `index.html:35,44`
-  - **Qué hacer:** hoy `og:image` apunta a `projects/Porfolio-web-rajb.png`, que funciona pero no
-    tiene la proporción correcta: LinkedIn la recorta. Diseñar una imagen 1200×630 con nombre,
-    rol y stack principal, guardarla en `public/` y actualizar `og:image` y `twitter:image`.
-    Añadir de paso `og:image:width` y `og:image:height`, que hoy faltan.
+  - **Qué hacer:** ⚠️ **medio hecha el 2026-09-09, sin querer.** Al pasar las capturas a WebP
+    (T2-01) se borró el PNG al que apuntaba `og:image` y la etiqueta quedó rota; se generó
+    `public/og-image.jpg` de 1200×630 para taparlo, y de paso se añadieron `og:image:width`,
+    `og:image:height` y `og:image:alt`. Así que la **proporción ya es correcta**, pero la
+    imagen es un recorte de la captura del portafolio, **no** la tarjeta diseñada con nombre,
+    rol y stack que pedía esta tarea. Falta eso y la validación con los inspectores.
   - **Criterio de aceptación:** validada con el post inspector de LinkedIn y el card validator de
     X, sin recorte.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
@@ -589,7 +640,7 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
     ella nadie puede decidir si un fallo es un bug o un navegador fuera de alcance.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
-- [ ] **[T2-20] Arreglar el `Cache-Control` de los CV**
+- [x] **[T2-20] Arreglar el `Cache-Control` de los CV**
   - **Área:** DevOps · **Ubicación:** `netlify.toml:113-116`
   - **Qué hacer:** la regla `for = "/assets/*"` aplica `max-age=31536000, immutable` a todo lo que
     hay en esa carpeta. Verificado en producción: el PDF del CV (650 KB) se sirve con `immutable`
@@ -600,6 +651,16 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
   - **Criterio de aceptación:** el PDF del CV se sirve sin `immutable`; los assets con hash lo
     conservan.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-09 · confirmado primero **contra producción** que el PDF salía con
+    `immutable` a un año. El arreglo no fue el obvio: acotar `/assets/*` a los PDF y dejar los
+    `/*.js` y `/*.css` cubriendo los bundles se apoyaba en dos supuestos que la doc de Netlify
+    **no** respalda —que el comodín cruza segmentos de ruta y que hay una precedencia definida
+    cuando dos reglas chocan (la doc menciona que los `cache-control` se *concatenan*)—. Las
+    reglas se reescribieron para **no solaparse**: `/assets/*.js` y `/assets/*.css` inmutables,
+    `/assets/*.pdf` a `max-age=86400, must-revalidate`, y los `/*.js` y `/*.css` de raíz
+    eliminados por inútiles. Ver la entrada de CONTEXT.md.
+    ⏳ **El criterio queda pendiente del próximo despliegue**; se comprueba con
+    `curl -sI https://portafolio-web-rajb.netlify.app/assets/CV-….pdf | grep -i cache`.
 
 - [ ] **[T2-21] Empezar a etiquetar versiones en git**
   - **Área:** DevOps · **Ubicación:** `package.json:4` · repositorio
@@ -610,7 +671,7 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
     changelog lo enlaza.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
-- [ ] **[T2-22] Corregir los tags que caen al icono genérico**
+- [x] **[T2-22] Corregir los tags que caen al icono genérico**
   - **Área:** Auditoría de código · **Ubicación:** `src/components/TechIcon.tsx:443,455-461`
   - **Avance parcial 2026-09-09 (con T2-07):** corregido el caso ya diagnosticado —la regla pasó a
     `/win(dows)?\s*forms/i` y **WinForms** resuelve. El recuento real hoy es **11 de 78 tags únicos**,
@@ -628,6 +689,14 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
   - **Criterio de aceptación:** el test de tabla de T2-07 pasa, o los tags sin icono propio son
     una lista explícita y justificada.
   - **Esfuerzo:** medio · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-09 · **de 14 ocurrencias con glifo genérico a 8** (de 13 % a 7 %),
+    medido, no estimado. Se añadieron **Jest** y **TanStack Query** con sus paths oficiales de
+    `simple-icons` (CC0-1.0, mismo `viewBox` 24×24), verificados **renderizándolos a PNG y
+    mirándolos** — el resto del archivo está dibujado a mano y un logotipo de memoria sale mal.
+    **Playwright y Supertest no están en los 3459 iconos del set** (Puppeteer sí), así que se
+    aceptan con glifo genérico de forma deliberada antes que inventarse una marca ajena.
+    Cierra por la **segunda** vía del criterio: `PENDIENTES_DE_ICONO` queda vacía y las 8
+    excepciones son una lista justificada que el test comprueba exacta en ambos sentidos.
 
 ---
 
@@ -904,13 +973,15 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
 
 - [ ] **[T4-04] Evaluar prerender / SSG**
   - **Área:** Rendimiento / SEO
-  - **Qué hacer:** el LCP medido es 3.011 s con **2.946 s de render delay** — el cuello de botella
-    es que no hay ni un carácter de contenido en el HTML hasta que React arranca. Prerenderizar el
-    HTML en build (`vite-plugin-prerender`, o migrar a Astro/Next) atacaría la causa raíz, en vez
-    de los 507 ms de T2-04 o los 540 ms de T2-05. Es un cambio de arquitectura: evaluar solo si
-    T2-04/T2-05/T2-06 no bastan.
+  - **Qué hacer:** ⚠️ **premisa corregida el 2026-09-09 por T2-06.** Decía que el cuello de
+    botella era no tener ni un carácter en el HTML hasta que React arranca (LCP 3.011 s con
+    2.946 s de render delay). Medido de nuevo: React pinta el navbar a los **108 ms** y lo que
+    retrasa el LCP es la animación de entrada del Hero, no el arranque. Prerenderizar por sí
+    solo **no lo arreglaría**: al hidratar, Framer Motion volvería a poner el `<h1>` a
+    `opacity: 0`. Reevaluar esta tarea **después de T2-23**, que ataca la causa medida con
+    esfuerzo bajo, y solo si entonces sigue habiendo margen.
   - **Criterio de aceptación:** decisión registrada en `CONTEXT.md`, con o sin implementación.
-  - **Esfuerzo:** alto · **Depende de:** T2-04, T2-05, T2-06
+  - **Esfuerzo:** alto · **Depende de:** T2-04, T2-05, T2-06, **T2-23**
 
 - [ ] **[T4-05] Publicar un `llms.txt`**
   - **Área:** SEO · **Ubicación:** `public/`

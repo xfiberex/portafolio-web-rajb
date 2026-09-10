@@ -23,7 +23,7 @@ meses después, o desde otro equipo y otra sesión de chat, sin perder nada de l
 | **Stack** | React 19.2 · TypeScript 5.9 · Vite 7.3 · Tailwind CSS 4.1 · Framer Motion 12.23 |
 | **Node** | 22 en CI y en Netlify. Mínimo real: ≥ 20.19 (Vite 7 y ESLint 10) |
 | **Despliegue** | Netlify, build `npm run build`, publica `dist/` |
-| **Nº de pruebas** | **87** unitarios (Vitest) + **3** e2e de accesibilidad (Playwright + axe). Ambos en CI |
+| **Nº de pruebas** | **87** unitarios (Vitest) + **21** e2e (Playwright: axe-core, foco, navegación, reflow, movimiento reducido). Ambos en CI |
 | **Build medido** | 384.50 kB JS (124.71 kB gzip) · 30.50 kB CSS (6.38 kB gzip) · un solo chunk |
 | **Imágenes publicadas** | 342 kB (6 capturas WebP + la tarjeta social). Antes: 1.68 MB |
 | **Peticiones a terceros** | **0.** La fuente se auto-hospeda desde 2026-09-08 |
@@ -64,8 +64,8 @@ portafolio-web-rajb/
 ├── eslint.config.js            Flat config. No respeta .gitignore: las carpetas de
 │                               herramientas IA se excluyen a mano.
 ├── public/
-│   ├── assets/                 Los dos PDF del CV. ⚠️ Netlify les aplica cache immutable
-│   │                           a un año (ver Trampas conocidas).
+│   ├── assets/                 Los dos PDF del CV. Comparten carpeta con el build de
+│   │                           Vite, y por eso la regla de caché va por extensión.
 │   ├── projects/               Capturas de los proyectos, en WebP (ver decisiones).
 │   ├── fonts/                  Inter auto-hospedada (variable, subsets latin y latin-ext)
 │   │                           y su licencia SIL OFL.
@@ -382,9 +382,47 @@ del repositorio, y conviene mantenerla:
 | Unitarios | `.test.ts` | `src/` | `npm test` |
 | End-to-end | `.spec.ts` | `e2e/` | `npm run test:e2e` |
 
+⚠️ `tsconfig.json` incluye solo `src`, así que **`e2e/` no pasa por `tsc`**. Su red es el
+propio Playwright en CI, que sí ejecuta el código; un error de tipos allí se manifiesta como
+fallo de prueba, no de compilación.
+
 Nota sobre `vite.config.ts`: el `defineConfig` se importa de `vitest/config`, no de `vite`,
 para que la clave `test` tenga tipos. **Sin** triple-slash reference: la regla
 `@typescript-eslint/triple-slash-reference` la rechaza y el import ya trae los tipos.
+
+### Una prueba que pasa a la primera no prueba nada todavía *(T2-10, 2026-09-09)*
+
+Los 18 e2e de T2-10 salieron en verde en la primera ejecución. Eso es exactamente lo que
+también haría una prueba vacua —un selector que no encuentra nada, una aserción que se
+cumple sola—, así que el verde inicial no distingue entre «el código funciona» y «la prueba
+no mira».
+
+Se validaron **rompiendo el código a propósito** y comprobando que fallaba la prueba
+correcta, con el mensaje correcto:
+
+| Sabotaje | Debía fallar | Falló |
+|---|---|---|
+| `{false ? (` en el condicional del Hero (montar siempre `<TypeAnimation>`) | movimiento reducido | ✅ y la de «sin preferencia» siguió pasando |
+| Quitar `return () => trigger?.focus?.()` del lightbox | retorno del foco | ✅ (las 2 del lightbox) |
+| Cortar la rama de `Tab` del lightbox | trampa de foco | ✅ con el `Tab` exacto que se escapó |
+| Inyectar un `div` de 2000 px en el Hero | scroll horizontal | ✅ los 5 anchos, con los px de desborde |
+
+El par de movimiento reducido merece un apunte: la prueba «sin preferencia» existe solo para
+que la otra no sea vacua. Si el Hero mostrara texto fijo **siempre** —por un fallo en el
+hook— la prueba de `reduce` pasaría igual sin demostrar nada. Una prueba de que algo *no*
+ocurre necesita a su lado la prueba de que sí puede ocurrir.
+
+### Congelar un bug conocido en vez de saltárselo *(T2-10, 2026-09-09)*
+
+El wordmark «Inicio» nunca recibe `aria-current`: `navItems` no incluye `home`, así que
+arriba del todo el scrollspy marca una sección que ningún enlace refleja. Es un punto de
+**T3-18** y arreglarlo no tocaba aquí.
+
+La opción fácil era no probar esa zona. En su lugar la prueba **afirma el comportamiento
+actual** —cero enlaces con `aria-current` en el tope— con el mensaje de fallo escrito para
+quien lo arregle: *«alguien añadió `home` al nav: T3-18 está resuelto, actualizar esta
+prueba»*. Así el hueco queda documentado en código ejecutable, y el arreglo futuro no puede
+aterrizar sin cobertura.
 
 ### Una opacidad intermedia falsea la regla de contraste de axe *(descubierto 2026-09-09)*
 
@@ -462,20 +500,106 @@ demos en tiers gratuitos se caen sin que nadie esté mirando.
 Netlify la normaliza en dominios `*.netlify.app`. Además `preload` no puede surtir efecto ahí:
 `netlify.app` está en la Public Suffix List. **El archivo miente sobre lo que se sirve.** Ver T4-02.
 
-### La regla de caché `/assets/*` alcanza a los PDF del CV
+### Las reglas de caché de Netlify se escriben para no solaparse *(T2-20, 2026-09-09)*
 
-`max-age=31536000, immutable` es correcto para los JS y CSS de Vite, que llevan hash de contenido.
-Los PDF del CV están en la misma carpeta y **no** llevan hash: hoy solo se salvan porque llevan la
-fecha en el nombre. El día que se actualice un CV conservando el nombre, quien ya lo descargó verá
-el viejo durante un año. Ver T2-20.
+Había un único `/assets/*` con `max-age=31536000, immutable`. Es correcto para los JS y CSS de
+Vite, que llevan hash de contenido, pero los PDF del CV están en **la misma carpeta** y no lo
+llevan. Medido en producción antes de arreglarlo:
 
-### `WinForms` no casa con `/windows.*forms/i`
+```
+/assets/index-mekZ0vce.js   public,max-age=31536000,immutable   ✅ lleva hash
+/assets/CV-….pdf            public,max-age=31536000,immutable   ❌ no lleva hash
+```
 
-En `TechIcon.tsx` existe la entrada `"Windows Forms"` y la regla `/windows.*forms/i`, pero
-`src/data/skills.ts` escribe `"WinForms"` — que no contiene "windows". Cae al glifo genérico.
+Lo interesante fue **cómo** arreglarlo. La primera idea —dejar que `/*.js` y `/*.css` cubrieran
+los bundles y acotar `/assets/*` a los PDF— resultó apoyarse en dos supuestos que la
+documentación de Netlify **no** respalda:
 
-Es el caso diagnosticado de un problema más amplio: **14 de 109 tags (13 %) muestran el icono
-genérico**, medido el 2026-09-08. Ver T2-22.
+1. Que el comodín cruza segmentos de ruta. La doc solo dice que `*` casa *«inside of a path
+   segment»*, así que `/*.js` probablemente **no** alcanzaba `/assets/index-abc.js` — y esas
+   dos reglas llevaban tiempo sin cubrir nada.
+2. Que hay una precedencia definida cuando dos reglas chocan. No está documentada, y la doc sí
+   menciona que varios `cache-control` se **concatenan**, que sería lo peor de los dos mundos.
+
+Por eso las reglas se reescribieron para **no solaparse** en vez de depender de un desempate:
+`/assets/*.js` y `/assets/*.css` inmutables, `/assets/*.pdf` a un día con `must-revalidate`, y
+los `/*.js` y `/*.css` de raíz eliminados —inútiles bajo la lectura estricta, redundantes bajo
+la amplia—. Todos los patrones caben dentro de un solo segmento, que es lo único garantizado.
+
+⚠️ Efecto secundario a vigilar: si algún día se importa una imagen desde `src/`, Vite la emitirá
+en `dist/assets/` con hash y **ninguna** regla la cubrirá — se servirá con el `max-age=0` por
+defecto de Netlify. Es un fallo seguro (cachea de menos, nunca de más), pero hay que añadir la
+extensión.
+
+### El LCP no era el arranque de React, era la animación del Hero *(T2-06, 2026-09-09)*
+
+Tres tareas del ROADMAP —T2-06, T2-08 y T4-04— repetían el mismo diagnóstico heredado de la
+auditoría: *«el 98 % del LCP es esperar a que React arranque»*. Es falso, y llevaba a la
+solución equivocada (dividir el bundle, prerenderizar).
+
+Lo que lo destapó fue capturar **cada candidato de LCP**, no solo el valor final:
+
+```
+ 108 ms  <A>  "Competencias"              ← primer candidato: el navbar ya está pintado
+ 776 ms  <H1> "Ricky Angel Jiménez Bueno" ← candidato final
+```
+
+React arranca y pinta a los 108 ms. Los ~670 ms restantes son la animación de entrada.
+Comprobado poniendo las duraciones de `animations.ts` a cero y reconstruyendo: **LCP 776 →
+148 ms, un 81 % menos**.
+
+La trampa que casi me lleva a la conclusión contraria: probé primero con
+`prefers-reduced-motion: reduce` esperando que el LCP se desplomara, y **no bajó** (780 ms
+frente a 752). Estuve a punto de descartar la hipótesis. El motivo es que
+`<MotionConfig reducedMotion="user">` desactiva las animaciones de *transform* y *layout*
+pero **mantiene las de opacidad** —se consideran seguras para trastornos vestibulares—, y la
+opacidad es justo lo que retiene al H1. Un experimento que no distingue lo que crees que
+distingue no es evidencia de nada.
+
+Esto también explica por qué `e2e/a11y.spec.ts` tiene que esperar a opacidad exactamente 1
+aunque los tests corran con movimiento reducido: la preferencia no quita esos fundidos.
+
+### Decisión: el bundle no se divide *(T2-06, 2026-09-09)*
+
+126,61 kB gzip en un solo chunk. Medido con `rollup-plugin-visualizer` (`npm run analyze`),
+el mayor contribuyente evitable es **Framer Motion con el 33,6 %** sumando sus tres paquetes
+—`react-dom` pesa más, 52,4 %, pero no se puede quitar de una app React—. El informe
+completo está en [docs/analisis-bundle-2026-09-09.md](docs/analisis-bundle-2026-09-09.md).
+
+No se divide, y el motivo no es el tamaño sino la topología: el elemento LCP es el `<h1>` del
+Hero, y para pintarlo hacen falta React, el CSS y Framer Motion, porque **`Hero.tsx` y
+`Navbar.tsx` lo importan los dos**. Diferir las secciones de debajo del pliegue no sacaría
+Framer Motion del camino crítico, y el código propio del proyecto es solo el 9,3 % del total.
+Se dividiría lo que no cuesta y seguiría cargándose lo que sí.
+
+Se revisa si el bundle pasa de ~200 kB gzip, o si se deja de usar Framer Motion por encima
+del pliegue — entonces sí tendría sentido aislarlo en un chunk diferido.
+
+### Los iconos que faltaban, y por qué dos siguen faltando *(T2-22, cerrada 2026-09-09)*
+
+El caso que lo destapó: `TechIcon.tsx` tenía la entrada `"Windows Forms"` y la regla
+`/windows.*forms/i`, pero `src/data/skills.ts` escribe `"WinForms"` — que no contiene
+"windows", así que la regla no casaba nunca pese a existir el icono. Corregida a
+`/win(dows)?\s*forms/i`.
+
+Recuento medido, no estimado:
+
+| | Ocurrencias con glifo genérico | Tags únicos sin icono |
+|---|---:|---:|
+| 2026-09-08 | 14 de 109 (13 %) | 11 |
+| 2026-09-09 | **8 de 109 (7 %)** | **8** |
+
+Los paths de **Jest** y **TanStack Query** se sacaron de `simple-icons` (CC0-1.0), que usa el
+mismo `viewBox="0 0 24 24"`, y se comprobaron **renderizándolos a PNG y mirándolos**: los
+demás iconos del archivo están escritos a mano, y dibujar un logotipo de memoria es
+exactamente lo que sale mal sin poder verlo.
+
+**Playwright y Supertest no se añadieron.** Se buscó en los 3459 iconos del set y no están —
+Puppeteer sí, Playwright no—. Dibujarlos a mano sería inventarse una marca ajena, así que
+pasan a la lista de excepciones justificadas junto a las seis competencias que no son
+productos. Las ocho que quedan son ahora **una decisión**, no deuda; y el test exige que la
+lista coincida **exactamente** con lo que falta, en los dos sentidos: si alguien añade un
+icono sin sacarlo de la lista, falla igual que si añade un tag sin icono.
 
 ---
 

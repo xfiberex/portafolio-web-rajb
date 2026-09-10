@@ -97,8 +97,12 @@ npm run type-check
 npm test
 npm run test:watch
 
-# Accesibilidad end-to-end (Playwright + axe-core) sobre el build
+# End-to-end (Playwright) sobre el build: accesibilidad con axe-core, ciclo de foco
+# del lightbox, menu movil, skip link, cero scroll horizontal y movimiento reducido
 npm run build && npm run test:e2e
+
+# Analizar el bundle: genera stats.html (treemap). Ver T2-06
+npm run analyze
 
 # Convertir a WebP las capturas nuevas de public/projects/
 # (se corre a mano al añadir una captura, no en cada build)
@@ -136,8 +140,13 @@ portafolio-web/
 │   ├── placeholder.svg             Reemplazo si falla la carga de una captura
 │   ├── robots.txt
 │   └── sitemap.xml
-├── e2e/
-│   └── a11y.spec.ts                axe-core sobre la página revelada (Playwright)
+├── e2e/                            End-to-end con Playwright (21 pruebas)
+│   ├── util/pagina.ts              Revelado de la página y detección de desbordes
+│   ├── a11y.spec.ts                axe-core sobre la página revelada
+│   ├── lightbox.spec.ts            Contrato de diálogo modal: foco, Tab, Escape, scroll
+│   ├── navegacion.spec.ts          Menú móvil, skip link y `aria-current`
+│   ├── responsive.spec.ts          Cero scroll horizontal a 320/360/768/1280/1440
+│   └── movimiento-reducido.spec.ts `prefers-reduced-motion` en los dos sentidos
 ├── scripts/
 │   └── images-to-webp.mjs          Conversión con sharp (npm run images:webp)
 ├── src/
@@ -269,11 +278,14 @@ Los estilos están definidos en `src/index.css` y utilizan Tailwind CSS 4. Puede
 
 ### Performance
 - Build ultrarrápido con Vite 7
-- Cache inmutable en `/assets/*` — pendiente acotarlo a los archivos con hash, que hoy
-  alcanza también a los PDF del CV (T2-06 no, **T2-20**)
+- Cache inmutable **solo** en lo que lleva hash de contenido (`/assets/*.js`, `/assets/*.css`)
+  y en las fuentes, cuyo nombre se cambia al actualizarlas. Los PDF del CV comparten carpeta
+  con el build pero **no** llevan hash, así que van a un día con `must-revalidate` (T2-20)
 - Imágenes con `loading="lazy"` nativo
-- **Sin code splitting**: el build produce un único chunk (~124 kB gzip). Si conviene
-  dividirlo está por decidir — ver T2-06 en [ROADMAP.md](ROADMAP.md)
+- **Sin code splitting, y es deliberado**: un único chunk de ~127 kB gzip. Medido con
+  `npm run analyze`, dividirlo no ayudaría al LCP — `Hero.tsx` y `Navbar.tsx` importan Framer
+  Motion, así que diferir lo de debajo del pliegue no lo sacaría del camino crítico. El
+  razonamiento completo está en [docs/analisis-bundle-2026-09-09.md](docs/analisis-bundle-2026-09-09.md)
 
 ### Seguridad (Security Score: A+)
 - **Content Security Policy (CSP)** estricto pero funcional

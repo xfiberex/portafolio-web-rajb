@@ -44,7 +44,7 @@ const Hero = () => {
             más larga en móvil. Sin esto, el texto que se escribe y se borra
             empuja todo el contenido de abajo en cada ciclo (CLS sobre el fold).
           */}
-          <div className="flex min-h-[3.6em] items-start sm:min-h-[2.4em]">
+          <div className="flex min-h-[3.6em] items-start sm:min-h-[2.4em]" data-testid="hero-rol">
             {/*
               Con movimiento reducido no basta con acelerar la animación: hay
               que no montarla. react-type-animation escribe con setTimeout y

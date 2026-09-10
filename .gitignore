@@ -36,3 +36,6 @@ skills-lock.json
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Informe del analizador de bundle (npm run analyze); se regenera en un comando
+/stats.html

@@ -108,23 +108,39 @@
     Cross-Origin-Resource-Policy = "same-origin"
 
 # =============================================================================
-# CACHE HEADERS PARA ASSETS ESTÁTICOS
-# Mejora rendimiento y seguridad con cache inmutable
+# CACHE HEADERS PARA ASSETS ESTATICOS
+#
+# Regla: solo lleva `immutable` lo que NO puede cambiar de contenido sin
+# cambiar de nombre. Antes habia un `/assets/*` unico, y como Vite y los PDF
+# del CV comparten esa carpeta, el CV se estaba sirviendo inmutable a un anno
+# (medido en produccion el 2026-09-09). Los PDF no llevan hash: hoy solo se
+# salvan porque llevan la fecha en el nombre, y el dia que se actualice uno
+# conservando el nombre, quien ya lo descargo veria el viejo durante un anno.
+#
+# Todos los patrones se mantienen DENTRO de un segmento de ruta a proposito.
+# La doc de Netlify solo garantiza el comodin "inside of a path segment" y no
+# documenta que gana cuando dos reglas chocan, asi que las reglas se escriben
+# para no solaparse en lugar de depender de una precedencia no especificada.
+# Por eso tambien desaparecieron los `/*.js` y `/*.css` de antes: bajo la
+# lectura estricta no cubrian nada (no hay .js ni .css en la raiz del build) y
+# bajo la amplia eran redundantes con las dos reglas de aqui abajo.
 # =============================================================================
 [[headers]]
-  for = "/assets/*"
+  for = "/assets/*.js"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "/*.js"
+  for = "/assets/*.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# Los dos PDF del CV. `must-revalidate` obliga a preguntar al servidor una vez
+# pasado el dia en vez de servir una copia vieja sin consultar.
 [[headers]]
-  for = "/*.css"
+  for = "/assets/*.pdf"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=86400, must-revalidate"
 
 [[headers]]
   for = "/projects/*"

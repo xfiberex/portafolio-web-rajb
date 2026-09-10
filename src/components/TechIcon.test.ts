@@ -24,26 +24,38 @@ const todosLosTags = (): string[] => {
 };
 
 /**
- * Competencias y prácticas que **no son productos**: no existe un logotipo
- * que ponerles, así que el glifo genérico es la respuesta correcta y no un
- * fallo. Decisión deliberada, ver T2-22.
+ * Cosas para las que **no existe un logotipo que poner**, así que el glifo
+ * genérico es la respuesta correcta y no un fallo. Decisión deliberada,
+ * cerrada con T2-22. Dos motivos distintos, y conviene no mezclarlos:
+ *
+ * a) Competencias y prácticas que no son productos.
+ * b) Productos reales cuya marca no está en simple-icons —el set CC0 del
+ *    que salen los demás iconos de este archivo—. Se comprobó sobre sus
+ *    3459 iconos: Playwright y Supertest no están. Dibujarlos a mano sería
+ *    inventarse una marca ajena, así que se acepta el glifo genérico hasta
+ *    que haya una fuente con licencia clara.
  */
 const SIN_LOGOTIPO_POR_DISENO = [
+  // (a) competencias, no productos
   "Control de acceso por rol",
   "Detección de reúso de token",
   "OAuth 2.0 con PKCE",
   "Pruebas de carga",
   "Rate limiting",
   "Registro de decisiones técnicas (ADRs)",
+  // (b) productos sin marca disponible en simple-icons
+  "Playwright (E2E)",
+  "Supertest",
 ];
 
 /**
  * Productos que **sí** deberían tener icono y todavía no lo tienen.
- * Es una deuda conocida, no una decisión: la cierra T2-22 añadiendo los SVG.
- * La lista se comprueba exacta más abajo para que no crezca en silencio ni
- * se quede obsoleta cuando alguien añada uno.
+ * Vacía desde T2-22: Jest y TanStack Query se añadieron con sus paths
+ * oficiales. Se conserva la lista, y no se borra, porque es donde va lo
+ * siguiente que falte — y la comprobación de abajo obliga a mantenerla al
+ * día en los dos sentidos.
  */
-const PENDIENTES_DE_ICONO = ["Jest", "Playwright (E2E)", "Supertest", "TanStack Query"];
+const PENDIENTES_DE_ICONO: string[] = [];
 
 const EXCEPCIONES = new Set([...SIN_LOGOTIPO_POR_DISENO, ...PENDIENTES_DE_ICONO]);
 
@@ -66,6 +78,21 @@ describe("pickIcon sobre los tags reales", () => {
   it("resuelve WinForms, que antes nunca casaba", () => {
     expect(pickIcon("WinForms")).not.toBeNull();
     expect(pickColor("WinForms")).toBe(pickColor("Windows Forms"));
+  });
+
+  /* Las variantes NO están en `src/data/`, así que el `it.each` de arriba
+     no las toca: ahí "Jest" y "TanStack Query" resuelven por coincidencia
+     exacta de clave y su regla podría estar muerta sin que nadie lo note.
+     Pasó de verdad al cerrar T2-22: el `` de `/jest/i` se coló como
+     carácter de retroceso () y los 89 tests siguieron en verde — lo
+     cazó ESLint (`no-control-regex`), no este archivo. Que no se repita. */
+  it.each([
+    ["jest", "Jest"],
+    ["Jest 29", "Jest"],
+    ["TanStack Router", "TanStack Query"],
+    ["tanstack table", "TanStack Query"],
+  ])("la regla, y no la clave exacta, resuelve %s", (variante, canonico) => {
+    expect(pickIcon(variante), `"${variante}" no casa con ninguna regla`).toBe(pickIcon(canonico));
   });
 });
 

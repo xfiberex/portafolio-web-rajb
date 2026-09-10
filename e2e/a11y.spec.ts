@@ -1,51 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
-
-const SECCIONES = ["home", "about", "projects", "experience", "skills", "education", "certificates", "contact"];
-
-/**
- * Recorre la página entera para disparar todas las variantes `whileInView`
- * y vuelve arriba. Sin esto, axe auditaría un documento donde la mayoría de
- * `<main>` está a `opacity: 0` y devolvería un verde que no significa nada.
- */
-const revelarTodaLaPagina = async (page: Page) => {
-  await page.evaluate(async () => {
-    const pausa = (ms: number) => new Promise((r) => setTimeout(r, ms));
-    const alto = document.documentElement.scrollHeight;
-    for (let y = 0; y < alto; y += 400) {
-      window.scrollTo(0, y);
-      await pausa(60);
-    }
-    window.scrollTo(0, 0);
-  });
-
-  /* Esperar a la CONDICIÓN, no a un tiempo fijo, y exigir opacidad **1**,
-     no simplemente distinta de 0.
-     `reducedMotion` quita la duración de la animación pero no los
-     `delayChildren`/`staggerChildren` del contenedor, así que tras el
-     recorrido queda algún elemento a medio revelar durante unos
-     milisegundos. Y una opacidad intermedia no es inocua para axe: su
-     regla de contraste **mezcla el color con el fondo** según la opacidad
-     heredada, así que una tarjeta a 0.93 se reporta como
-     `#4376ec` en vez de `#487fff` y produce una violación fantasma de
-     4.47:1. Descubierto así, con dos falsos positivos en Certificados. */
-  await page.waitForFunction(
-    () => {
-      const opacidadHeredada = (el: Element) => {
-        let o = 1;
-        for (let n: Element | null = el; n; n = n.parentElement) {
-          o *= parseFloat(getComputedStyle(n).opacity);
-        }
-        return o;
-      };
-      return [...document.querySelectorAll("main a, main button, main [tabindex]")].every(
-        (el) => opacidadHeredada(el) === 1,
-      );
-    },
-    undefined,
-    { timeout: 15_000 },
-  );
-};
+import { expect, test } from "@playwright/test";
+import { revelarTodaLaPagina, SECCIONES } from "./util/pagina";
 
 test.describe("Accesibilidad", () => {
   test.beforeEach(async ({ page }) => {

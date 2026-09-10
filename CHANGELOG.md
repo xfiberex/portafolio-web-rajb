@@ -20,11 +20,22 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 
 ### Añadido
 
+- **`npm run analyze`**: `rollup-plugin-visualizer` detrás de `vite build --mode analyze`, así
+  que no entra ni en el build normal ni en CI. Informe y decisión en
+  [docs/analisis-bundle-2026-09-09.md](docs/analisis-bundle-2026-09-09.md).
+
 - **Los primeros tests del repositorio**: 87 unitarios con Vitest, integrados en CI antes del build.
   Solo funciones puras, que es donde está el valor: la resolución de iconos (~90 heurísticas
   regex donde el orden importa) y los helpers de URL. El test de tabla recorre los 78 tags
   reales de `src/data/` y **falla si se añade una tecnología sin icono** — hasta ahora ese
   fallo era silencioso: salía el glifo genérico y nadie se enteraba.
+- **Red de pruebas de comportamiento (18 e2e)**: Playwright congela lo que hasta ahora solo
+  se había verificado a mano — el ciclo de foco del lightbox (que es un diálogo modal escrito
+  a mano, no un `<dialog>` nativo), el menú móvil, el skip link, `aria-current`, cero scroll
+  horizontal a 320/360/768/1280/1440 y `prefers-reduced-motion`. Este último **cierra la
+  reserva de T1-02**: en su día hubo que parchear `matchMedia` a mano porque la herramienta
+  no emulaba la preferencia; Playwright sí la emula. Los cinco bloques se validaron
+  **rompiendo el código a propósito** para comprobar que fallan cuando deben.
 - **Accesibilidad automatizada en CI**: Playwright + `@axe-core/playwright` audita el build con
   la página completamente revelada — **1586 nodos, 37 reglas**— y falla ante cualquier violación
   *serious* o *critical*. Un test previo se niega a auditar si queda algo a opacidad < 1, porque
@@ -62,6 +73,22 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
   exigen Vite 7 y ESLint 10 y lo que ya usaban CI y Netlify.
 
 ### Corregido
+
+- **El diagnóstico del LCP que arrastraban tres tareas del ROADMAP.** Se repetía que «el 98 %
+  del LCP es esperar a que React arranque». Midiendo *cada candidato* de LCP en vez de solo el
+  final: el navbar ya está pintado a los **108 ms**, y lo que retrasa el `<h1>` hasta los
+  776 ms es la animación de entrada del Hero. Con las duraciones a cero, LCP **148 ms (−81 %)**.
+  Corregidas las premisas de T2-06, T2-08 y T4-04, y abierta T2-23 para la causa real.
+
+- **Los iconos de Jest y TanStack Query**, que caían al glifo genérico. Las ocurrencias con
+  icono de respaldo bajan de **14 a 8 sobre 109**. Las 8 restantes son deliberadas y están en
+  una lista que el test comprueba exacta: seis son competencias sin logotipo posible, y
+  Playwright y Supertest no tienen marca en el set CC0 del que salen los demás.
+- **El PDF del CV se servía con cache `immutable` a un año.** Los JS y CSS de Vite llevan hash
+  de contenido y lo aguantan; los PDF comparten carpeta con ellos pero no llevan hash, así que
+  actualizar un CV conservando el nombre habría dejado a quien ya lo descargó con el viejo
+  durante un año. Las reglas de `netlify.toml` pasan a ir por extensión y a no solaparse entre
+  sí, en vez de depender de una precedencia que Netlify no documenta.
 
 - **El icono de WinForms nunca se mostraba**: la regla era `/windows.*forms/i` y el dato dice
   `"WinForms"`, que no contiene «windows». El icono existía desde el principio.
@@ -101,6 +128,7 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 > **Pendiente de verificar en un deploy preview** (no se puede en local): tamaño del bundle en
 > preview, 404 real, Lighthouse SEO = 100 y `Content-Type: application/xml` del sitemap.
 ---
+
 
 ## [2.0.0] — 2026-09-07
 
