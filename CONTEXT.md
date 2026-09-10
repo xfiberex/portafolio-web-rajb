@@ -367,6 +367,25 @@ que de todas formas vería la página rota.
 ⚠️ Esto **cierra T2-03 antes de que T2-19 declare el `browserslist`**. Si al declararlo el mínimo
 resultara ser anterior a 2020, hay que revisar esta decisión.
 
+### Vitest recoge los `.spec.ts` de Playwright si no se le acota *(descubierto 2026-09-09)*
+
+El patrón por defecto de Vitest incluye `**/*.spec.*`, así que arrastraba `e2e/a11y.spec.ts`
+e intentaba ejecutarlo fuera del runner de Playwright. El error que sale no menciona a
+Vitest y despista: *«Playwright Test did not expect test.describe() to be called here»*,
+con una lista de causas probables donde ninguna es la real.
+
+Resuelto acotando `test.include` a `src/**/*.test.{ts,tsx}` en `vite.config.ts`. Convención
+del repositorio, y conviene mantenerla:
+
+| | Sufijo | Carpeta | Se lanza con |
+|---|---|---|---|
+| Unitarios | `.test.ts` | `src/` | `npm test` |
+| End-to-end | `.spec.ts` | `e2e/` | `npm run test:e2e` |
+
+Nota sobre `vite.config.ts`: el `defineConfig` se importa de `vitest/config`, no de `vite`,
+para que la clave `test` tenga tipos. **Sin** triple-slash reference: la regla
+`@typescript-eslint/triple-slash-reference` la rechaza y el import ya trae los tipos.
+
 ### Una opacidad intermedia falsea la regla de contraste de axe *(descubierto 2026-09-09)*
 
 Ampliación de la trampa de las animaciones `whileInView`, y más sutil que la original.

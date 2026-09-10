@@ -453,6 +453,10 @@ mayor retorno medido está en T2-04 (507 ms de FCP/LCP) y T2-05 (540 ms de force
     simplemente distinta de 0.
   - **Un test guarda al otro:** «todo `<main>` está visible cuando se audita» corre antes del scan;
     si falla, el verde de axe no significaría nada. Verificado estable en 3 corridas seguidas.
+  - 🔧 **Arreglado el 2026-09-09 tras romper CI (#14):** Vitest recogía `e2e/*.spec.ts` —su
+    patrón por defecto incluye `*.spec.*`— e intentaba correr los tests de Playwright.
+    Acotado `test.include` a `src/**/*.test.{ts,tsx}` en `vite.config.ts`. Ver *Trampas
+    conocidas* en CONTEXT.md.
   - **Esfuerzo:** medio · **Depende de:** T1-02
 
 - [ ] **[T2-10] Playwright: congelar lo verificado a mano** *(viene de BACKLOG 4.3)*
