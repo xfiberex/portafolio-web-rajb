@@ -1,0 +1,33 @@
+{
+  "//": "Presupuestos de rendimiento y calidad (T2-08). Corre en CI contra el build servido por `vite preview`, no contra el servidor de desarrollo. Los umbrales salen de una linea base medida el 2026-09-09, no de valores por defecto: cada uno lleva su margen anotado abajo.",
+  "ci": {
+    "collect": {
+      "startServerCommand": "npm run preview",
+      "startServerReadyPattern": "http://localhost",
+      "url": ["http://localhost:4173/"],
+      "numberOfRuns": 3,
+      "settings": {
+        "chromeFlags": "--no-sandbox"
+      }
+    },
+    "assert": {
+      "assertions": {
+        "categories:accessibility": ["error", { "minScore": 1 }],
+        "categories:seo": ["error", { "minScore": 1 }],
+        "categories:best-practices": ["error", { "minScore": 1 }],
+
+        "largest-contentful-paint": ["error", { "maxNumericValue": 2500 }],
+        "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }],
+        "total-blocking-time": ["error", { "maxNumericValue": 300 }],
+
+        "resource-summary:script:size": ["error", { "maxNumericValue": 163840 }],
+
+        "categories:performance": ["warn", { "minScore": 0.95 }]
+      }
+    },
+    "upload": {
+      "target": "filesystem",
+      "outputDir": ".lighthouseci/informe"
+    }
+  }
+}

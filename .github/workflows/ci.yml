@@ -62,10 +62,32 @@ jobs:
       - name: Accesibilidad (axe-core)
         run: npm run test:e2e
 
-      - name: Guardar el informe si falla
+      # Chrome viene preinstalado en la imagen ubuntu-latest. Se imprime la
+      # version para que, si algun dia desaparece, el fallo diga por que en
+      # vez de morir dentro de chrome-launcher.
+      - name: Comprobar que hay Chrome
+        run: google-chrome --version
+
+      # Presupuestos que FALLAN el build, no que solo informan (T2-08).
+      # Los umbrales salen de una linea base medida, con su margen anotado
+      # en lighthouserc.json. El LCP que estima Lighthouse depende del grafo
+      # de red y no de la CPU —comprobado con cpuSlowdown x4, x6 y x8: el
+      # mismo valor—, asi que no oscila segun lo cargado que este el runner.
+      - name: Presupuestos de rendimiento (Lighthouse CI)
+        run: npm run lighthouse
+
+      - name: Guardar el informe de Playwright si falla
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
           path: playwright-report/
+          retention-days: 7
+
+      - name: Guardar el informe de Lighthouse si falla
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: .lighthouseci/
           retention-days: 7

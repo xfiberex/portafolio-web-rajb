@@ -526,6 +526,11 @@ Por eso las reglas se reescribieron para **no solaparse** en vez de depender de 
 los `/*.js` y `/*.css` de raíz eliminados —inútiles bajo la lectura estricta, redundantes bajo
 la amplia—. Todos los patrones caben dentro de un solo segmento, que es lo único garantizado.
 
+✅ **Verificado en producción el 2026-09-10.** Los dos PDF salen
+`public,max-age=86400,must-revalidate` y los assets con hash conservan `immutable`. Eso
+confirma además, empíricamente, lo que la documentación no aclaraba: **el comodín dentro de
+un segmento sí casa** (`/assets/*.js` alcanza `/assets/index-DumLsK7O.js`).
+
 ⚠️ Efecto secundario a vigilar: si algún día se importa una imagen desde `src/`, Vite la emitirá
 en `dist/assets/` con hash y **ninguna** regla la cubrirá — se servirá con el `max-age=0` por
 defecto de Netlify. Es un fallo seguro (cachea de menos, nunca de más), pero hay que añadir la
@@ -558,6 +563,95 @@ distingue no es evidencia de nada.
 
 Esto también explica por qué `e2e/a11y.spec.ts` tiene que esperar a opacidad exactamente 1
 aunque los tests corran con movimiento reducido: la preferencia no quita esos fundidos.
+
+### El elemento LCP cambia con el viewport *(T2-23/T2-08, 2026-09-09)*
+
+Cerré T2-23 midiendo solo en escritorio, donde el elemento LCP es el `<h1>`. En viewport
+móvil (412×823) **no lo es**: gana el párrafo «Construyo aplicaciones modernas…», que es más
+texto. Ese párrafo seguía dentro de un envoltorio animado, así que el LCP móvil real seguía
+en 2292 ms mientras yo daba la tarea por cerrada con 108 ms de escritorio.
+
+Lo destapó Lighthouse, que audita en móvil por defecto y nombra el elemento. Corregido
+sacando también el bloque de rol + descripción del envoltorio: **2292 → 1624 ms**, otra vez
+igual al FCP.
+
+Regla para la próxima: **medir el LCP en al menos dos viewports**, y mirar *qué elemento* es,
+no solo el número.
+
+### Lighthouse y la medición real no coinciden, y aun así el presupuesto va sobre Lighthouse *(T2-08)*
+
+Con el mismo estrangulamiento nominal (4G lento, CPU ×4) sobre el mismo build:
+
+| | LCP |
+|---|---:|
+| Medición real (Playwright + CDP) | 1624 ms |
+| Lighthouse (estimación *Lantern*) | 2334 ms |
+
+Lighthouse no mide con reloj: reconstruye la línea de tiempo con un modelo a partir de una
+traza sin estrangular. Al sacar el párrafo del envoltorio animado, la medición real bajó
+652 ms y **la estimación de Lighthouse no se movió ni un milisegundo**. Se comprobó que no
+era un build viejo comparando el hash del bundle que Lighthouse descargó.
+
+La conclusión práctica no es cuál tiene razón, sino que **el umbral hay que calibrarlo contra
+la herramienta que lo impone**. Y hay un efecto secundario bueno: la estimación resultó
+**insensible a la CPU** (2329 ms con `cpuSlowdownMultiplier` a 4, 6 y 8), porque para esta
+página la domina el grafo de red. Eso convierte un margen del 7 % —que en CI sería
+temerario— en algo estable: no oscila con la carga del runner, y lo que sí lo movería es que
+crezca el bundle.
+
+### `startServerReadyPattern` y los códigos ANSI de Vite *(T2-08)*
+
+`"startServerReadyPattern": "Local:"` **nunca casa**. Vite imprime el rótulo en negrita y
+cierra el estilo *antes* de los dos puntos:
+
+```
+  ➜  ESC[1mLocalESC[22m:   ESC[36mhttp://localhost:ESC[1m4173
+```
+
+La cadena `Local:` no existe contigua en la salida. El síntoma engaña: lhci avisa con un
+*timeout* y **sigue adelante igual**, así que funciona si el servidor ya estaba levantado y
+falla de forma intermitente si no. El patrón bueno es `http://localhost`, que sí es contiguo.
+
+### El LCP se registra cuando la animación **termina** *(T2-23, 2026-09-09)*
+
+La regla, medida variante a variante sobre el build real:
+
+```
+LCP ≈ FCP + (retardo + duración de la animación de entrada del elemento LCP
+             y de todos sus ancestros que animen)
+```
+
+| Variante del `<h1>` del Hero | LCP |
+|---|---:|
+| `fadeUpVariant` (retardo 0,13 s + duración 0,5 s) | 748 ms |
+| duración 0,3 s, sin retardo | 436 ms |
+| duración 0,15 s, sin retardo | 280 ms |
+| sin animación | **108 ms** |
+
+Cada fila cuadra con `FCP + duración`. Esto es lo contrario de lo que yo suponía: pensaba que
+Chrome registraba el LCP en cuanto el elemento **empieza** a ser visible.
+
+Dos consecuencias que ahorran tiempo:
+
+1. **No es la opacidad.** Quitar `opacity` del `<h1>` y dejar solo `y` + `blur` no movió el
+   LCP ni un milisegundo (748 → 748). Quitar el `blur` tampoco (744). Lo que cuesta es la
+   **duración**, sea cual sea la propiedad animada.
+2. **Las animaciones anidadas son puertas encadenadas.** El contenedor `staggerContainer`
+   animaba su propia opacidad y el `<h1>` la suya. Arreglar **una sola** no sirve de nada:
+
+   | Cambio | LCP |
+   |---|---:|
+   | nada (base) | 748 ms |
+   | solo contenedor sin opacidad | 748 ms |
+   | solo `<h1>` estático | 412 ms |
+   | **los dos** | **112 ms** |
+
+Por eso el `<h1>` del Hero no anima, y `staggerContainer` solo orquesta. El resto del Hero
+sigue entrando en cascada; comprobado con capturas a 150/400/700/1200 ms.
+
+`npm run medir:lcp` (o `-- --lento` para 4G lento + CPU ×4) reproduce la medición. Registra
+**cada candidato** de LCP y toma la mediana de 3 corridas: quedarse con el valor final
+escondía que el navbar ya estaba pintado a los 108 ms.
 
 ### Decisión: el bundle no se divide *(T2-06, 2026-09-09)*
 

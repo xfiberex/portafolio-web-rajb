@@ -101,6 +101,14 @@ npm run test:watch
 # del lightbox, menu movil, skip link, cero scroll horizontal y movimiento reducido
 npm run build && npm run test:e2e
 
+# Presupuestos de Lighthouse: falla si a11y/SEO/buenas practicas bajan de 100,
+# si el LCP pasa de 2,5 s o si el JS transferido pasa de 160 kB. Corre en CI.
+npm run lighthouse
+
+# Medir FCP/LCP/CLS del build (requiere `npm run preview` en otra terminal)
+npm run medir:lcp
+npm run medir:lcp -- --lento    # 4G lento + CPU x4
+
 # Analizar el bundle: genera stats.html (treemap). Ver T2-06
 npm run analyze
 

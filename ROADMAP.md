@@ -18,10 +18,10 @@ Los datos entre paréntesis son **medidos**, no estimados, salvo donde diga *est
 |---|---|---:|---:|---|
 | **Tier 0** | Crítico / bloqueante | 3 | 0 | — (cerrado) |
 | **Tier 1** | Alta prioridad — accesibilidad AA, build y documentación que engaña | 9 | 0 | — (cerrado) |
-| **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 23 | 8 | bajo·6 medio·2 |
+| **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 23 | 6 | bajo·5 medio·1 |
 | **Tier 3** | Pulido y mantenimiento | 20 | 19 | bajo·14 medio·5 |
 | **Tier 4** | Futuro / opcional | 6 | 5 | bajo·4 alto·1 |
-| | **Total** | **61** | **32** | |
+| | **Total** | **61** | **30** | |
 
 **No hay ninguna tarea de Tier 0 abierta.** La auditoría del 2026-09-08 no encontró
 vulnerabilidades explotables, pérdida de datos ni fallos que rompan producción. Las tres
@@ -407,7 +407,7 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     pliegue no lo sacaría del camino crítico, y el código propio es solo el 9,3 % del total.
     Abre **T2-23** para el coste real.
 
-- [ ] **[T2-23] Bajar el coste de la animación de entrada del Hero en el LCP**
+- [x] **[T2-23] Bajar el coste de la animación de entrada del Hero en el LCP**
   - **Área:** Rendimiento · **Ubicación:** `src/lib/animations.ts` · `src/components/Hero.tsx`
   - **Qué hacer:** medido en T2-06: la animación de entrada del Hero es **628 ms de los 776 ms**
     de LCP en local, y el hueco FCP→LCP se mantiene con estrangulamiento (332 ms en local,
@@ -423,6 +423,30 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     midiendo con el mismo método de T2-06 (candidatos de LCP, mediana de 3 corridas), y el
     Hero sigue teniendo animación de entrada visible.
   - **Esfuerzo:** bajo · **Depende de:** T2-06
+  - **Cerrada:** 2026-09-09 · **LCP 748 → 108 ms (−86 %)**, mediana de 3 corridas.
+
+    | | Antes | Después |
+    |---|---:|---:|
+    | LCP sin estrangular | 748 ms | **108 ms** |
+    | LCP a 4G lento + CPU ×4 | 2008 ms | **1656 ms** |
+    | Hueco FCP→LCP | 332–656 ms | **0 ms** |
+
+    Dos cambios, los dos guiados por medición y no por intuición:
+    **(1)** `staggerContainer` deja de animar su propia opacidad — era un doble fundido, y los
+    nueve sitios que lo usan tienen hijos que ya se funden solos; **(2)** el `<h1>` deja de ser
+    `motion.h1`.
+    ⚠️ **Ninguno de los dos por separado sirve de nada** (748 → 748 ms y 748 → 412 ms): son dos
+    puertas encadenadas y hay que abrir las dos. Quitar solo la opacidad tampoco servía: el
+    coste no es la opacidad, es que **el LCP se registra cuando la animación termina**.
+    Verificado que el Hero sigue animando con capturas a 150/400/700/1200 ms.
+    CLS 0,0003 (el 0,00 anterior venía de una traza redondeada a 2 decimales: no es regresión).
+    Reproducible con `npm run medir:lcp` (y `-- --lento`).
+    🔁 **Ampliada el mismo día al montar T2-08.** El criterio que escribí solo hablaba del
+    build local sin estrangular, y lo verifiqué **solo en escritorio**. En viewport móvil el
+    elemento LCP no es el `<h1>` sino el párrafo «Construyo aplicaciones modernas…», que
+    seguía animando: el LCP móvil real seguía en **2292 ms**. Se sacó también del envoltorio
+    animado el bloque de rol + descripción, y bajó a **1624 ms**, otra vez igual al FCP.
+    Lección: el elemento LCP **cambia con el viewport**, así que medir uno solo no basta.
 
 ### QA y testing
 
@@ -453,7 +477,7 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
        solución de fondo es **T3-16**.
   - **Esfuerzo:** medio · **Depende de:** ninguna
 
-- [ ] **[T2-08] Lighthouse CI con budgets que fallen el build** *(viene de BACKLOG 4.1)*
+- [x] **[T2-08] Lighthouse CI con budgets que fallen el build** *(viene de BACKLOG 4.1)*
   - **Área:** QA · **Ubicación:** `.github/workflows/`
   - **Qué hacer:** `@lhci/cli` contra `vite preview` o la URL del deploy preview. **Budgets que
     fallen**, no solo reporten. Alternativa más barata: `@netlify/plugin-lighthouse`.
@@ -465,6 +489,29 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     esta página lo domina la animación de entrada del Hero, que T2-23 va a cambiar—.
   - **Criterio de aceptación:** el workflow falla si SEO < 100, accesibilidad < 100 o LCP > 2.5 s.
   - **Esfuerzo:** medio · **Depende de:** T1-04, T1-06
+  - **Cerrada:** 2026-09-09 · `@lhci/cli` en `lighthouserc.json` + paso en CI.
+
+    Línea base **vuelta a medir** (móvil, build local), que era lo primero que pedía la nota:
+
+    | | Auditoría 2026-09-08 | Hoy | Umbral |
+    |---|---:|---:|---:|
+    | Accesibilidad | 96 | **100** | = 100 |
+    | SEO | 92 | **100** | = 100 |
+    | Buenas prácticas | 100 | **100** | = 100 |
+    | Rendimiento | — | **98** | ≥ 95 *(aviso)* |
+    | LCP | 3011 ms | **2334 ms** | ≤ 2500 ms |
+    | TBT | — | **15 ms** | ≤ 300 ms |
+    | CLS | 0.00 | **0.001** | ≤ 0.1 |
+    | JS transferido | — | **124 kB** | ≤ 160 kB |
+
+    El margen del LCP es solo del 7 %, lo que normalmente sería temerario en CI. Aquí no:
+    **la estimación de Lighthouse para esta página no depende de la CPU** —comprobado con
+    `cpuSlowdownMultiplier` a 4, 6 y 8: 2329 ms en los tres casos—, sino del grafo de red.
+    Es decir, es determinista frente a lo cargado que esté el runner, y lo que sí la movería
+    es que crezca el bundle. Que es exactamente lo que un presupuesto debe cazar.
+    Los ocho umbrales se validaron **por mutación**, no por salir en verde.
+    ⏳ Queda por confirmar en la primera corrida real de CI que la imagen `ubuntu-latest`
+    trae Chrome; por eso el workflow lo comprueba en un paso aparte antes de auditar.
 
 - [x] **[T2-09] axe-core en CI** *(viene de BACKLOG 4.2)*
   - **Área:** QA · **Ubicación:** `.github/workflows/`
@@ -659,8 +706,17 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     reglas se reescribieron para **no solaparse**: `/assets/*.js` y `/assets/*.css` inmutables,
     `/assets/*.pdf` a `max-age=86400, must-revalidate`, y los `/*.js` y `/*.css` de raíz
     eliminados por inútiles. Ver la entrada de CONTEXT.md.
-    ⏳ **El criterio queda pendiente del próximo despliegue**; se comprueba con
-    `curl -sI https://portafolio-web-rajb.netlify.app/assets/CV-….pdf | grep -i cache`.
+    ✅ **Verificado en producción el 2026-09-10** tras el despliegue:
+
+    | Recurso | `Cache-Control` |
+    |---|---|
+    | `/assets/index-*.js` y `*.css` | `public,max-age=31536000,immutable` |
+    | `/assets/CV-….pdf` y `/assets/ATS-CV-….pdf` | `public,max-age=86400,must-revalidate` |
+    | `/fonts/inter-latin.woff2` | `public,max-age=31536000,immutable` |
+
+    De paso resuelve la ambigüedad de la documentación de Netlify: **el comodín `*` dentro de
+    un segmento sí funciona** (`/assets/*.js` casa), que era el supuesto sobre el que se
+    construyeron las reglas nuevas.
 
 - [ ] **[T2-21] Empezar a etiquetar versiones en git**
   - **Área:** DevOps · **Ubicación:** `package.json:4` · repositorio
@@ -978,8 +1034,10 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     2.946 s de render delay). Medido de nuevo: React pinta el navbar a los **108 ms** y lo que
     retrasa el LCP es la animación de entrada del Hero, no el arranque. Prerenderizar por sí
     solo **no lo arreglaría**: al hidratar, Framer Motion volvería a poner el `<h1>` a
-    `opacity: 0`. Reevaluar esta tarea **después de T2-23**, que ataca la causa medida con
-    esfuerzo bajo, y solo si entonces sigue habiendo margen.
+    `opacity: 0`. **T2-23 se cerró el 2026-09-09** y dejó el LCP local en 108 ms y en 1656 ms
+    a 4G lento + CPU ×4, donde ya coincide con el FCP: lo que quede por ganar es **arranque y
+    red**, que es justo lo que atacaría prerenderizar. Ahí sí tiene sentido reevaluarlo, pero
+    con la línea base nueva, no con los 3.011 s de la auditoría.
   - **Criterio de aceptación:** decisión registrada en `CONTEXT.md`, con o sin implementación.
   - **Esfuerzo:** alto · **Depende de:** T2-04, T2-05, T2-06, **T2-23**
 

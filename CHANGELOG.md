@@ -23,8 +23,14 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 - **`npm run analyze`**: `rollup-plugin-visualizer` detrás de `vite build --mode analyze`, así
   que no entra ni en el build normal ni en CI. Informe y decisión en
   [docs/analisis-bundle-2026-09-09.md](docs/analisis-bundle-2026-09-09.md).
+- **`npm run medir:lcp`**: mide FCP, LCP y CLS del build registrando **cada candidato** de LCP
+  y tomando la mediana de 3 corridas. Con `-- --lento`, a 4G lento y CPU ×4.
+- **Presupuestos de rendimiento que fallan el build** (`lighthouserc.json` + paso en CI).
+  Accesibilidad, SEO y buenas prácticas tienen que seguir en **100**; LCP ≤ 2,5 s, CLS ≤ 0,1,
+  TBT ≤ 300 ms y el JS transferido ≤ 160 kB. Los umbrales salen de una línea base medida, no
+  de valores por defecto, y se validaron rompiéndolos a propósito uno por uno.
 
-- **Los primeros tests del repositorio**: 87 unitarios con Vitest, integrados en CI antes del build.
+- **Los primeros tests del repositorio**: 93 unitarios con Vitest, integrados en CI antes del build.
   Solo funciones puras, que es donde está el valor: la resolución de iconos (~90 heurísticas
   regex donde el orden importa) y los helpers de URL. El test de tabla recorre los 78 tags
   reales de `src/data/` y **falla si se añade una tecnología sin icono** — hasta ahora ese
@@ -59,6 +65,15 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 - **`scripts/images-to-webp.mjs`** y `npm run images:webp` (dependencia nueva: `sharp`).
 
 ### Cambiado
+
+- **El `<h1>` del Hero ya no anima y `staggerContainer` solo orquesta.** El nombre aparece de
+  inmediato y el resto del Hero sigue entrando en cascada a su alrededor. **LCP 748 → 108 ms**
+  (−86 %); a 4G lento con CPU ×4, 2008 → 1656 ms, donde ya coincide con el FCP. El motivo es
+  que el LCP se registra cuando la animación **termina**, así que la duración de la entrada
+  del elemento LCP se suma entera — y las animaciones anidadas se encadenan: quitar solo una
+  de las dos no cambiaba nada. En móvil el elemento LCP resultó ser otro —el párrafo de
+  descripción, no el `<h1>`—, así que el bloque de rol y descripción también dejó de animar:
+  LCP móvil **2292 → 1624 ms**.
 
 - **Contraste WCAG AA.** El acento se separó en dos tokens porque cumplía dos papeles con
   requisitos opuestos: `--value-primary` (62.8 %, acento sobre superficie oscura) y

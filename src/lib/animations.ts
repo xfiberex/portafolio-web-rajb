@@ -41,11 +41,21 @@ export const fadeUpVariant: Variants = {
   },
 };
 
-/** Contenedor con stagger para hijos */
+/**
+ * Contenedor con stagger para hijos. **Solo orquesta**: no anima nada
+ * propio.
+ *
+ * Tenía un `opacity: 0 → 1` que era un doble fundido: los nueve sitios que
+ * usan este contenedor tienen hijos con su propio fundido (`fadeUpVariant`,
+ * `scaleUpVariant`, `slideLeftVariant`), así que la opacidad del padre se
+ * multiplicaba con la del hijo sin aportar nada visible.
+ *
+ * Y sí costaba: el LCP se registra cuando **termina** la animación de
+ * entrada del elemento, incluidos los ancestros que animan. Ver T2-23.
+ */
 export const staggerContainer: Variants = {
-  hidden: { opacity: 0 },
+  hidden: {},
   visible: {
-    opacity: 1,
     transition: {
       staggerChildren: 0.08,
       delayChildren: 0.05,

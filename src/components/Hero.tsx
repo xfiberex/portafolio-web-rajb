@@ -34,11 +34,18 @@ const Hero = () => {
           Hola, soy
         </motion.p>
 
-        <motion.h1 variants={fadeUpVariant} className="mt-3 text-6xl font-bold text-foreground">
-          Ricky Angel Jiménez Bueno
-        </motion.h1>
+        {/*
+          El <h1> NO anima, y es deliberado: es el elemento LCP de la página.
+          El LCP se registra cuando **termina** su animación de entrada, no
+          cuando empieza, así que cualquier variante aquí se suma entera al
+          LCP. Medido (T2-23): con `fadeUpVariant` eran 748 ms; así, 112 ms.
+          No es solo rendimiento: el nombre es el contenido principal y no
+          tiene por qué hacerse esperar. El resto del Hero sigue entrando
+          en cascada a su alrededor.
+        */}
+        <h1 className="mt-3 text-6xl font-bold text-foreground">Ricky Angel Jiménez Bueno</h1>
 
-        <motion.div variants={fadeUpVariant} className="mt-6 max-w-3xl text-lg text-muted sm:text-xl">
+        <div className="mt-6 max-w-3xl text-lg text-muted sm:text-xl">
           {/*
             min-h reserva el alto de las dos líneas que llega a ocupar la frase
             más larga en móvil. Sin esto, el texto que se escribe y se borra
@@ -66,7 +73,7 @@ const Hero = () => {
           <p className="mt-2 leading-relaxed">
             Construyo aplicaciones modernas, escalables y accesibles con enfoque en performance y buenas prácticas.
           </p>
-        </motion.div>
+        </div>
 
         <motion.div variants={fadeUpVariant} className="mt-8 flex flex-wrap gap-4">
           <a

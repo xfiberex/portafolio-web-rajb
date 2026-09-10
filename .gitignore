@@ -39,3 +39,6 @@ skills-lock.json
 
 # Informe del analizador de bundle (npm run analyze); se regenera en un comando
 /stats.html
+
+# Lighthouse CI
+/.lighthouseci/
