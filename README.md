@@ -42,7 +42,7 @@ Un portafolio web moderno, seguro y responsivo construido con las últimas tecno
 - **Secure External Links** - rel="noopener noreferrer" en todos los enlaces
 
 ### Development Tools
-- **ESLint 9** - Linter moderno para TypeScript/React
+- **ESLint 10** - Linter moderno para TypeScript/React
 - **typescript-eslint** - Parser y reglas para análisis de archivos TypeScript/TSX
 - **Vite Plugin React** - Plugin oficial optimizado para React
 
@@ -56,8 +56,8 @@ Un portafolio web moderno, seguro y responsivo construido con las últimas tecno
 
 1. **Clona el repositorio**
    ```bash
-   git clone https://github.com/tu-usuario/portafolio-web.git
-   cd portafolio-web
+   git clone https://github.com/xfiberex/portafolio-web-rajb.git
+   cd portafolio-web-rajb
    ```
 
 2. **Instala las dependencias**
@@ -159,11 +159,36 @@ npm run test:visual:update
 # 2. Las de Linux, en el contenedor oficial de Playwright (misma version que
 #    @playwright/test). El volumen sobre node_modules es OBLIGATORIO: sin el,
 #    el `npm ci` de dentro pisa los binarios de Windows y rompe tu entorno.
-docker run --rm -v "$(pwd -W):/work" -v /work/node_modules -w /work   mcr.microsoft.com/playwright:v1.63.0-noble   bash -c "npm ci && npm run build && npm run test:visual:update"
+docker run --rm -v "$(pwd -W):/work" -v /work/node_modules -w /work \
+  mcr.microsoft.com/playwright:v1.63.0-noble \
+  bash -c "npm ci && npm run build && npm run test:visual:update"
 ```
 
 Si el fallo **no** era intencionado, el informe con las tres imágenes —esperada, obtenida y
 diferencia— queda como artefacto de la corrida de CI.
+
+## 📚 Documentación del proyecto
+
+Este README explica **cómo usar** el proyecto. Lo demás vive en tres archivos con un
+propósito distinto cada uno, y conviene no mezclarlos:
+
+| Archivo | Responde a |
+|---|---|
+| [ROADMAP.md](ROADMAP.md) | **Qué falta.** 61 tareas con ID permanente, ordenadas por severidad, con criterio de aceptación y una nota de cierre que dice cómo se verificó. |
+| [CONTEXT.md](CONTEXT.md) | **Por qué se decidió así.** Trampas encontradas, mediciones y decisiones con su razón. Antes de cambiar algo que parezca raro, mirar aquí. |
+| [CHANGELOG.md](CHANGELOG.md) | **Qué cambió**, en formato Keep a Changelog. |
+
+### Integración continua
+
+Dos workflows en [`.github/workflows/`](.github/workflows/):
+
+- **CI** (`ci.yml`) — en cada push y PR a `main`. Tipos → lint → unitarios → build →
+  accesibilidad con axe-core → snapshots visuales → presupuestos de Lighthouse. Los
+  presupuestos **fallan el build**, no solo informan.
+- **Enlaces** (`links.yml`) — los lunes, y a mano desde la pestaña Actions. Revisa los
+  enlaces externos de la documentación y del contenido, y abre un issue si alguno cae. No
+  corre en cada PR a propósito: los enlaces externos flaquean por motivos ajenos al commit,
+  y romper PRs por eso enseña a ignorar el CI.
 
 ## 📁 Estructura del Proyecto
 
@@ -198,7 +223,6 @@ portafolio-web/
 │   │   ├── ui/
 │   │   │   ├── ErrorBoundary.tsx   Fallback cuando el árbol React revienta
 │   │   │   ├── Lightbox.tsx        Visor modal con contrato de diálogo
-│   │   │   ├── ObfuscatedEmail.tsx Ensambla el email en JavaScript
 │   │   │   ├── Section.tsx         Ritmo vertical, ancho y scroll-margin del navbar
 │   │   │   ├── SectionHeader.tsx   h2 + subtítulo
 │   │   │   ├── SkipLink.tsx        Salta la navegación; visible al recibir foco
@@ -279,11 +303,10 @@ npm install -g vercel
 vercel --prod
 ```
 
-### GitHub Pages
-```bash
-npm run build
-# Sube el contenido de la carpeta 'dist' a tu repositorio gh-pages
-```
+> **GitHub Pages no está soportado, y es a propósito.** Necesitaría fijar `base` en
+> `vite.config.ts` y, sobre todo, perdería **todas** las cabeceras de `netlify.toml`: el CSP,
+> el `Cache-Control` por tipo de archivo y el `Content-Type` del sitemap. Media docena de
+> tareas del roadmap viven en ese archivo.
 
 ## 🔧 Personalización
 
@@ -304,10 +327,11 @@ Los estilos están definidos en `src/index.css` y utilizan Tailwind CSS 4. Puede
 - Espaciados
 - Animaciones
 
-### Configurar Variables de Entorno
-1. Crea un archivo `.env` en la raíz del proyecto
-2. Configura tus claves API (si usas servicios externos como EmailJS)
-3. Solo las variables con prefijo `VITE_` son accesibles en el frontend
+### Variables de entorno
+
+**El proyecto no usa ninguna.** No hay `.env`, ni claves de API, ni backend: el botón de
+contacto abre el cliente de correo con un `mailto:`. Si algún día hiciera falta, Vite solo
+expone al frontend las variables con prefijo `VITE_`.
 
 ### Añadir Nuevas Secciones
 1. Crea un nuevo componente TypeScript en `src/components/`
@@ -367,19 +391,31 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 ## 📞 Contacto
 
 **Ricky Angel Jiménez Bueno**
-<!-- - Portfolio: [tu-portfolio.com](https://tu-portfolio.com) -->
-- LinkedIn: [linkedin.com/in/tu-perfil](www.linkedin.com/in/ricky-angel-jimenez-bueno-52659928a)
-- GitHub: [github.com/tu-usuario](https://github.com/xfiberex)
+- Portafolio: [portafolio-web-rajb.netlify.app](https://portafolio-web-rajb.netlify.app)
+- LinkedIn: [linkedin.com/in/ricky-angel-jimenez-bueno-52659928a](https://www.linkedin.com/in/ricky-angel-jimenez-bueno-52659928a)
+- GitHub: [github.com/xfiberex](https://github.com/xfiberex)
 - Email: rickyjimenez1820@gmail.com
 
-## 🙏 Agradecimientos
+## 📜 Licencias de terceros
 
-- [React](https://reactjs.org/) - Biblioteca de JavaScript
-- [Vite](https://vitejs.dev/) - Build tool
-- [Tailwind CSS](https://tailwindcss.com/) - CSS Framework
-- [Framer Motion](https://www.framer.com/motion/) - Animation library
-- [Heroicons](https://heroicons.com/) - Beautiful hand-crafted SVG icons
-- [Lucide](https://lucide.dev/) - Beautiful & consistent icon toolkit
+Este proyecto es MIT. Todo lo que se distribuye con él lleva licencia compatible:
+
+| Dependencia | Uso | Licencia |
+|---|---|---|
+| [React](https://react.dev/) y React DOM | Interfaz | MIT |
+| [Vite](https://vite.dev/) | Build | MIT |
+| [Tailwind CSS](https://tailwindcss.com/) | Estilos | MIT |
+| [Framer Motion](https://motion.dev/) | Animaciones | MIT |
+| [Lucide](https://lucide.dev/) | Iconos de interfaz | ISC |
+| [react-type-animation](https://react-type-animation.netlify.app/) | Texto del Hero | MIT |
+| [Inter](https://rsms.me/inter/) | Tipografía auto-hospedada | SIL OFL 1.1 |
+| [simple-icons](https://simpleicons.org/) | Siluetas de Jest y TanStack Query | CC0 1.0 |
+
+La licencia completa de Inter viaja con la fuente, en
+[`public/fonts/LICENSE.txt`](public/fonts/LICENSE.txt), como exige la SIL OFL.
+
+> Antes esta sección agradecía a **Heroicons**, que no se usa en ninguna parte del código, y
+> no declaraba ni una licencia.
 
 ---
 

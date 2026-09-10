@@ -50,6 +50,7 @@ const Navbar = () => {
         */}
         <a
           href="#home"
+          aria-current={active === "home" ? "true" : undefined}
           className="-mx-2 inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-lg font-bold text-foreground hover:text-primary"
           onClick={closeMenu}
         >

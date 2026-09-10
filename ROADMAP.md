@@ -19,9 +19,9 @@ Los datos entre paréntesis son **medidos**, no estimados, salvo donde diga *est
 | **Tier 0** | Crítico / bloqueante | 3 | 0 | — (cerrado) |
 | **Tier 1** | Alta prioridad — accesibilidad AA, build y documentación que engaña | 9 | 0 | — (cerrado) |
 | **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 23 | 1 | bajo·1 |
-| **Tier 3** | Pulido y mantenimiento | 20 | 19 | bajo·14 medio·5 |
+| **Tier 3** | Pulido y mantenimiento | 20 | 11 | bajo·7 medio·4 |
 | **Tier 4** | Futuro / opcional | 6 | 5 | bajo·4 alto·1 |
-| | **Total** | **61** | **25** | |
+| | **Total** | **61** | **17** | |
 
 **No hay ninguna tarea de Tier 0 abierta.** La auditoría del 2026-09-08 no encontró
 vulnerabilidades explotables, pérdida de datos ni fallos que rompan producción. Las tres
@@ -625,12 +625,29 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
   - **Cerrada:** 2026-09-09 · añadidos `README.md`, `ROADMAP.md`, `CONTEXT.md`, `CHANGELOG.md` y
     `docs/**/*.md`. Contadas las URLs `http(s)` únicas de los globs: **21 → 42**, así que el `Total`
     superará holgadamente 23.
-  - ⏳ **La segunda mitad del criterio la confirma el runner**, no se puede en local (lychee no está
-    instalado aquí). Verificado en cambio que el cebo sigue puesto:
-    `[linkedin.com/in/tu-perfil](www.linkedin.com/in/ricky-...)` está en el README **sin esquema**.
-  - ⚠️ **Orden importante:** ese enlace roto es justo lo que **T3-01** arregla. Conviene lanzar
-    `links.yml` a mano (Actions → Enlaces → *Run workflow*) **antes** de cerrar T3-01, para
-    comprobar que el verificador lo caza. Si se arregla primero, se pierde el único caso de prueba.
+  - ✅ **Lanzado a mano el 2026-09-10** (13 s, `workflow_dispatch`). Primera mitad del criterio
+    cumplida de sobra:
+
+    | | Enlaces revisados | Errores |
+    |---|---:|---:|
+    | Corrida del 2026-09-07 (globs viejos) | **3** | 1 |
+    | Corrida del 2026-09-10 (globs nuevos) | **76** | 0 |
+
+    De paso corrige dos cifras del propio enunciado: la base no eran 23 enlaces sino **3**
+    —lychee filtra por extensión y se saltaba los `.ts`, así que solo miraba `index.html`—,
+    y la estimación de «21 → 42» se quedó corta.
+  - ❌ **La segunda mitad del criterio era insatisfacible, y eso es el hallazgo.** El
+    verificador **no puede** cazar ese enlace, por dos motivos que se suman: `lychee.toml`
+    **excluye LinkedIn a propósito** (devuelve 999 a clientes sin sesión y sería un falso
+    positivo permanente), y el workflow pasa `--scheme http --scheme https`, así que un
+    destino sin esquema ni siquiera entra en la lista de candidatos. Errores: 0 con el cebo
+    puesto.
+    El hueco es real —GitHub resuelve `](www.ejemplo.com)` como ruta relativa y da 404— así
+    que se cubrió con un test propio, `src/lib/docs.test.ts`, que revisa los `.md` buscando
+    destinos sin esquema y marcadores sin sustituir. Ignora el código en línea: este mismo
+    repositorio cita el enlace roto entre backticks para documentarlo, y sin esa limpieza la
+    documentación del bug contaba como el bug.
+    Verificado en el orden correcto: el test **falla** con el README roto y pasa tras T3-01.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
 ### SEO y contenido
@@ -825,7 +842,7 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
 
 ## Tier 3 — Pulido y mantenimiento
 
-- [ ] **[T3-01] Sustituir los marcadores de posición del README**
+- [x] **[T3-01] Sustituir los marcadores de posición del README**
   - **Área:** Ortografía y redacción · **Ubicación:** `README.md:60,186-188`
   - **Qué hacer:** quedan sin sustituir `git clone https://github.com/tu-usuario/portafolio-web.git`,
     `[github.com/tu-usuario]` y `[linkedin.com/in/tu-perfil]`. Además el enlace de LinkedIn apunta
@@ -834,6 +851,14 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
   - **Criterio de aceptación:** ningún `tu-usuario`/`tu-perfil` en el archivo y todos los enlaces
     con `https://`.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-10 · `git clone` apunta al repositorio real, el enlace de LinkedIn
+    lleva `https://` y el texto de los enlaces ya no dice `tu-usuario`. Se descomentó la
+    línea del portafolio, que ahora tiene URL de verdad.
+    El criterio queda **fijado por un test** (`src/lib/docs.test.ts`), no solo aplicado: es
+    la clase de cosa que vuelve sola al copiar una plantilla.
+    ℹ️ **Nota aparte:** el README publica el correo en claro. Es deliberado en un repo
+    público y distinto de la ofuscación del sitio (T3-13), pero conviene saber que un
+    rastreador que lea GitHub lo encuentra igual.
 
 - [x] **[T3-02] Actualizar el árbol de estructura del README**
   - **Área:** Documentación · **Ubicación:** `README.md:98-140`
@@ -845,7 +870,7 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     `lib/contact.ts`, `public/fonts/`, `scripts/`) y corrige la extensión de `useScrollspy`.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
-- [ ] **[T3-03] Limpiar la documentación muerta del README**
+- [x] **[T3-03] Limpiar la documentación muerta del README**
   - **Área:** Documentación · **Ubicación:** `README.md:39,163-166,171-175,196-203`
   - **Qué hacer:** dice "ESLint 9" (es 10); documenta cómo configurar variables de entorno y
     EmailJS cuando el proyecto **no usa ninguna** variable de entorno; da instrucciones de GitHub
@@ -854,8 +879,17 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     cambio una mención a `ROADMAP.md`, `CONTEXT.md` y los dos workflows de CI.
   - **Criterio de aceptación:** cada sección del README describe algo que existe.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-10 · «ESLint 9» → **10** (verificado en `package.json`).
+    La sección de variables de entorno decía cómo configurar `.env` y EmailJS: ahora dice
+    que **no se usa ninguna**, que es la información útil.
+    Las instrucciones de GitHub Pages se sustituyen por el motivo de que no esté soportado:
+    perdería **todas** las cabeceras de `netlify.toml` —CSP, `Cache-Control` por tipo,
+    `Content-Type` del sitemap—, donde vive media docena de tareas de este roadmap.
+    Añadida la sección que faltaba: el README **no mencionaba ni una vez** ROADMAP.md,
+    CONTEXT.md, CHANGELOG.md ni los dos workflows. Ahora hay una tabla que dice a qué
+    pregunta responde cada archivo, y qué hace cada workflow.
 
-- [ ] **[T3-04] Declarar las licencias de terceros**
+- [x] **[T3-04] Declarar las licencias de terceros**
   - **Área:** Legal · **Ubicación:** `README.md:205-212`
   - **Qué hacer:** el proyecto es MIT y usa `lucide-react` (ISC), la fuente Inter (SIL OFL) y
     React/Framer Motion/Tailwind (MIT). Todas compatibles, sin conflicto — pero la sección de
@@ -863,6 +897,13 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     Convertirla en una lista de atribuciones con licencia.
   - **Criterio de aceptación:** cada dependencia visible al usuario aparece con su licencia.
   - **Esfuerzo:** bajo · **Depende de:** T3-03
+  - **Cerrada:** 2026-09-10 · «Agradecimientos» pasa a **«Licencias de terceros»**, una tabla
+    de 8 filas con dependencia, uso y licencia. **Licencias leídas de `node_modules`, no de
+    memoria**: React/Vite/Tailwind/Framer Motion/react-type-animation MIT, Lucide **ISC**,
+    Inter **SIL OFL 1.1** y simple-icons **CC0 1.0** (de ahí salen los dibujos de Jest y
+    TanStack Query, que la tarea no contemplaba porque son posteriores).
+    Todas compatibles con MIT. Se enlaza `public/fonts/LICENSE.txt`, que viaja con la fuente
+    como exige la OFL. Y desaparece **Heroicons**, que se agradecía sin usarse.
 
 - [ ] **[T3-05] Definir el tema claro** *(viene de BACKLOG 3)*
   - **Área:** UI/UX · **Ubicación:** `src/index.css:17-44`
@@ -941,7 +982,7 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
   - **Criterio de aceptación:** las categorías principales destacan y "Principios" no usa pills.
   - **Esfuerzo:** medio · **Depende de:** ninguna
 
-- [ ] **[T3-13] Eliminar el código muerto de `ObfuscatedEmail`**
+- [x] **[T3-13] Eliminar el código muerto de `ObfuscatedEmail`**
   - **Área:** Refactorización · **Ubicación:** `src/components/ui/ObfuscatedEmail.tsx:11,19-23,36-46` ·
     `src/components/Contact.tsx:43-53`
   - **Qué hacer:** el componente promete en su propio comentario construir el email "en memoria,
@@ -955,8 +996,18 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
   - **Criterio de aceptación:** no queda código inalcanzable en el componente y el README describe
     la protección real.
   - **Esfuerzo:** bajo · **Depende de:** T1-09
+  - **Cerrada:** 2026-09-10 · se eligió la segunda opción: borrar el estado muerto.
+    `ObfuscatedEmail.tsx` desaparece; Contact ensambla el correo con `buildEmail` y comparte
+    un solo manejador entre los dos botones. Se van con él `isRevealed`,
+    `obfuscatedDisplay`, la prop `className` y la rama de render por defecto — nada de eso
+    llegaba a ejecutarse.
+    **Lo que sí importaba se conservó y ahora está fijado por un test:** el literal
+    `usuario@dominio.tld` no aparece en `src/`, ni en `index.html`, ni en el bundle.
+    Comprobado también sobre `dist/` tras el cambio: solo sale dentro de los **PDF del CV**,
+    donde debe estar. En el `<noscript>` va a propósito en forma `[at]`/`[dot]`.
+    Validado por mutación: escribir el correo a mano en Contact hace fallar el test.
 
-- [ ] **[T3-14] Eliminar las ramas regex inalcanzables de `TechIcon`**
+- [x] **[T3-14] Eliminar las ramas regex inalcanzables de `TechIcon`**
   - **Área:** Refactorización · **Ubicación:** `src/components/TechIcon.tsx:311,323,328,345-346,355-357,392,435,436,445-446`
   - **Qué hacer:** verificado con pruebas directas de las expresiones: `/solid/` precede a
     `/principios.*solid/`, `/mvc/` a `/arquitectura.*mvc/`, `/\.net.*\d+/` a `/\.net.*9/` y
@@ -968,8 +1019,18 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
   - **Criterio de aceptación:** ninguna rama posterior queda tapada por una anterior; el test de
     tabla de T2-07 sigue verde.
   - **Esfuerzo:** bajo · **Depende de:** T2-07
+  - **Cerrada:** 2026-09-10 · **15 ramas eliminadas y 4 alternativas redundantes
+    simplificadas** (`/next\.?js.*16|next\.?js/` → `/next\.?js/`, ídem Prisma), en
+    `pickColor` y `pickIcon`. Todas estaban estrictamente subsumidas por una regla anterior:
+    `/solid/` antes que `/principios.*solid/`, `/\.net.*\d+/` antes que `/\.net.*9/`…
+    y `/ef.*core/` aparecía dos veces.
+    **No se borró nada por confianza en la descripción de la tarea:** se capturó una huella
+    de icono + color para **89 nombres** (los 78 tags reales más los que tenían rama propia)
+    antes y después, y salió **idéntica**. Añadido un test que fija que «.NET 9», «React 19»,
+    «Tailwind CSS 4», «Next.js 16», «Prisma 7», «EF Core» y compañía siguen resolviendo, para
+    que nadie reponga las ramas «por si acaso».
 
-- [ ] **[T3-15] Limpiar entradas de `BRAND_COLORS`/`ICONS` sin uso**
+- [x] **[T3-15] Limpiar entradas de `BRAND_COLORS`/`ICONS` sin uso**
   - **Área:** Refactorización · **Ubicación:** `src/components/TechIcon.tsx:4-83`
   - **Qué hacer:** al menos 11 entradas no corresponden a ninguna tecnología de `src/data/`:
     Cypress, GitHub Copilot, ChatGPT, Gemini, Cursor IDE, AI Code Review, Google Antigravity,
@@ -978,14 +1039,40 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
   - **Criterio de aceptación:** cada entrada corresponde a un tag realmente listado, o se
     documenta por qué se conserva.
   - **Esfuerzo:** bajo · **Depende de:** T2-22
+  - **Cerrada:** 2026-09-10 · **por la segunda vía del criterio: se conservan, documentadas.**
+    Recuento real: **18 de 71** entradas de `ICONS` no las alcanza ningún tag — ni las 11 que
+    decía la tarea ni las 25 de un primer análisis mío, que identificaba los iconos por su
+    `path` y colapsaba los que comparten dibujo; se rehízo por identidad de referencia.
+    **Medido antes de decidir:** esas 18 suman **1,6 kB gzip, el 1,3 %** de un bundle de
+    124 kB contra un presupuesto de 160. A ese precio, borrarlas solo lograría que el día que
+    se añada «Python» o «Docker» salga el glifo genérico, que es el fallo silencioso que T2-07
+    existe para evitar. No son deuda: son inventario.
+    Lo que sí faltaba era que la lista no creciera a escondidas, y de eso se encarga un test
+    que la comprueba **exacta en los dos sentidos** (requiere exportar `ICONS`).
 
-- [ ] **[T3-16] Sacar los datos de iconos fuera del componente**
+- [x] **[T3-16] Sacar los datos de iconos fuera del componente**
   - **Área:** Arquitectura · **Ubicación:** `src/components/TechIcon.tsx` (541 líneas)
   - **Qué hacer:** el archivo mezcla 78 colores de marca, ~69 rutas SVG y la lógica de resolución.
     Mover los dos diccionarios a `src/data/tech-icons.ts` y dejar en el componente solo
     `pickColor`, `pickIcon` y el render.
   - **Criterio de aceptación:** `TechIcon.tsx` baja de 150 líneas.
   - **Esfuerzo:** medio · **Depende de:** T3-14, T3-15
+  - **Cerrada:** 2026-09-10 · **550 → 74 líneas**, holgadamente bajo el criterio. Partido en
+    tres en vez de dos: `src/data/tech-icons.ts` (los diccionarios, 251 líneas),
+    `src/lib/tech-icons.ts` (la resolución, 197) y el componente, que ya solo pinta.
+    Efecto colateral bueno: **desaparecen los dos `eslint-disable` de `react-refresh`**,
+    que existían solo porque un archivo de componente exportaba funciones.
+    Dos cambios de diseño sobre el enunciado:
+    1. Los iconos pasan de elementos JSX a **cadenas `path`**, así que el archivo de datos
+       no importa React y es datos de verdad.
+    2. `pickIcon` pasa a ser **`pickIconKey`**: devuelve la clave, no el dibujo. Hizo falta
+       porque varias claves comparten `path` —`.NET`, `.NET 8` y `DotNet` dan el mismo
+       logo— y con el dibujo era imposible saber qué entrada se eligió: el test de
+       inventario de T3-15 colapsaba las duplicadas e inventaba huérfanas. Se detectó
+       porque ese test se puso rojo a mitad del refactor.
+    Verificado que no cambia nada: se regeneró la **misma huella de 89 nombres** (color +
+    dibujo) usada en T3-14 y salió idéntica, y se comprobó a ojo que los 61 iconos de
+    Competencias siguen pintando con su color.
 
 - [ ] **[T3-17] Unificar el estilo de código**
   - **Área:** Refactorización · **Ubicación:** `src/components/ui/ObfuscatedEmail.tsx` ·
@@ -996,7 +1083,7 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
   - **Criterio de aceptación:** `npx prettier --check .` en verde, y el paso añadido a `ci.yml`.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
 
-- [ ] **[T3-18] Correcciones menores de código**
+- [x] **[T3-18] Correcciones menores de código**
   - **Área:** Auditoría de código
   - **Qué hacer:** cuatro arreglos de una línea cada uno:
     - `src/components/Contact.tsx:33,45` — los dos `<button>` no declaran `type="button"`.
@@ -1008,6 +1095,23 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
       sea la sección activa, porque `navItems` no incluye "home".
   - **Criterio de aceptación:** los cuatro puntos aplicados, lint y tipos en verde.
   - **Esfuerzo:** bajo · **Depende de:** T2-18
+  - **Cerrada:** 2026-09-10 · los cuatro:
+    1. `type="button"` en los dos `<button>` de Contact.
+    2. El centinela `project.demo === "#"` **ya era código muerto**: en `src/data/` no queda
+       ningún `demo: "#"`, solo dos URLs reales. Se eliminó la rama, no hizo falta tocar
+       los datos.
+    3. Contact pasa a usar `SectionHeader`. Cambia ligeramente el espaciado —el subtítulo
+       va a `mt-3` y el bloque gana el `mb-10 sm:mb-12` del componente— y eso es el punto:
+       ahora es consistente con las otras seis secciones. Verificado con captura.
+    4. El wordmark recibe `aria-current` cuando «home» es la sección activa.
+
+    🎯 **El punto 4 validó el mecanismo de T2-10.** Aquella prueba congelaba el hueco
+    afirmando que arriba del todo no había ningún enlace marcado, con un mensaje escrito
+    para quien lo arreglara: *«alguien añadió `home` al nav: T3-18 está resuelto,
+    actualizar esta prueba»*. Al aplicar el arreglo **falló con ese mensaje exacto**, que
+    era justo su razón de ser. Se convirtió en dos pruebas que afirman el comportamiento
+    correcto, incluida la de que wordmark y enlace del nav no queden marcados a la vez.
+    Ambas validadas por mutación.
 
 - [ ] **[T3-19] Correcciones menores de estilos y configuración** *(2 de 4 puntos ya aplicados)*
   - **Área:** UI/UX · DevOps

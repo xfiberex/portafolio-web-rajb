@@ -22,7 +22,7 @@ const ProjectLinks = ({ project, onPreview }: ProjectLinksProps) => {
   const externals = [
     { key: "frontend", url: project.frontend, label: "Frontend" },
     { key: "backend", url: project.backend, label: "Backend" },
-    { key: "demo", url: project.demo === "#" ? undefined : project.demo, label: "Demo" },
+    { key: "demo", url: project.demo, label: "Demo" },
   ];
 
   return (

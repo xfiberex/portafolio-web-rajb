@@ -99,19 +99,32 @@ test.describe("aria-current sigue a la sección activa", () => {
     });
   }
 
-  test("el wordmark nunca recibe aria-current — hueco conocido (T3-18)", async ({ page }) => {
+  /* Antes esta prueba congelaba el hueco: afirmaba que arriba del todo NO
+     había ningún enlace marcado, porque `navItems` no incluía "home" y el
+     wordmark nunca recibía `aria-current`. Al cerrar **T3-18** falló con el
+     mensaje que llevaba escrito para este momento, que era justo su razón
+     de ser. Ahora afirma el comportamiento correcto. */
+  test("el wordmark recibe aria-current arriba del todo (T3-18)", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("#home")).toBeInViewport();
 
-    /* Esto NO es el comportamiento deseado: `navItems` no incluye `home`,
-       así que arriba del todo el scrollspy marca "home" y ningún enlace lo
-       refleja. Se congela tal cual para que, cuando T3-18 lo arregle, esta
-       prueba falle y obligue a actualizarla en vez de quedar el arreglo sin
-       cobertura. */
-    await expect(
-      page.locator('header a[aria-current="true"]'),
-      "alguien añadió `home` al nav: T3-18 está resuelto, actualizar esta prueba",
-    ).toHaveCount(0);
+    const wordmark = page.locator('header a[href="#home"]');
+    await expect(wordmark).toHaveAttribute("aria-current", "true", { timeout: 10_000 });
+    await expect(page.locator('header a[aria-current="true"]')).toHaveCount(1);
+  });
+
+  test("el wordmark deja de estar marcado al bajar a otra sección", async ({ page }) => {
+    await page.goto("/");
+    await page.locator('header ul a[href="#skills"]').click();
+
+    await expect(page.locator('header ul a[href="#skills"]')).toHaveAttribute("aria-current", "true", {
+      timeout: 10_000,
+    });
+    /* La parte que de verdad importa: que no queden DOS marcados. El
+       wordmark y los enlaces del nav se calculan por separado, así que es
+       fácil que se solapen sin que nadie lo note. */
+    await expect(page.locator('header a[href="#home"]')).not.toHaveAttribute("aria-current", "true");
+    await expect(page.locator('header a[aria-current="true"]')).toHaveCount(1);
   });
 });
 

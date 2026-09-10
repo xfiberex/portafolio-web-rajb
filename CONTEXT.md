@@ -23,7 +23,7 @@ meses después, o desde otro equipo y otra sesión de chat, sin perder nada de l
 | **Stack** | React 19.2 · TypeScript 5.9 · Vite 7.3 · Tailwind CSS 4.1 · Framer Motion 12.23 |
 | **Node** | 22 en CI y en Netlify. Mínimo real: ≥ 20.19 (Vite 7 y ESLint 10) |
 | **Despliegue** | Netlify, build `npm run build`, publica `dist/` |
-| **Nº de pruebas** | **93** unitarios (Vitest) + **24** e2e + **3** snapshots visuales (Playwright). Todos en CI |
+| **Nº de pruebas** | **114** unitarios (Vitest) + **25** e2e + **3** snapshots visuales (Playwright). Todos en CI |
 | **Build medido** | 384.50 kB JS (124.71 kB gzip) · 30.50 kB CSS (6.38 kB gzip) · un solo chunk |
 | **Imágenes publicadas** | 342 kB (6 capturas WebP + la tarjeta social). Antes: 1.68 MB |
 | **Peticiones a terceros** | **0.** La fuente se auto-hospeda desde 2026-09-08 |
@@ -100,8 +100,7 @@ portafolio-web-rajb/
 │   │       ├── SkipLink.tsx       Salta los 8 enlaces del nav. Invisible hasta recibir foco.
 │   │       ├── TechTags.tsx       Lista de tecnologías, compartida por proyectos y competencias.
 │   │       ├── Lightbox.tsx       Visor modal con el contrato completo de diálogo.
-│   │       ├── ErrorBoundary.tsx   Fallback sin dependencias cuando el árbol React revienta.
-│   │       └── ObfuscatedEmail.tsx  ⚠️ Su rama de render por defecto es código muerto.
+│   │       └── ErrorBoundary.tsx   Fallback sin dependencias cuando el árbol React revienta.
 │   ├── data/                   Contenido del portafolio, tipado. Editar aquí, no en los
 │   │                           componentes.
 │   ├── hooks/
@@ -563,6 +562,65 @@ distingue no es evidencia de nada.
 
 Esto también explica por qué `e2e/a11y.spec.ts` tiene que esperar a opacidad exactamente 1
 aunque los tests corran con movimiento reducido: la preferencia no quita esos fundidos.
+
+### El verificador de enlaces no ve los enlaces sin esquema *(T2-12, 2026-09-10)*
+
+Se lanzó `links.yml` a mano con el enlace roto del README todavía puesto, para comprobar que
+lo cazaba. **No lo cazó**: 76 enlaces revisados, **0 errores**. Dos motivos que se suman:
+
+1. `lychee.toml` **excluye LinkedIn a propósito** — responde 999 a cualquier cliente sin
+   sesión de navegador, así que comprobarlo sería un falso positivo permanente.
+2. El workflow pasa `--scheme http --scheme https`, y un destino sin esquema no es una URL
+   http: ni siquiera entra en la lista de candidatos.
+
+Es decir, la clase de bug **más fácil de cometer** en un README —escribir
+`](www.ejemplo.com)` en vez de `](https://www.ejemplo.com)`, que GitHub resuelve como ruta
+relativa y acaba en 404— es justo la que el verificador no puede ver.
+
+Cubierto con `src/lib/docs.test.ts`, que revisa los `.md` en busca de destinos sin esquema y
+de marcadores sin sustituir. **Ignora el código en línea**: este repositorio cita el enlace
+roto entre backticks para documentarlo, y sin esa limpieza la documentación del bug contaba
+como el bug.
+
+De paso, el lanzamiento corrigió la línea base: la corrida anterior revisaba **3** enlaces,
+no 23. Lychee filtra por extensión conocida y se saltaba los `.ts`, así que en la práctica
+solo miraba `index.html`. Con los globs de T2-12 son **76**.
+
+### Identificar un icono por su `path` colapsa los que comparten dibujo *(T3-15, 2026-09-10)*
+
+Para saber qué entradas de `ICONS` no alcanza ningún tag, el primer intento comparaba
+iconos por su atributo `d`. Dio **25 entradas sin uso**. Está mal: varias claves distintas
+comparten el mismo dibujo —`.NET`, `.NET 8`, `DotNet` y `Minimal APIs` devuelven todas el
+logo de .NET— y el mapa `path → clave` se queda con la primera, marcando las demás como
+huérfanas.
+
+Rehecho comparando por **identidad de referencia** (`ICONS[k] === pickIcon(tag)`), que
+funciona porque los elementos se crean una sola vez al cargar el módulo: **18 de 71**.
+Para poder hacerlo desde el test hubo que exportar `ICONS`; la alternativa era parsear el
+archivo fuente, que es justo lo frágil que uno no quiere en una prueba.
+
+Y la decisión fue **conservarlas**: pesan 1,6 kB gzip, el 1,3 % del bundle. Borrarlas solo
+lograría que añadir «Python» a las competencias diera el glifo genérico. El test fija el
+inventario exacto para que no crezca en silencio.
+
+### Congelar un bug conocido funciona: la prueba disparó *(T3-18, 2026-09-10)*
+
+Al montar T2-10 había un hueco conocido —el wordmark nunca recibía `aria-current`— y la
+opción fácil era no probar esa zona. En su lugar la prueba **afirmó el comportamiento
+roto** (cero enlaces marcados arriba del todo) con el mensaje de fallo escrito para quien
+algún día lo arreglara.
+
+Un día después, al cerrar T3-18, falló con ese mensaje exacto:
+
+```
+Error: alguien añadió `home` al nav: T3-18 está resuelto, actualizar esta prueba
+  Expected: 0   Received: 1
+```
+
+El valor no fue detectar una regresión, sino **impedir que un arreglo aterrizara sin
+cobertura** y obligar a convertir la prueba en la afirmación correcta. Cuesta lo mismo que
+saltarse la zona y evita el hueco silencioso. Merece la pena repetirlo con los huecos
+conocidos que queden.
 
 ### Un `maxDiffPixelRatio` que suena pequeño es un colador *(T2-11, 2026-09-10)*
 

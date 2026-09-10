@@ -74,6 +74,25 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 
 ### Cambiado
 
+- **`TechIcon` pasa de 550 a 74 líneas**, partido en datos
+  (`src/data/tech-icons.ts`), resolución (`src/lib/tech-icons.ts`) y componente. Con ello
+  desaparecen los dos `eslint-disable` de `react-refresh` que hacían falta solo porque un
+  archivo de componente exportaba funciones. Verificado que no cambia ni un color ni un
+  dibujo: misma huella de 89 nombres antes y después.
+- **El README describe lo que existe**: ESLint 10 y no 9, sin instrucciones de EmailJS ni de
+  variables de entorno que el proyecto no usa, y sin una guía de GitHub Pages que perdería
+  todas las cabeceras de `netlify.toml`. Añadida una tabla que dice a qué pregunta responde
+  cada documento y qué hace cada workflow.
+- **«Agradecimientos» pasa a «Licencias de terceros»**, con las 8 licencias leídas de
+  `node_modules` y no de memoria. Fuera Heroicons, que se agradecía sin usarse.
+- **Limpieza de `TechIcon`**: 15 ramas regex que **nunca podían ejecutarse** —tapadas por
+  una regla anterior más general— y 4 alternativas redundantes. Verificado capturando la
+  resolución de icono y color de 89 nombres antes y después: idéntica.
+- **`ObfuscatedEmail` desaparece.** Prometía revelar el correo bajo demanda, pero sus dos
+  únicos usos pasaban render prop y uno ya lo pintaba en claro, así que el estado y la rama
+  de render por defecto nunca se ejecutaban. Contact ensambla el correo con `buildEmail`. La
+  protección que sí era real —que el literal no exista en el HTML ni en el bundle— queda
+  fijada por un test.
 - **El Hero pasa de 8 acciones a 5, y de tres filas a una.** Los dos CV se funden en un solo
   control «Descargar CV» —un `<details>` nativo, con Escape y clic fuera añadidos a mano— y
   sus etiquetas dejan la jerga: «CV-ATS» ahora es **«CV en texto plano (ATS)»**. GitHub y
@@ -110,6 +129,18 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 
 ### Corregido
 
+- **Los marcadores de posición del README** (`tu-usuario`, `tu-perfil`) y el enlace de
+  LinkedIn **sin esquema**, que GitHub resolvía como ruta relativa y llevaba a un 404. El
+  verificador de enlaces no podía detectarlo —LinkedIn está excluido y un destino sin
+  esquema no es una URL http—, así que ahora lo cubre un test propio sobre los `.md`.
+- **El wordmark no recibía `aria-current`** aunque «Inicio» fuera la sección activa, porque
+  `navItems` no incluye `home`. Quien navega con lector de pantalla no tenía forma de saber
+  dónde estaba al principio de la página.
+- **Los dos `<button>` de Contacto no declaraban `type="button"`**, así que dentro de un
+  `<form>` habrían hecho submit.
+- **Contacto duplicaba a mano el markup de `SectionHeader`** en lugar de usar el componente,
+  y había divergido en espaciado respecto a las otras seis secciones.
+- Eliminado el centinela mágico `project.demo === "#"`, que ya no correspondía a ningún dato.
 - **El resumen de Lighthouse anunciaba el doble de corridas de las que hubo** (decía «mediana
   de 6» con 3). `lhci` deja cada informe **dos veces** —el crudo en `.lighthouseci/` y una
   copia en el `outputDir`— y el script los contaba por archivo. La mediana era correcta
