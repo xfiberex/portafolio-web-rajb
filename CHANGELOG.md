@@ -29,6 +29,10 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
   Accesibilidad, SEO y buenas prácticas tienen que seguir en **100**; LCP ≤ 2,5 s, CLS ≤ 0,1,
   TBT ≤ 300 ms y el JS transferido ≤ 160 kB. Los umbrales salen de una línea base medida, no
   de valores por defecto, y se validaron rompiéndolos a propósito uno por uno.
+- **Resumen de Lighthouse en el log de CI** (`scripts/resumen-lighthouse.mjs`): una línea con
+  las cuatro puntuaciones, LCP, TBT, CLS, peso del JS y **qué elemento** es el LCP, con su
+  umbral al lado. Sin esto, `lhci` en verde no imprime ningún número y el margen contra los
+  presupuestos solo se conocería el día que rompan.
 
 - **Los primeros tests del repositorio**: 93 unitarios con Vitest, integrados en CI antes del build.
   Solo funciones puras, que es donde está el valor: la resolución de iconos (~90 heurísticas

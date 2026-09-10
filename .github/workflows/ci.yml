@@ -76,6 +76,13 @@ jobs:
       - name: Presupuestos de rendimiento (Lighthouse CI)
         run: npm run lighthouse
 
+      # `lhci` en verde no imprime ni un numero, asi que sin esto solo se
+      # conoceria el margen contra los umbrales el dia que rompan.
+      # `always()`: interesa aun mas cuando el paso de arriba ha fallado.
+      - name: Resumen de Lighthouse
+        if: always()
+        run: node scripts/resumen-lighthouse.mjs
+
       - name: Guardar el informe de Playwright si falla
         if: failure()
         uses: actions/upload-artifact@v4

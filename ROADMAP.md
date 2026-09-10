@@ -447,6 +447,12 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     seguía animando: el LCP móvil real seguía en **2292 ms**. Se sacó también del envoltorio
     animado el bloque de rol + descripción, y bajó a **1624 ms**, otra vez igual al FCP.
     Lección: el elemento LCP **cambia con el viewport**, así que medir uno solo no basta.
+    ✅ **Verificado en producción el 2026-09-10** (4G lento + CPU ×4, mediana de 3):
+    FCP 1784 ms y **LCP 1784 ms — el hueco es cero**, que es lo que esta tarea perseguía.
+    ⚠️ No comparar el absoluto con los 5372 ms de la medición anterior: el FCP de producción
+    oscila muchísimo según lo caliente que esté el CDN (en estas mismas 3 corridas, la
+    primera dio 4492 ms en frío y las otras dos 1764 y 1784). Lo atribuible a T2-23 es el
+    **hueco FCP→LCP: 656 ms → 0**.
 
 ### QA y testing
 
@@ -510,8 +516,14 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     Es decir, es determinista frente a lo cargado que esté el runner, y lo que sí la movería
     es que crezca el bundle. Que es exactamente lo que un presupuesto debe cazar.
     Los ocho umbrales se validaron **por mutación**, no por salir en verde.
-    ⏳ Queda por confirmar en la primera corrida real de CI que la imagen `ubuntu-latest`
-    trae Chrome; por eso el workflow lo comprueba en un paso aparte antes de auditar.
+    ✅ **Confirmado en la primera corrida de CI (2026-09-10, 2m03s):** `ubuntu-latest` trae
+    **Google Chrome 152.0.7977.82**, el patrón de arranque del servidor casa (sin aviso de
+    *timeout*) y las **3 corridas** se completan en Linux —el `EPERM` era solo de Windows—.
+    El log dice *«Checking assertions against 1 URL(s), **3 total run(s)**»*, que es lo que
+    hay que mirar: en local llegué a tener un «All results processed» **sobre 0 informes**,
+    un verde que no significaba nada.
+    🔁 Añadido después un paso **«Resumen de Lighthouse»** (`if: always()`), porque `lhci` en
+    verde no imprime ni un número y así solo se conocería el margen el día que rompa.
 
 - [x] **[T2-09] axe-core en CI** *(viene de BACKLOG 4.2)*
   - **Área:** QA · **Ubicación:** `.github/workflows/`
