@@ -89,6 +89,19 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 
 ### Cambiado
 
+- **Competencias con jerarquía**: Frontend y Backend destacados como «Stack principal»; el
+  resto en texto, y Principios como lista en vez de etiquetas. En escritorio, tres columnas
+  sin huecos que cierran en un rectángulo. La sección mide un 38 % menos en escritorio y un
+  23 % menos en móvil.
+- **Certificados en una sola tarjeta** con una fila por curso, en lugar de cinco tarjetas
+  idénticas: −27 % de alto en escritorio y −29 % en móvil.
+- **Las tarjetas de proyecto destacadas muestran como mucho 4 features** («+N más en el
+  repositorio»). El hueco bajo las etiquetas pasa de 134 px a 49 px como máximo.
+- **Títulos alineados en los destacados**: un título en dos líneas ya no baja su subtítulo
+  28 px respecto a los vecinos.
+- **El hueco bajo el texto animado del Hero es exacto**: la reserva se mide en alturas de
+  línea (`lh`) y coincide al píxel con la frase más larga en cada ancho. Antes sobraban 9 px
+  en móvil y 20 px en escritorio.
 - **Título y descripción coherentes entre `<title>`, `description` y Open Graph**: eran
   cuatro textos distintos con dos guiones distintos. Se unificó en «MERN/PERN» tras
   comprobar en los datos que es lo cierto —PostgreSQL en tres proyectos— y no «MERN stack».

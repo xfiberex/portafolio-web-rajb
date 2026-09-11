@@ -24,6 +24,19 @@ export interface Experience {
 export interface Skill {
   category: string;
   items: string[];
+  /**
+   * Como se pinta la categoria (T3-12). `principal` = pills con icono y
+   * tarjeta destacada; `texto` = nombres separados por puntos; `lista` =
+   * lista con vinetas, para frases que no son etiquetas (Principios).
+   */
+  formato: "principal" | "texto" | "lista";
+  /**
+   * Columna en escritorio (lg). El reparto NO es arbitrario: sale de probar
+   * los 2187 repartos posibles con los altos reales de cada tarjeta y quedarse
+   * con el de menor desnivel (17 px). Si cambia el contenido y el desnivel
+   * crece, `e2e/pulido.spec.ts` lo detecta.
+   */
+  columna: 1 | 2 | 3;
 }
 
 export interface Education {

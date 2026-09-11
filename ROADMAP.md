@@ -19,19 +19,28 @@ Los datos entre paréntesis son **medidos**, no estimados, salvo donde diga *est
 | **Tier 0** | Crítico / bloqueante | 3 | 0 | — (cerrado) |
 | **Tier 1** | Alta prioridad — accesibilidad AA, build y documentación que engaña | 9 | 0 | — (cerrado) |
 | **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 23 | 1 | bajo·1 |
-| **Tier 3** | Pulido y mantenimiento | 20 | 5 | bajo·4 medio·1 |
+| **Tier 3** | Pulido y mantenimiento | 20 | 0 | — (cerrado) |
 | **Tier 4** | Futuro / opcional | 6 | 5 | bajo·4 alto·1 |
-| | **Total** | **61** | **11** | |
+| | **Total** | **61** | **6** | |
 
 **No hay ninguna tarea de Tier 0 abierta.** La auditoría del 2026-09-08 no encontró
 vulnerabilidades explotables, pérdida de datos ni fallos que rompan producción. Las tres
 tareas de Tier 0 son las del backlog anterior, ya cerradas.
 
-**Tier 1 quedó cerrado el 2026-09-08.** El bloque de QA de Tier 2 quedó cerrado el
-2026-09-09 con T2-10: el repositorio pasó de **cero pruebas** a **87 unitarias + 21 e2e**,
-todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redacción
-(T2-15 a T2-18), infraestructura (T2-20, T2-21) y las dos que sí valen medida —T2-06
-(dividir el bundle) y T2-08 (budgets de Lighthouse que fallen el build)—.
+**Tiers 0, 1, 2 y 3 están cerrados** salvo T2-21. El repositorio pasó de **cero pruebas**
+(2026-09-08) a **117 unitarias + 46 e2e + 6 snapshots visuales** (2026-09-10), todas en CI,
+junto con axe en los dos temas, formato con Prettier y presupuestos de Lighthouse que fallan
+el build.
+
+> 📌 **Estado al cierre del 2026-09-10 (para retomar en otro equipo).**
+> - **Pendiente de commit y push:** T3-08 a T3-12 y la documentación de cierre. Tras el push,
+>   verificar que CI pasa entero (el paso de snapshots visuales usa las líneas base de Linux,
+>   regeneradas en el contenedor de Playwright) y comprobar en producción Competencias,
+>   Certificados y las tarjetas de proyecto en los dos temas.
+> - **Abiertas (6):** **T2-21** (etiquetar `v2.0.0` en git; la hace el dueño del repo) y
+>   **T4-01, T4-02, T4-04, T4-05, T4-06**, todas opcionales.
+> - Los snapshots visuales se regeneran con el comando de Docker del README; en Git Bash hace
+>   falta `MSYS_NO_PATHCONV=1`, y Docker Desktop tiene que estar arrancado.
 
 > ✅ **Verificado en producción el 2026-09-08:** `/ruta-que-no-existe` → **404**, `/robots.txt`
 > 200 `text/plain`, `/sitemap.xml` 200 **`application/xml`**, Lighthouse móvil **SEO 100 ·
@@ -1014,7 +1023,7 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     `playwright.config.ts` y los snapshots pasan a **seis**: los dos temas por tres anchos, en
     las dos plataformas.
 
-- [ ] **[T3-08] Igualar el alto útil de las tarjetas de proyecto** *(viene de BACKLOG 2)*
+- [x] **[T3-08] Igualar el alto útil de las tarjetas de proyecto** *(viene de BACKLOG 2)*
   - **Área:** UI/UX · **Ubicación:** `src/components/Projects.tsx:39` ·
     `src/components/projects/ProjectCard.tsx:109-118`
   - **Qué hacer:** **medido a 1440 px**: el hueco entre los tags y la fila de enlaces es de 200,
@@ -1024,16 +1033,34 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     contenido.
   - **Criterio de aceptación:** ninguna tarjeta destacada supera 120 px de hueco, vuelto a medir.
   - **Esfuerzo:** medio · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-10 · como mucho **4 features** en la grilla de destacados; si hay más, una
+    línea «+N más en el repositorio». Vuelto a medir a 1440 px: huecos de **0 / 26 / 49 px**
+    (antes 0 / 134 / 129; el enunciado decía 200 / 334 / 328, pero el contenido había cambiado
+    desde entonces y se remidió antes de tocar nada). La lista completa sigue en el layout de
+    fila y en el repositorio.
 
-- [ ] **[T3-09] Alinear los encabezados de las tarjetas** *(viene de BACKLOG 2)*
+    Se eligió frente a `items-start` (huecos 0 / 0 / 0) tras comparar las dos variantes con
+    capturas: con `items-start` no se oculta nada, pero los bordes inferiores de la fila
+    quedan escalonados.
+
+- [x] **[T3-09] Alinear los encabezados de las tarjetas** *(viene de BACKLOG 2)*
   - **Área:** UI/UX · **Ubicación:** `src/components/projects/ProjectCard.tsx:39-44`
   - **Qué hacer:** **medido a 1440 px**: "KiosGo - Sistema de Kiosko de Comida" ocupa 2 líneas y
     los otros 1, así que su subtítulo arranca **28 px** más abajo. Se resuelve con un `min-h` en
     el bloque de encabezado.
   - **Criterio de aceptación:** los tres subtítulos arrancan a la misma altura.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-10 · `lg:min-h-[2lh]` en el título de las tarjetas destacadas. Vuelto a
+    medir: a 1024 px los tres subtítulos arrancan a **258 / 258 / 258** y a 1440 a
+    **281 / 281 / 281** (antes 253 / 253 / 281).
 
-- [ ] **[T3-10] Afinar el hueco bajo el texto animado del Hero** *(viene de BACKLOG 2)*
+    En `lh` y no en px: reserva exactamente dos alturas de línea del propio título, así que
+    sigue siendo correcto si cambia el tamaño de fuente. Solo desde `lg` a propósito: en `sm`
+    la grilla es de dos columnas y la tarjeta que parte en dos queda **sola en su fila**
+    (a 768 px: 254 / 254 / 282, sin vecina con la que desalinearse); reservar ahí solo
+    añadiría 28 px de hueco a las otras dos.
+
+- [x] **[T3-10] Afinar el hueco bajo el texto animado del Hero** *(viene de BACKLOG 2)*
   - **Área:** UI/UX · **Ubicación:** `src/components/Hero.tsx:35`
   - **Qué hacer:** el `min-h-[3.6em]` reserva las 2 líneas de la frase más larga, así que se ve un
     hueco cuando muestra una corta. Es el precio correcto de no tener CLS, pero se puede afinar
@@ -1050,21 +1077,77 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
   - **Criterio de aceptación:** el hueco se reduce y el CLS no empeora respecto a la línea base
     real (~0.006 con el tecleo activo, 0 con movimiento reducido).
   - **Esfuerzo:** bajo · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-10 · `min-h-[3.6em] sm:min-h-[2.4em]` → `min-h-[2lh] sm:min-h-[1lh]`.
 
-- [ ] **[T3-11] Compactar la sección de Certificados** *(viene de BACKLOG 2)*
+    Se midió el alto real de **cada frase en cada ancho** (320 a 1440) en vez de estimarlo.
+    La estimación en `em` sobraba en los dos tramos: 65 px reservados donde la frase más
+    larga ocupa 56 en móvil, y 48 donde ocupa 28 desde `sm` (desde 640 px las tres frases
+    caben en una línea). Ahora la reserva coincide **al píxel** en todos los anchos: 0 px de
+    sobra.
+
+    CLS con el tecleo activo, 6 s: **0.0026 / 0.0015 / 0.0005** a 375 / 768 / 1440, frente a
+    0.0035 / 0.0016 / 0.0007 antes. No empeora; mejora un poco. La línea base del enunciado
+    (~0.006) ya no era la actual cuando se retomó la tarea, así que se remidió antes de tocar.
+
+    Lo que **no** se puede quitar: en móvil, con la frase corta, siguen viéndose 28 px vacíos.
+    Es el hueco de la segunda línea que usa la frase larga, y quitarlo es volver a tener CLS.
+
+- [x] **[T3-11] Compactar la sección de Certificados** *(viene de BACKLOG 2)*
   - **Área:** UI/UX · **Ubicación:** `src/components/Certificates.tsx` · `src/data/certificates.ts`
   - **Qué hacer:** 5 tarjetas idénticas, todas de Udemy, mismo icono, sin fechas. Una lista
     compacta comunica lo mismo en un tercio del espacio.
   - **Criterio de aceptación:** la sección ocupa menos de la mitad de alto.
   - **Esfuerzo:** medio · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-10 · **una sola tarjeta con una fila por curso**. Contenido de la sección:
+    **390 → 286 px** a 1440 y **1000 → 706 px** a 375 (medido contra producción, que aún tenía
+    la versión anterior).
 
-- [ ] **[T3-12] Jerarquizar Competencias** *(viene de BACKLOG 2)*
+    ⚠️ **El criterio escrito no se cumple, y es una decisión consciente.** Se construyeron dos
+    variantes: una lista en dos columnas que sí bajaba de la mitad (155 px, 40 %) y esta, que
+    se queda en el 73 %. Se eligió esta al verlas lado a lado. Además, «menos de la mitad» es
+    inalcanzable para cualquier variante con filas: cada fila lleva un enlace de **44 px**
+    (área táctil mínima, WCAG 2.5.8), así que cinco filas ya ocupan más de 195 px. Y medido
+    sobre la sección entera tampoco era posible: cabecera y padding fijos suman 322 px de los
+    712.
+
+- [x] **[T3-12] Jerarquizar Competencias** *(viene de BACKLOG 2)*
   - **Área:** UI/UX · **Ubicación:** `src/components/Skills.tsx` · `src/data/skills.ts:80-89`
   - **Qué hacer:** 45 items en 9 categorías, todos con el mismo peso visual, lo que diluye la
     señal fuerte (.NET + React). Además "Principios" mete frases largas ("MVC - Modular por
     dominios - Feature Based") en pills de tag, y esas no son tags.
   - **Criterio de aceptación:** las categorías principales destacan y "Principios" no usa pills.
   - **Esfuerzo:** medio · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-10 · tres niveles en los datos (`formato` en `Skill`): **Frontend y
+    Backend** como «Stack principal» con pills e icono; el resto como **texto separado por
+    puntos**; **Principios** como lista con viñetas. Contenido: **1078 → 670 px** a 1440
+    (−38 %) y **2620 → 2025 px** a 375 (−23 %).
+
+    Pedido explícito al elegir la variante: **sin huecos verticales y todo dentro de un
+    rectángulo**. La grilla no puede hacerlo (cada fila mide lo que su tarjeta más alta), así
+    que en escritorio son tres columnas explícitas y la última tarjeta de cada una crece lo que
+    falte. El reparto (`columna` en los datos) no es a ojo: se probaron los **2187 repartos**
+    posibles con los altos reales y se eligió el de menor desnivel. Estiramiento resultante:
+    26 / 0 / 31 px a 1440. Por debajo de `lg` los contenedores son `display: contents` y un
+    `order` inline devuelve el orden de lectura de los datos.
+
+    Tres fallos que cazaron las pruebas y no la vista:
+    - **Scroll horizontal en todos los anchos.** El espacio que permite partir la línea
+      estaba *dentro* de cada `<li>` con `whitespace-nowrap`, y cada lista era una línea
+      irrompible (hasta 860 px de desborde).
+    - **22 px de desborde a 320 px** después de arreglar lo anterior: una sola entrada larga
+      no cabía. Resuelto con `inline-block max-w-full`, que mantiene los nombres enteros y
+      solo los parte si son más anchos que la línea.
+    - **Una prueba que daba verde sin proteger nada.** La del rectángulo medía los
+      contenedores de columna, que la grilla iguala siempre. La mutación lo destapó; ahora
+      mide la última tarjeta.
+
+    Congelado en `e2e/pulido.spec.ts` junto con T3-08, T3-09 y T3-10. Las seis pruebas se
+    validaron por mutación, y en el proceso apareció una trampa del propio método: una
+    mutación que deja una variable sin usar **no compila**, y la prueba corre sobre el build
+    anterior y sale verde. El script de mutación ahora aborta si el build falla.
+
+    Límite conocido: a 1024 px la tercera columna se estira 80 px, porque el reparto está
+    optimizado para 1440. La prueba mide 1440.
 
 - [x] **[T3-13] Eliminar el código muerto de `ObfuscatedEmail`**
   - **Área:** Refactorización · **Ubicación:** `src/components/ui/ObfuscatedEmail.tsx:11,19-23,36-46` ·
@@ -1389,6 +1472,7 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
 | 2026-09-10 | T3-13, T3-14, T3-15, T3-16 | `TechIcon.tsx` de **550 a 74 líneas** en tres archivos (datos / lógica / componente). El análisis de iconos sin usar dio 25 en el primer intento y **18** en el correcto: identificaba los iconos por su `path` y colapsaba las claves que comparten dibujo. Ese mismo error volvió a morder durante el refactor, y por eso `pickIconKey` devuelve la clave y no el icono. |
 | 2026-09-10 | T3-03, T3-04, T3-17, T3-19, T3-20 | Prettier + paso en CI, con los `.md` fuera a propósito. Destapó que el estilo sin punto y coma había **migrado** al archivo recién creado en T3-16. El README describía ESLint 9 (es 10), variables de entorno que no existen y un despliegue a GitHub Pages que perdería todas las cabeceras de `netlify.toml`. Arreglado el solape de 1px de las anclas separando el token del header en dos. |
 | 2026-09-10 | T3-05, T3-06, T3-07 | **Tema claro.** La capa semantica no cambio ni una linea, que era la apuesta de la arquitectura. Los 17 tokens salen de resolver la luminosidad que iguala el contraste del tema oscuro, con una calculadora validada primero contra los ratios que el propio repositorio ya habia medido. Destello **cero**, comprobado midiendo la luminancia de los 68 fotogramas de la carga a 4G lento. El scrim del lightbox no aislaba en claro (7.47 de desviacion frente a 2.43) y se corrigio a 2.41. La suite visual se auto-delato: pasaba a auditar el tema claro por el `colorScheme` por defecto de Playwright. |
+| 2026-09-10 | T3-08 … T3-12 | **Tier 3 completo.** Las cinco tareas se remidieron antes de tocarlas: los números del enunciado eran de antes de los cambios de contenido. T3-09 y T3-10 con `lh` (reserva del Hero exacta al píxel, CLS con tecleo 0.0035 → 0.0026). T3-08, T3-11 y T3-12 con variantes construidas y elegidas con capturas; Competencias −38 % y sin huecos, con un reparto en columnas elegido entre 2187. T3-11 no cumple el criterio escrito, por decisión y con el motivo anotado. Seis pruebas nuevas, todas validadas por mutación. |
 | 2026-09-08 | T2-01, T2-02, T2-03 | Capturas a WebP con `sharp`: **1123 kB → 291 kB (-74 %)**. Sin respaldo PNG (decisión registrada). Se rompió `og:image` al borrar los PNG y se arregló generando `public/og-image.jpg` 1200×630, que cubre la parte medible de T2-15. |
 | 2026-09-08 | T2-14 | `<noscript>` con nombre, rol, email ofuscado y enlaces a CV/GitHub/LinkedIn. Verificado con scripting desactivado de verdad (iframe en sandbox): 0 → 268 caracteres visibles. |
 | 2026-09-08 | T2-05 (parcial) | Reflow forzado: **740.6 ms → 0.5 ms** de coste de lecturas de layout. El diagnóstico del ROADMAP era incorrecto — el 99.9 % era `useScrollspy` leyendo `scrollHeight` en cada frame, no Framer Motion. Sigue abierta porque el insight de DevTools, que es lo que pide el criterio, no baja. |

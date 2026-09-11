@@ -23,13 +23,13 @@ meses después, o desde otro equipo y otra sesión de chat, sin perder nada de l
 | **Stack** | React 19.2 · TypeScript 5.9 · Vite 7.3 · Tailwind CSS 4.1 · Framer Motion 12.23 |
 | **Node** | 22 en CI y en Netlify. Mínimo real: ≥ 20.19 (Vite 7 y ESLint 10) |
 | **Despliegue** | Netlify, build `npm run build`, publica `dist/` |
-| **Nº de pruebas** | **114** unitarios (Vitest) + **25** e2e + **3** snapshots visuales (Playwright). Todos en CI |
-| **Build medido** | 384.50 kB JS (124.71 kB gzip) · 30.50 kB CSS (6.38 kB gzip) · un solo chunk |
+| **Nº de pruebas** | **117** unitarios (Vitest) + **46** e2e + **6** snapshots visuales (Playwright). Todos en CI |
+| **Build medido** | 389.63 kB JS (127.51 kB gzip) · 34.46 kB CSS (7.04 kB gzip) · un solo chunk |
 | **Imágenes publicadas** | 342 kB (6 capturas WebP + la tarjeta social). Antes: 1.68 MB |
 | **Peticiones a terceros** | **0.** La fuente se auto-hospeda desde 2026-09-08 |
-| **Planificación** | [ROADMAP.md](ROADMAP.md) — 40 tareas abiertas; Tier 0 y Tier 1 cerrados |
+| **Planificación** | [ROADMAP.md](ROADMAP.md) — 6 tareas abiertas (T2-21 y cinco de Tier 4); Tiers 0 a 3 cerrados |
 | **Historial** | [CHANGELOG.md](CHANGELOG.md) |
-| **Última actualización** | 2026-09-08 |
+| **Última actualización** | 2026-09-10 |
 
 ---
 
@@ -87,6 +87,8 @@ portafolio-web-rajb/
 │   ├── App.tsx                 Compone las 8 secciones en orden. Nada más.
 │   ├── index.css               Design system. Dos capas a propósito: valores crudos en
 │   │                           :root (--value-*) y capa semántica en @theme inline.
+│   │                           El tema claro es un bloque [data-theme="light"] que
+│   │                           solo sobreescribe los --value-* (T3-05).
 │   ├── components/
 │   │   ├── Layout.tsx          Estructura global: skip link, gradiente, navbar, main, footer.
 │   │   ├── Navbar.tsx          Navegación sticky, menú móvil y scrollspy.
@@ -94,9 +96,10 @@ portafolio-web-rajb/
 │   │   ├── About/Experience/Skills/Education/Certificates/Contact.tsx
 │   │   │                       Una sección cada uno; leen su archivo de src/data/.
 │   │   ├── Footer.tsx
-│   │   ├── TechIcon.tsx        541 líneas: 78 colores de marca, ~69 rutas SVG y ~90
-│   │   │                       heurísticas regex que resuelven un nombre a un icono.
-│   │   │                       Es el archivo más frágil del proyecto.
+│   │   ├── TechIcon.tsx        74 líneas, solo pinta. Los datos están en
+│   │   │                       data/tech-icons.ts y las ~90 heurísticas en
+│   │   │                       lib/tech-icons.ts (T3-16). La resolución sigue siendo
+│   │   │                       lo más frágil del proyecto; la cubre un test de tabla.
 │   │   ├── projects/
 │   │   │   ├── ProjectCard.tsx    Dos disposiciones: "featured" (grilla) y "row" (lista).
 │   │   │   └── ProjectLinks.tsx   Fila de acciones: repo, ampliar, frontend, backend, demo.
@@ -113,19 +116,28 @@ portafolio-web-rajb/
 │   ├── hooks/
 │   │   ├── useScrollspy.ts     IntersectionObserver + scroll con rAF. Cachea la geometría
 │   │   │                       para no leer layout al scrollear (ver Trampas conocidas).
-│   │   └── usePrefersReducedMotion.ts   useSyncExternalStore sobre matchMedia.
+│   │   ├── usePrefersReducedMotion.ts   useSyncExternalStore sobre matchMedia.
+│   │   └── useTheme.ts         Tema claro/oscuro. Lee el atributo que ya puso el script
+│   │                           inline del <head>; solo escribe en localStorage cuando
+│   │                           el usuario pulsa el botón (ver T3-06).
 │   ├── lib/
 │   │   ├── animations.ts       Variantes de Framer Motion. Fuente única de verdad.
 │   │   ├── assets.ts           toAssetUrl (BASE_URL) y safeExternalUrl (bloquea javascript:).
-│   │   └── contact.ts          Email y rutas de los CV, en un solo sitio.
+│   │   ├── contact.ts          Email y rutas de los CV, en un solo sitio.
+│   │   ├── tech-icons.ts       pickColor y pickIconKey (devuelve la CLAVE, no el dibujo:
+│   │   │                       varias claves comparten el mismo path).
+│   │   └── *.test.ts           Unitarios: assets, contact, csp, docs, tech-icons.
 │   └── types/index.ts          Las 5 interfaces de datos.
 ├── scripts/
-│   └── images-to-webp.mjs      Conversión con sharp. Se corre a mano, no en el build.
+│   ├── images-to-webp.mjs      Conversión con sharp. Se corre a mano, no en el build.
+│   ├── medir-lcp.mjs           FCP/LCP/CLS registrando CADA candidato de LCP.
+│   └── resumen-lighthouse.mjs  Una línea de métricas en el log de CI.
 ├── docs/
 │   ├── BACKLOG.md              Superado por ROADMAP.md el 2026-09-08.
 │   └── auditoria-2026-09-08/   Capturas de evidencia de la auditoría.
 └── .github/workflows/
-    ├── ci.yml                  Tipos + lint + build. En push y PR a main.
+    ├── ci.yml                  Tipos, lint, formato, unitarios, build, axe, snapshots
+    │                           visuales y presupuestos de Lighthouse. En push y PR a main.
     └── links.yml               Enlaces externos. Cron semanal, no en PR (decisión, ver abajo).
 ```
 
@@ -133,32 +145,26 @@ portafolio-web-rajb/
 
 ## Estado actual
 
-**Recién cerrado (2026-09-08):** la auditoría técnica de las 13 áreas **y la primera tanda de
-correcciones**. Tier 0 y **Tier 1 completos**, más T2-01…T2-05, T2-13, T2-14, T3-02 y T4-03.
+**Recién cerrado (2026-09-10):** Tiers 0, 1, 2 y 3 completos salvo T2-21. En esta tanda:
+tema claro con conmutador (T3-05/06/07), Prettier en CI (T3-17), el pulido de interfaz entero
+(T3-08…T3-12) y la limpieza de `TechIcon` (T3-15/16). Todo lo cerrado tiene prueba, y cada
+prueba nueva se validó rompiendo a propósito el código que protege.
 
-Lo medido antes y después, en las mismas condiciones:
+**Abierto (6):** T2-21 (etiquetar `v2.0.0` en git: la hace el dueño del repo) y cinco de
+Tier 4, todas opcionales. Detalle en [ROADMAP.md](ROADMAP.md).
 
-| | Antes | Ahora |
-|---|---|---|
-| Contraste del botón primario | 3.45:1 ❌ | **4.56:1** ✅ |
-| Contraste en `hover` | 4.42:1 ❌ | **5.91:1** ✅ |
-| `prefers-reduced-motion` en el Hero | ignorado (WCAG A) | respetado; CLS pasa a **0** |
-| Peticiones a terceros | 1 (Google Fonts) | **0** |
-| Peso de las imágenes | 1.68 MB | **342 kB** |
-| Coste de lecturas de layout al scrollear | 740.6 ms | **0.5 ms** |
-| Ruta inexistente | 200 con la página completa | **404** |
-| Contenido sin JavaScript | 0 caracteres | **268** |
+Lo que la sesión del 2026-09-10 dejó aprendido y conviene no olvidar:
 
-**Abierto:** las 40 tareas restantes de [ROADMAP.md](ROADMAP.md). Ninguna de Tier 0 ni Tier 1.
-Lo siguiente por valor medido:
-
-- **T2-06** — el LCP sigue dominado por el arranque de React, no por la red. Falta correr el
-  analizador de bundle antes de decidir nada.
-- **T2-07 / T2-09 / T2-10** — no hay **ni un test**. Todo lo verificado en esta sesión se
-  comprobó a mano y hoy no tiene red de seguridad.
-- **T2-15** — la tarjeta social ya tiene la proporción correcta, pero sigue siendo una captura
-  recortada, no una pieza diseñada.
-- **T2-19** — sin `browserslist` declarado; T2-03 se cerró asumiendo un mínimo de 2020.
+- **Un hash de CSP depende de los saltos de línea.** `index.html` está forzado a LF en
+  `.gitattributes`; `src/lib/csp.test.ts` falla si alguien edita el script inline sin
+  actualizar el hash en `netlify.toml`.
+- **Una mutación que no compila da un falso verde.** Si el build falla, la prueba corre sobre
+  el `dist/` anterior. Al validar por mutación, comprobar primero que el build pasó.
+- **Playwright arranca en `colorScheme: "light"` por defecto.** Está fijado a `dark` en
+  `playwright.config.ts`; las pruebas que necesitan el claro lo piden con `emulateMedia`.
+- **El reparto en columnas de Competencias está calculado**, no a ojo (`columna` en
+  `src/data/skills.ts`). Si cambia el contenido y `e2e/pulido.spec.ts` falla por el
+  estiramiento, hay que recalcularlo (procedimiento en ROADMAP, T3-12).
 
 ✅ **Verificado en producción el 2026-09-08**, tras desplegar Tier 1 y T2-04/05/13/14:
 
@@ -842,7 +848,7 @@ icono sin sacarlo de la lista, falla igual que si añade un tag sin icono.
 | `npm run format:check` | Prettier sobre 63 archivos. Falla si algo esta sin formatear | Corre en CI tras el lint |
 | `npm run format` | Aplica el formato | Los `.md` quedan fuera (`.prettierignore`) |
 | `npm test` | 117 tests unitarios (Vitest). Funciones puras y coherencia de documentos | — |
-| `npm run test:e2e` | 35 tests de extremo a extremo (Playwright) sobre el build | Chromium instalado |
+| `npm run test:e2e` | 46 tests de extremo a extremo (Playwright) sobre el build | Chromium instalado |
 | `npm run test:visual` | 6 snapshots del pliegue (2 temas x 3 anchos), sin tolerancia | Lineas base por plataforma |
 | `npm run lighthouse` | Presupuestos de rendimiento | Chrome instalado |
 | `npm run medir:lcp` | FCP, LCP y CLS con todos los candidatos de LCP | `npm run preview` en otra terminal |

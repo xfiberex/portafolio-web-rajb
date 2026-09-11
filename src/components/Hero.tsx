@@ -78,11 +78,17 @@ const Hero = () => {
 
         <div className="mt-6 max-w-3xl text-lg text-muted sm:text-xl">
           {/*
-            min-h reserva el alto de las dos líneas que llega a ocupar la frase
-            más larga en móvil. Sin esto, el texto que se escribe y se borra
-            empuja todo el contenido de abajo en cada ciclo (CLS sobre el fold).
+            min-h reserva el alto de la frase más larga. Sin esto, el texto
+            que se escribe y se borra empuja todo lo de abajo en cada ciclo
+            (CLS sobre el pliegue).
+
+            En `lh` y no en `em` (T3-10): antes era 3.6em / 2.4em, una
+            estimación que reservaba 65px donde la frase más larga ocupa 56
+            en móvil, y 48px donde ocupa 28 desde `sm` (medido de 320 a 1440:
+            desde 640px las tres frases caben en una línea). `lh` es la altura
+            de línea real, así que 2lh / 1lh reserva exactamente lo que se usa.
           */}
-          <div className="flex min-h-[3.6em] items-start sm:min-h-[2.4em]" data-testid="hero-rol">
+          <div className="flex min-h-[2lh] items-start sm:min-h-[1lh]" data-testid="hero-rol">
             {/*
               Con movimiento reducido no basta con acelerar la animación: hay
               que no montarla. react-type-animation escribe con setTimeout y

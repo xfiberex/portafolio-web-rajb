@@ -16,6 +16,8 @@ Un portafolio web moderno, seguro y responsivo construido con las últimas tecno
 - **🎨 Diseño Moderno**: Interfaz limpia y profesional con animaciones suaves
 - **📱 Totalmente Responsivo**: Optimizado para dispositivos móviles, tablets y escritorio
 - **🌟 Animaciones Interactivas**: Implementadas con Framer Motion
+- **🌗 Tema claro y oscuro**: sigue la preferencia del sistema y recuerda tu elección, sin
+  destello al cargar
 - **⚡ Rendimiento Optimizado**: Construido con Vite 7 para carga ultrarrápida
 - **🛡️ Seguridad Reforzada**: Headers HTTP de seguridad, CSP estricto, protección anti-clickjacking
 - **🔒 Protección de Datos**: Email sin `mailto:` en el HTML, enlaces externos con `rel="noopener noreferrer"`
@@ -218,14 +220,16 @@ portafolio-web/
 │   ├── placeholder.svg             Reemplazo si falla la carga de una captura
 │   ├── robots.txt
 │   └── sitemap.xml
-├── e2e/                            End-to-end con Playwright (24 + 3 visuales)
+├── e2e/                            End-to-end con Playwright (46 + 6 visuales)
 │   ├── util/pagina.ts              Revelado de la página y detección de desbordes
 │   ├── a11y.spec.ts                axe-core sobre la página revelada
 │   ├── lightbox.spec.ts            Contrato de diálogo modal: foco, Tab, Escape, scroll
 │   ├── navegacion.spec.ts          Menú móvil, skip link y `aria-current`
 │   ├── responsive.spec.ts          Cero scroll horizontal a 320/360/768/1280/1440
 │   ├── movimiento-reducido.spec.ts `prefers-reduced-motion` en los dos sentidos
-│   └── visual.spec.ts              Snapshots del pliegue (npm run test:visual)
+│   ├── tema.spec.ts                Tema: preferencia del sistema, persistencia, sin destello
+│   ├── pulido.spec.ts              Medidas congeladas de T3-08…T3-12 (huecos, alineación)
+│   └── visual.spec.ts              Snapshots del pliegue, 2 temas × 3 anchos
 ├── scripts/
 │   ├── images-to-webp.mjs          Conversión con sharp (npm run images:webp)
 │   ├── medir-lcp.mjs               FCP/LCP/CLS con cada candidato (npm run medir:lcp)
@@ -253,31 +257,40 @@ portafolio-web/
 │   │   ├── Navbar.tsx
 │   │   ├── Projects.tsx
 │   │   ├── Skills.tsx
-│   │   ├── TechIcon.tsx            Colores de marca, rutas SVG y resolución por heurística
-│   │   └── TechIcon.test.ts        Test de tabla: cada tag de src/data/ debe resolver
+│   │   └── TechIcon.tsx            Solo pinta: los datos y la lógica viven aparte
 │   ├── data/                       Contenido tipado: editar aquí, no en los componentes
 │   │   ├── certificates.ts
 │   │   ├── education.ts
 │   │   ├── experience.ts
 │   │   ├── projects.ts
-│   │   └── skills.ts
+│   │   ├── skills.ts               Con `formato` y `columna` por categoría (T3-12)
+│   │   └── tech-icons.ts           Colores de marca y rutas SVG
 │   ├── hooks/
 │   │   ├── usePrefersReducedMotion.ts
-│   │   └── useScrollspy.ts
+│   │   ├── useScrollspy.ts
+│   │   └── useTheme.ts             Tema claro/oscuro; solo guarda cuando eliges
 │   ├── lib/
 │   │   ├── animations.ts           Variantes de Framer Motion
 │   │   ├── assets.ts               toAssetUrl y safeExternalUrl
 │   │   ├── assets.test.ts          Casos borde de ambos helpers
-│   │   └── contact.ts              Email y rutas de los CV
+│   │   ├── contact.ts              Email y rutas de los CV
+│   │   ├── contact.test.ts         El email literal no aparece en ningún fuente
+│   │   ├── csp.test.ts             El hash del script inline coincide con netlify.toml
+│   │   ├── docs.test.ts            Enlaces sin esquema y marcadores en los .md
+│   │   ├── tech-icons.ts           Resolución de nombre a icono por heurística
+│   │   └── tech-icons.test.ts      Test de tabla: cada tag de src/data/ debe resolver
 │   ├── types/index.ts
 │   ├── App.tsx
 │   ├── index.css                   Design system en dos capas
 │   └── main.tsx
-├── index.html
+├── index.html                      Lleva el script de tema inline (autorizado por hash)
 ├── playwright.config.ts
+├── lighthouserc.json               Presupuestos de rendimiento que fallan el build
 ├── netlify.toml
 ├── lychee.toml
 ├── eslint.config.js
+├── .prettierrc.json / .prettierignore
+├── .gitattributes                  index.html forzado a LF (el hash del CSP depende de ello)
 └── vite.config.ts
 ```
 
@@ -336,7 +349,11 @@ Edita los archivos TypeScript en la carpeta `src/data/`:
 Todos los archivos están tipados para evitar errores y mejorar la experiencia de desarrollo.
 
 ### Cambiar Colores y Estilos
-Los estilos están definidos en `src/index.css` y utilizan Tailwind CSS 4. Puedes personalizar:
+Los estilos están definidos en `src/index.css` y utilizan Tailwind CSS 4. Los colores se
+definen **una vez por tema**: los valores oscuros en `:root` y los claros en
+`[data-theme="light"]`, ambos con prefijo `--value-*`. Si cambias un color, cámbialo en los
+dos bloques y comprueba el contraste en ambos: `npm run test:e2e` pasa axe en los dos temas.
+Puedes personalizar:
 - Colores primarios
 - Tipografías
 - Espaciados
@@ -386,7 +403,7 @@ expone al frontend las variables con prefijo `VITE_`.
 - **Animations**: Smooth animations con Framer Motion 12
 - **Accesibilidad**: contraste AA verificado en botones, badges y texto de acento;
   `prefers-reduced-motion` respetado también en el texto animado; skip link y foco
-  visible. **No hay auditoría completa todavía** — pendiente axe en CI (T2-09)
+  visible. axe-core audita la página entera **en los dos temas** en cada push (T2-09, T3-07)
 - **SEO**: Meta tags optimizados y estructura semántica
 
 ## 🤝 Contribuciones

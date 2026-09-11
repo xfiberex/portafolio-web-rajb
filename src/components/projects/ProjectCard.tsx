@@ -23,22 +23,51 @@ const handleImageError = (event: SyntheticEvent<HTMLImageElement>) => {
 const cardClass =
   "group relative rounded-card border border-border bg-surface shadow-lg transition-[box-shadow,border-color] duration-300 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/10";
 
-const FeatureList = ({ project }: { project: Project }) =>
-  project.features?.length ? (
+/**
+ * Tope de features en la grilla de destacados (T3-08). Las tres tarjetas
+ * miden lo mismo, así que la que más features tiene fijaba el alto de las
+ * otras dos y les dejaba 130 px vacíos bajo los tags. Con 4 el hueco más
+ * grande queda en ~50 px. La lista completa sigue en el layout `row` y,
+ * sobre todo, en el repositorio, que es lo que dice la línea de cierre.
+ */
+const MAX_FEATURES_DESTACADAS = 4;
+
+const FeatureList = ({ project, max }: { project: Project; max?: number }) => {
+  const features = project.features ?? [];
+  if (!features.length) return null;
+
+  const visibles = max ? features.slice(0, max) : features;
+  const ocultas = features.length - visibles.length;
+
+  return (
     <ul className="mt-5 space-y-2.5">
-      {project.features.map((feature) => (
+      {visibles.map((feature) => (
         <li key={feature} className="flex items-start gap-2.5 text-sm text-subtle">
           <span className="mt-2 inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" aria-hidden="true" />
           <span className="leading-relaxed">{feature}</span>
         </li>
       ))}
+      {ocultas > 0 && <li className="pl-4 text-xs text-subtle">+{ocultas} más en el repositorio</li>}
     </ul>
-  ) : null;
+  );
+};
 
-/** h4 porque cada grupo de proyectos ya aporta su propio h3. */
-const Heading = ({ project }: { project: Project }) => (
+/**
+ * h4 porque cada grupo de proyectos ya aporta su propio h3.
+ *
+ * `alinear` reserva dos líneas de título en la grilla de destacados a partir
+ * de `lg` (T3-09): con las tres tarjetas en una fila, un título que parte en
+ * dos bajaba su subtítulo 28px respecto a los vecinos. Solo desde `lg` porque
+ * en `sm` la grilla es de dos columnas y la tarjeta que parte queda sola en
+ * su fila: reservar ahí solo añadiría un hueco a las otras dos.
+ */
+const Heading = ({ project, alinear = false }: { project: Project; alinear?: boolean }) => (
   <>
-    <h4 className="text-xl font-bold text-foreground transition-colors group-hover:text-primary">{project.title}</h4>
+    <h4
+      className={`text-xl font-bold text-foreground transition-colors group-hover:text-primary ${alinear ? "lg:min-h-[2lh]" : ""}`}
+    >
+      {project.title}
+    </h4>
     {project.subtitle && (
       <p className="mt-1.5 text-xs font-semibold tracking-wide text-primary uppercase">{project.subtitle}</p>
     )}
@@ -113,9 +142,9 @@ const ProjectCard = ({ project, layout = "featured", onPreview }: ProjectCardPro
       )}
 
       <div className="flex flex-1 flex-col p-6">
-        <Heading project={project} />
+        <Heading project={project} alinear />
         <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-muted">{project.description}</p>
-        <FeatureList project={project} />
+        <FeatureList project={project} max={MAX_FEATURES_DESTACADAS} />
         <TechTags tags={project.tags} className="mt-5" />
         {/* mt-auto alinea la fila de enlaces entre tarjetas de distinto alto */}
         <div className="mt-auto">

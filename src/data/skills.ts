@@ -3,6 +3,8 @@ import type { Skill } from "../types";
 export const skills: Skill[] = [
   {
     category: "Frontend",
+    formato: "principal",
+    columna: 1,
     items: [
       "React 19",
       "Next.js (App Router)",
@@ -20,10 +22,14 @@ export const skills: Skill[] = [
   },
   {
     category: "Backend",
+    formato: "principal",
+    columna: 2,
     items: ["C#", ".NET 10", "ASP.NET Core (MVC, Web API)", "Node.js", "Express 5", "APIs REST", "Swagger / OpenAPI"],
   },
   {
     category: "Bases de datos & ORMs",
+    formato: "texto",
+    columna: 3,
     items: [
       "SQL Server",
       "PostgreSQL",
@@ -38,6 +44,8 @@ export const skills: Skill[] = [
   },
   {
     category: "Seguridad",
+    formato: "texto",
+    columna: 2,
     items: [
       "JWT con refresh rotativo",
       "Detección de reúso de token",
@@ -49,18 +57,26 @@ export const skills: Skill[] = [
   },
   {
     category: "Testing",
+    formato: "texto",
+    columna: 2,
     items: ["xUnit", "Jest", "Vitest", "Playwright (E2E)", "Supertest", "Pruebas de carga"],
   },
   {
     category: "Escritorio (Windows)",
+    formato: "texto",
+    columna: 1,
     items: ["WinUI 3", "WPF (MVVM)", "WinForms", "Tauri + Rust", "Inno Setup"],
   },
   {
     category: "Herramientas & DevOps",
+    formato: "texto",
+    columna: 3,
     items: ["Git", "GitHub", "Docker", "Docker Compose", "Visual Studio", "VS Code", "Postman", "Prisma Studio"],
   },
   {
     category: "Principios",
+    formato: "lista",
+    columna: 3,
     items: [
       "Programación Orientada a Objetos (POO)",
       "Principios SOLID",
@@ -72,6 +88,8 @@ export const skills: Skill[] = [
   },
   {
     category: "IAs & Herramientas de Desarrollo",
+    formato: "texto",
+    columna: 1,
     items: ["Claude Code", "Prompt Engineering"],
   },
 ];
