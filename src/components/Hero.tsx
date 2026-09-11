@@ -88,7 +88,7 @@ const Hero = () => {
             desde 640px las tres frases caben en una línea). `lh` es la altura
             de línea real, así que 2lh / 1lh reserva exactamente lo que se usa.
           */}
-          <div className="flex min-h-[2lh] items-start sm:min-h-[1lh]" data-testid="hero-rol">
+          <div className="flex min-h-[2lh] items-start sm:min-h-lh" data-testid="hero-rol">
             {/*
               Con movimiento reducido no basta con acelerar la animación: hay
               que no montarla. react-type-animation escribe con setTimeout y
