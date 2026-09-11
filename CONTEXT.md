@@ -171,6 +171,17 @@ Lo que la sesión del 2026-09-10 dejó aprendido y conviene no olvidar:
   espera añadida, así que **la causa sigue sin demostrar**. Se añadió `toBeAttached()` antes
   del Tab por higiene, y CI ahora guarda la traza del intento que falla: si reaparece, el
   artefacto `trazas-e2e` dirá qué tenía el foco.
+- **La otra «flaky», esta sí resuelta: la guarda de visibilidad de `a11y.spec.ts`.** Fue la
+  primera que dejó traza con el artefacto nuevo. Reproducida en local: **1 de cada ~4**
+  bajo carga, siempre los dos botones de Contacto. Causa: `revelarTodaLaPagina` daba la
+  página por buena en cuanto la opacidad se leía 1 en un instante, pero Framer anima la
+  opacidad con la Web Animations API y escribe el valor final un momento después; la
+  revelación de Contacto empieza en el último paso del recorrido y seguía terminando.
+  Ahora la espera exige además que no quede ninguna animación en marcha y que todo siga
+  estable 3 fotogramas. Bajo carga: **120 de 120** (antes 28 fallos de 120 con la condición
+  antigua, comprobado por mutación). Se descartó antes una hipótesis falsa —la transición
+  CSS de 0.01 ms del bloque de movimiento reducido—: cambiarla a 0 s no alteró la tasa de
+  fallos, así que se dejó como estaba. No está demostrado que el usuario vea parpadeo alguno.
 
 ✅ **Verificado en producción el 2026-09-08**, tras desplegar Tier 1 y T2-04/05/13/14:
 

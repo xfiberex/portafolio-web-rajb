@@ -34,24 +34,30 @@ for (const tema of TEMAS) {
      aunque salga verde. Va primero a propósito. */
     test("todo <main> está visible cuando se audita", async ({ page }) => {
       const invisibles = await page.evaluate(() => {
-        const opacidadCero = (el: Element) => {
+        /* Devuelve QUÉ elemento y QUÉ ancestro lo tapa, no solo cuántos: un
+           fallo de CI con «Received: 2» no se puede diagnosticar desde el log. */
+        const tapadoPor = (el: Element) => {
           for (let n: Element | null = el; n; n = n.parentElement) {
-            if (parseFloat(getComputedStyle(n).opacity) === 0) return true;
+            if (parseFloat(getComputedStyle(n).opacity) === 0) {
+              const clases = String(n.className).split(/\s+/).slice(0, 3).join(".");
+              return `${el.tagName.toLowerCase()} «${(el.textContent ?? "").trim().slice(0, 30)}» ← ${n.tagName.toLowerCase()}.${clases}`;
+            }
           }
-          return false;
+          return null;
         };
         const interactivos = [...document.querySelectorAll("main a, main button, main [tabindex]")];
-        return {
-          total: interactivos.length,
-          invisibles: interactivos.filter(opacidadCero).length,
-        };
+        const detalle = interactivos.map(tapadoPor).filter((d): d is string => d !== null);
+        return { total: interactivos.length, invisibles: detalle.length, detalle };
       });
 
       expect(
         invisibles.total,
         "no se encontró ningún elemento interactivo: el selector o el build cambiaron",
       ).toBeGreaterThan(20);
-      expect(invisibles.invisibles, "hay elementos a opacity:0 — axe no los auditaría").toBe(0);
+      expect(
+        invisibles.invisibles,
+        `hay elementos a opacity:0 — axe no los auditaría:\n  ${invisibles.detalle.join("\n  ")}`,
+      ).toBe(0);
     });
 
     test("las 8 secciones están presentes y visibles", async ({ page }) => {

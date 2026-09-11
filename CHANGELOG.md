@@ -163,6 +163,11 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 - **Dependencias**: `npm audit fix` sin cambios mayores; producción pasa a 0
   vulnerabilidades. Las 12 restantes son todas de `@lhci/cli`, solo de desarrollo, y su
   código vulnerable no se ejecuta en este uso (detalle en ROADMAP, T4-01).
+- **Prueba intermitente de accesibilidad.** La guarda que impide que axe audite contenido
+  invisible fallaba 1 de cada ~4 veces bajo carga: la espera daba la página por revelada
+  mientras la animación de opacidad de Contacto aún terminaba. Ahora espera a que no quede
+  ninguna animación en marcha. Bajo carga: 120 de 120. Y cuando falle dirá qué elementos,
+  no solo cuántos.
 - **CI no guardaba nada útil cuando fallaba una prueba de navegador.** Subía
   `playwright-report/`, que en CI nunca se genera (el reporter es `github` + `list`), y la
   traza se grababa solo en el reintento, es decir, en el intento que pasa. Ahora se graba la

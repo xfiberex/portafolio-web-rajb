@@ -40,8 +40,19 @@ export const revelarTodaLaPagina = async (page: Page) => {
      heredada, así que una tarjeta a 0.93 se reporta como `#4376ec` en vez
      de `#487fff` y produce una violación fantasma de 4.47:1. Descubierto
      así, con dos falsos positivos en Certificados. */
+  /* Y además, que NADA se esté moviendo, y que siga así varios fotogramas.
+     Mirar solo la opacidad en un instante no basta: Framer anima la
+     opacidad con la Web Animations API y escribe el valor final en línea
+     un momento DESPUÉS de que la animación termine. En ese hueco la
+     opacidad ya se leía 1 y la espera se daba por cumplida, pero justo
+     después Contacto volvía a leerse 0, y la guarda de a11y.spec.ts
+     fallaba de forma intermitente: 1 de cada ~4 bajo carga en local, y
+     como «flaky» en CI el 2026-09-10. Se ignoran las animaciones
+     infinitas (el cursor del texto animado, cuando se monta), que por
+     definición nunca terminan. */
   await page.waitForFunction(
     () => {
+      const w = window as unknown as { __fotogramasEstables?: number };
       const opacidadHeredada = (el: Element) => {
         let o = 1;
         for (let n: Element | null = el; n; n = n.parentElement) {
@@ -49,12 +60,17 @@ export const revelarTodaLaPagina = async (page: Page) => {
         }
         return o;
       };
-      return [...document.querySelectorAll("main a, main button, main [tabindex]")].every(
+      const todoVisible = [...document.querySelectorAll("main a, main button, main [tabindex]")].every(
         (el) => opacidadHeredada(el) === 1,
       );
+      const nadaEnMarcha = document
+        .getAnimations()
+        .every((a) => a.playState !== "running" || a.effect?.getTiming().iterations === Infinity);
+      w.__fotogramasEstables = todoVisible && nadaEnMarcha ? (w.__fotogramasEstables ?? 0) + 1 : 0;
+      return w.__fotogramasEstables >= 3;
     },
     undefined,
-    { timeout: 15_000 },
+    { timeout: 15_000, polling: "raf" },
   );
 };
 

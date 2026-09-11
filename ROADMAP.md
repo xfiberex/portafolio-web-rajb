@@ -1404,8 +1404,14 @@ el build.
 
     Para cumplir el criterio sin tocar ese riesgo: quitar `@lhci/cli` de `devDependencies` y
     lanzarlo con `npx @lhci/cli@0.15.1 autorun` en CI. El árbol vulnerable dejaría de estar en
-    el lockfile del proyecto y `npm audit` quedaría en 0. **Pendiente de decisión**: a cambio,
-    `npm run lighthouse` en local descargaría la herramienta la primera vez.
+    el lockfile del proyecto y `npm audit` quedaría en 0. A cambio, `npm run lighthouse` en
+    local descargaría la herramienta la primera vez.
+
+    **Decidido 2026-09-10: se deja como está.** Las 12 restantes dependen por completo de
+    `@lhci/cli`, no se ejecutan en este uso y moverla a `npx` solo limpiaría el informe, no el
+    riesgo. La tarea sigue abierta a propósito, pero ya no por trabajo pendiente: se cierra en
+    cuanto `@lhci/cli` publique una versión que actualice `lighthouse`, `tmp` y `uuid`. Para
+    comprobarlo: `npm view @lhci/cli version` (hoy 0.15.1, de junio de 2025).
 
 - [ ] **[T4-02] Ajustar tres cabeceras de seguridad**
   - **Área:** Seguridad · **Ubicación:** `netlify.toml:23-38,66,75`
