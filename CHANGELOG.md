@@ -8,11 +8,11 @@ adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 Para saber **por qué** se tomó una decisión, ver [CONTEXT.md](CONTEXT.md).
 Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 
-> ⚠️ **Reconstrucción aproximada.** El repositorio **no tiene ningún tag de git**, pese a que
-> `package.json` declara `version: 2.0.0`. Las versiones de abajo se reconstruyeron a partir del
-> historial de commits el 2026-09-08: las fechas son reales, los números de versión son una
-> propuesta retrospectiva y nunca se publicaron como release. A partir de la próxima versión hay
-> que etiquetar de verdad (tarea **T2-21**).
+> ⚠️ **Reconstrucción aproximada hasta la 2.0.0.** Las versiones de abajo se reconstruyeron a
+> partir del historial de commits el 2026-09-08: las fechas son reales, pero los números de 0.1.0,
+> 1.0.0 y 1.1.0 son una propuesta retrospectiva y no tienen tag. **`v2.0.0` sí está etiquetada**
+> (2026-09-11, sobre `710f799`, el último commit del 2026-09-07). A partir de aquí, cada versión
+> publicada se etiqueta (tarea **T2-21**).
 
 ---
 
@@ -396,5 +396,5 @@ Primera versión pública del portafolio.
 
 ---
 
-[Sin publicar]: https://github.com/xfiberex/portafolio-web-rajb/compare/main...HEAD
-[2.0.0]: https://github.com/xfiberex/portafolio-web-rajb/commits/main
+[Sin publicar]: https://github.com/xfiberex/portafolio-web-rajb/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/xfiberex/portafolio-web-rajb/releases/tag/v2.0.0
