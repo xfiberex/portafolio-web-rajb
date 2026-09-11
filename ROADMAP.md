@@ -1531,6 +1531,14 @@ el build.
     Verificado: 117 unitarios, 46 e2e, 6 visuales y los presupuestos de Lighthouse en verde;
     **cero mensajes de consola** al cargar en tema claro y en oscuro, que es donde aparecería
     un desajuste de hidratación.
+  - ✅ **Verificado en producción el 2026-09-11** (`35177fb`, CI en verde): el HTML servido
+    trae el contenido dentro de `#root` (126,7 kB) y **cero** apariciones del correo literal.
+    Medido a 4G lento + CPU ×4, mediana de 3: **FCP/LCP 1544 ms en escritorio y 1528 ms en
+    móvil**. Consola **limpia en los dos temas**, con el icono y la etiqueta correctos en cada
+    uno y el correo ya ensamblado tras hidratar.
+    ⚠️ La primera corrida dio 4088 ms con el CDN frío, frente a 1544 y 1376 las otras dos. Es
+    el mismo comportamiento anotado en T2-23: en producción hay que mirar la mediana, no la
+    primera carga.
   - 📌 **El `<noscript>` se queda.** Parecía que sobraba —el HTML ya llega pintado—, pero sin
     JavaScript las secciones heredan `opacity: 0` de `whileInView`: medido, el email del
     bloque Contacto está en el DOM y **no se ve**. Sigue siendo la única vía de contacto sin
