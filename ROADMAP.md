@@ -1387,6 +1387,25 @@ el build.
     TypeScript 7) que merecen su propia sesión.
   - **Criterio de aceptación:** `npm audit` sin vulnerabilidades y CI en verde.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
+  - **Avance 2026-09-10 (sigue abierta):** el aviso ya no era de 3 sino de **15** (2 bajas,
+    4 moderadas, 9 altas). `npm audit fix` **sin** `--force`, que solo cambia
+    `package-lock.json`, resolvió las que tenían arreglo compatible: `nanoid` 3.3.19 (la
+    única que figuraba como de producción, vía `postcss`, y que no entra en el bundle),
+    `brace-expansion` 5.0.9 y `@humanfs/node` 0.16.8. **Producción: 0 vulnerabilidades.**
+
+    Quedan **12, todas dentro de `@lhci/cli`** (`lighthouse`, `puppeteer-core`,
+    `extract-zip`, `tmp`, `uuid`, `inquirer`, y `express`/`qs` de su servidor). La 0.15.1
+    instalada es la última publicada y fija esas versiones, así que ninguna actualización lo
+    arregla; el «arreglo» que propone npm es bajar a la 0.1.0, que es más antigua. Riesgo
+    real, revisado contra cómo se usa aquí: CI lanza `lhci autorun` con el Chrome del
+    sistema (no descarga navegador, así que `@puppeteer/browsers` y `extract-zip` no se
+    ejecutan), sube a `filesystem` (no arranca el servidor `express`) y no usa el asistente
+    interactivo (`inquirer`). **El código vulnerable no se ejecuta.**
+
+    Para cumplir el criterio sin tocar ese riesgo: quitar `@lhci/cli` de `devDependencies` y
+    lanzarlo con `npx @lhci/cli@0.15.1 autorun` en CI. El árbol vulnerable dejaría de estar en
+    el lockfile del proyecto y `npm audit` quedaría en 0. **Pendiente de decisión**: a cambio,
+    `npm run lighthouse` en local descargaría la herramienta la primera vez.
 
 - [ ] **[T4-02] Ajustar tres cabeceras de seguridad**
   - **Área:** Seguridad · **Ubicación:** `netlify.toml:23-38,66,75`

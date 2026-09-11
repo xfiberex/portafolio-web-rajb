@@ -165,6 +165,12 @@ Lo que la sesión del 2026-09-10 dejó aprendido y conviene no olvidar:
 - **El reparto en columnas de Competencias está calculado**, no a ojo (`columna` en
   `src/data/skills.ts`). Si cambia el contenido y `e2e/pulido.spec.ts` falla por el
   estiramiento, hay que recalcularlo (procedimiento en ROADMAP, T3-12).
+- **Una prueba «flaky» sin causa encontrada: el skip link** (`e2e/navegacion.spec.ts`). Falló
+  una vez en CI (el enlace existía pero no recibió el foco tras el primer Tab) y pasó en el
+  reintento. En local: 1 fallo en 40 una vez, y después 0 en 500 repeticiones con y sin la
+  espera añadida, así que **la causa sigue sin demostrar**. Se añadió `toBeAttached()` antes
+  del Tab por higiene, y CI ahora guarda la traza del intento que falla: si reaparece, el
+  artefacto `trazas-e2e` dirá qué tenía el foco.
 
 ✅ **Verificado en producción el 2026-09-08**, tras desplegar Tier 1 y T2-04/05/13/14:
 

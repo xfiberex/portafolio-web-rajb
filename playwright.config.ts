@@ -27,7 +27,11 @@ export default defineConfig({
        toda la suite auditaria el tema claro por accidente. Las pruebas que
        necesitan el otro tema lo piden con `emulateMedia`. */
     colorScheme: "dark",
-    trace: "on-first-retry",
+    /* `retain-on-failure` y no `on-first-retry`: con reintentos, la traza
+       del reintento es la del intento que PASA, y el que falla no deja nada.
+       Así, cuando una prueba sale «flaky» en CI, su intento fallido queda
+       grabado y se sube como artefacto aunque el job termine en verde. */
+    trace: "retain-on-failure",
   },
 
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],

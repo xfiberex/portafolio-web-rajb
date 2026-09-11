@@ -61,13 +61,22 @@ test.describe("Menú móvil", () => {
 test.describe("Skip link", () => {
   test("es el primer elemento del orden de foco y salta a <main>", async ({ page }) => {
     await page.goto("/");
+    const skip = page.getByRole("link", { name: "Saltar al contenido" });
+
+    /* Esperar a que exista ANTES de pulsar Tab. `goto` resuelve en `load`,
+       pero React 19 monta en una tarea programada que, en un runner de CI
+       cargado, puede llegar después: el único Tab caía en un documento
+       vacío, el foco se quedaba en <body> y el enlace aparecía un instante
+       más tarde sin que nadie volviera a tabular. Pasó en CI el 2026-09-10
+       (marcada «flaky»: falló a los 5 s y pasó en el reintento); el log
+       mostraba el enlace resuelto 14 veces pero nunca enfocado. */
+    await expect(skip).toBeAttached();
 
     /* Un Tab desde el documento recién cargado. Si algún elemento se cuela
        delante, quien navega con teclado ya no puede saltar los 8 enlaces
        del nav sin tabular por todos ellos. */
     await page.keyboard.press("Tab");
 
-    const skip = page.getByRole("link", { name: "Saltar al contenido" });
     await expect(skip).toBeFocused();
     // `sr-only` hasta recibir foco: si sigue oculto, nadie lo ve al tabular.
     await expect(skip, "el skip link no se hace visible al recibir foco").toBeVisible();

@@ -160,6 +160,14 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 
 ### Corregido
 
+- **Dependencias**: `npm audit fix` sin cambios mayores; producción pasa a 0
+  vulnerabilidades. Las 12 restantes son todas de `@lhci/cli`, solo de desarrollo, y su
+  código vulnerable no se ejecuta en este uso (detalle en ROADMAP, T4-01).
+- **CI no guardaba nada útil cuando fallaba una prueba de navegador.** Subía
+  `playwright-report/`, que en CI nunca se genera (el reporter es `github` + `list`), y la
+  traza se grababa solo en el reintento, es decir, en el intento que pasa. Ahora se graba la
+  traza de todo intento fallido y se sube `test-results/` tras cada paso de Playwright,
+  también cuando una prueba sale «flaky» y el job termina en verde.
 - **El `theme-color` no correspondía a ningún color del sitio.** Declaraba `#1a1c22` cuando
   el fondo real es `#080c11`, así que la barra del navegador móvil se pintaba más clara que
   la página. Ahora, además, sigue al tema.

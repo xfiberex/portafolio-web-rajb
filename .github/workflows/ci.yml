@@ -74,6 +74,21 @@ jobs:
       # generan en el contenedor oficial de Playwright, no a mano.
       # Si este paso falla por un cambio de diseno INTENCIONADO, hay que
       # regenerarlas: ver README, seccion de snapshots visuales.
+      # Justo detras del paso y no al final del job: el paso de snapshots
+      # vuelve a lanzar Playwright y eso vacia test-results/. `always()` y no
+      # `failure()`: una prueba «flaky» deja el job en verde, y su intento
+      # fallido es precisamente el que hay que poder mirar. Si no fallo nada,
+      # solo queda test-results/.last-run.json, que upload-artifact v4 excluye
+      # por ser oculto: sin ficheros, `ignore` hace que no se suba nada.
+      - name: Guardar trazas de e2e si algun intento fallo
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trazas-e2e
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Snapshots visuales
         run: npm run test:visual
 
@@ -98,12 +113,16 @@ jobs:
         if: always()
         run: node scripts/resumen-lighthouse.mjs
 
-      - name: Guardar el informe de Playwright si falla
-        if: failure()
+      # Antes subia playwright-report/, que en CI NUNCA existia: el reporter
+      # de CI es github + list, que no genera informe HTML. Lo que si queda
+      # es test-results/, con las imagenes esperada/obtenida/diferencia.
+      - name: Guardar diferencias de snapshots si fallan
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: diferencias-visuales
+          path: test-results/
+          if-no-files-found: ignore
           retention-days: 7
 
       - name: Guardar el informe de Lighthouse si falla
