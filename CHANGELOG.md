@@ -160,6 +160,9 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 
 ### Corregido
 
+- **Dos datos no coincidían con el CV.** La carrera empezaba en 05/2019 en el portafolio y en
+  01/2019 en el CV, y el gestor de tareas en Blazor figuraba con .NET 9 cuando usa .NET 10.
+  Se tomó el CV como fuente de verdad.
 - **Dependencias**: `npm audit fix` sin cambios mayores; producción pasa a 0
   vulnerabilidades. Las 12 restantes son todas de `@lhci/cli`, solo de desarrollo, y su
   código vulnerable no se ejecuta en este uso (detalle en ROADMAP, T4-01).

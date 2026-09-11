@@ -82,6 +82,7 @@ export const BRAND_COLORS: Record<string, string> = {
   "TanStack Query": "#ECE8D1",
   "Windows Forms": "#68217A",
   ".NET Framework": "#512BD4",
+  ".NET 10": "#512BD4",
   ".NET 9": "#512BD4",
   ".NET 8": "#512BD4",
   "EF Core": "#512BD4",

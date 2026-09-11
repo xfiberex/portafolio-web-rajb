@@ -127,6 +127,7 @@ describe("las versiones concretas siguen resolviendo sin rama propia (T3-14)", (
   it.each([
     [".NET 8", ".NET"],
     [".NET 9", ".NET"],
+    [".NET 10", ".NET"],
     ["React 19", "React"],
     ["Tailwind CSS 4", "TailwindCSS"],
     ["Next.js 16", "Next.js"],

@@ -107,7 +107,7 @@ export const projects: Project[] = [
   },
   {
     title: "Sistema de Gestión de Tareas Recurrentes",
-    subtitle: ".NET Blazor · Aplicación Web Full-Stack con Blazor WebAssembly y .NET 9",
+    subtitle: ".NET Blazor · Aplicación Web Full-Stack con Blazor WebAssembly y .NET 10",
     description:
       "Aplicación empresarial para gestión de tareas recurrentes con calendario interactivo y servicios automatizados.",
     image: "/projects/S-Blazor-TDApp.webp",
@@ -116,7 +116,7 @@ export const projects: Project[] = [
       "Panel de reportes y seguimiento de procesos completados",
       "API RESTful documentada con Swagger y servicios en segundo plano",
     ],
-    tags: ["Blazor", ".NET 9", "WebAssembly", "EF Core", "SQL Server", "Swagger/OpenAPI", "Background Services"],
+    tags: ["Blazor", ".NET 10", "WebAssembly", "EF Core", "SQL Server", "Swagger/OpenAPI", "Background Services"],
     github: "https://github.com/xfiberex/S_Blazor_TDApp",
   },
   {
