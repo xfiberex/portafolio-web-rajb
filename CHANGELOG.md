@@ -86,6 +86,9 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 - **`src/lib/contact.ts`**: email y rutas de los CV en un solo sitio. El nombre de los PDF lleva la
   fecha dentro, así que duplicarlos garantizaba enlaces rotos al actualizarlos.
 - **`scripts/images-to-webp.mjs`** y `npm run images:webp` (dependencia nueva: `sharp`).
+- **`public/llms.txt`**: resumen del portafolio para herramientas automatizadas —perfil, los
+  dos CV, proyectos con su stack y enlaces—, con el email ofuscado como en el `<noscript>`.
+  Lo revisa el verificador de enlaces, porque repite las rutas de los CV.
 
 ### Cambiado
 
@@ -252,6 +255,15 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 - Dos capturas huérfanas (0.58 MB) que ya no referenciaba ningún proyecto pero se seguían
   publicando.
 - `--value-primary-hover`, que solo usaban los botones ahora migrados a `primary-strong`.
+
+### Seguridad
+
+- El CSP ya no acepta imágenes de cualquier origen HTTPS: `img-src 'self' data:`. Todas las
+  imágenes del sitio son propias.
+- `X-XSS-Protection` pasa de `1; mode=block` a `0`, la recomendación actual: el auditor de
+  XSS ya no existe en los navegadores modernos y en los antiguos podía abrir fugas.
+- La cabecera HSTS de `netlify.toml` declara ahora lo que Netlify sirve de verdad (1 año, no
+  2), en vez de un valor que el hosting reescribía sin avisar.
 
 ### Interno
 

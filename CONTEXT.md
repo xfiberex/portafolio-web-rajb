@@ -525,9 +525,11 @@ demos en tiers gratuitos se caen sin que nadie esté mirando.
 
 ### Netlify reescribe la cabecera HSTS
 
-`netlify.toml` declara `max-age=63072000` (2 años); la respuesta real trae `31536000` (1 año).
+`netlify.toml` declaraba `max-age=63072000` (2 años); la respuesta real trae `31536000` (1 año).
 Netlify la normaliza en dominios `*.netlify.app`. Además `preload` no puede surtir efecto ahí:
-`netlify.app` está en la Public Suffix List. **El archivo miente sobre lo que se sirve.** Ver T4-02.
+`netlify.app` está en la Public Suffix List. Desde T4-02 (2026-09-11) el archivo declara
+exactamente lo servido, `preload` incluido —Netlify lo añade igual—, para que no mienta.
+Si el sitio pasa a un dominio propio, revisar: ahí sí mandaría el valor declarado.
 
 ### Las reglas de caché de Netlify se escriben para no solaparse *(T2-20, 2026-09-09)*
 

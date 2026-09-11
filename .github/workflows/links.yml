@@ -44,6 +44,7 @@ jobs:
             --scheme http
             --scheme https
             index.html
+            public/llms.txt
             'src/**/*.ts'
             'src/**/*.tsx'
             README.md

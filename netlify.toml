@@ -28,7 +28,7 @@
       script-src 'self' 'sha256-6C3d9bYyDzRE+cf1EAxaFy3qRCXp6/hwrj9wujw/Eq8=';
       style-src 'self' 'unsafe-inline';
       font-src 'self';
-      img-src 'self' data: https:;
+      img-src 'self' data:;
       connect-src 'self';
       frame-ancestors 'none';
       form-action 'self';
@@ -45,9 +45,13 @@
 
     # =========================================================================
     # HSTS - HTTP STRICT TRANSPORT SECURITY
-    # Fuerza HTTPS por 2 años, incluye subdominios y permite preload list
+    # Fuerza HTTPS por 1 año. Se declara exactamente lo que Netlify sirve: en
+    # dominios *.netlify.app normaliza la cabecera a 1 año aunque se pidan 2
+    # (medido 2026-09-11). `preload` no surte efecto aquí —netlify.app está en
+    # la Public Suffix List— pero Netlify la añade igual; se deja para que lo
+    # declarado y lo servido coincidan (T4-02).
     # =========================================================================
-    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
 
     # =========================================================================
     # MIME SNIFFING PROTECTION
@@ -62,9 +66,11 @@
     X-Permitted-Cross-Domain-Policies = "none"
 
     # =========================================================================
-    # XSS PROTECTION (Legacy pero útil para navegadores antiguos)
+    # XSS PROTECTION — desactivada a propósito. Los navegadores modernos ya
+    # eliminaron el auditor de XSS y `1; mode=block` podía abrir fugas en los
+    # antiguos; la recomendación actual es `0`. La protección real es el CSP.
     # =========================================================================
-    X-XSS-Protection = "1; mode=block"
+    X-XSS-Protection = "0"
 
     # =========================================================================
     # REFERRER POLICY
@@ -160,6 +166,14 @@
   for = "/sitemap.xml"
   [headers.values]
     Content-Type = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=86400"
+
+# llms.txt lleva tildes. Sin charset explícito, un text/plain puede leerse
+# como Latin-1 y «Jiménez» llegaría como «JimÃ©nez» (T4-05).
+[[headers]]
+  for = "/llms.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
     Cache-Control = "public, max-age=86400"
 
 # =============================================================================

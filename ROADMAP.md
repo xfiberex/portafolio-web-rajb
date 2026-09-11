@@ -18,27 +18,28 @@ Los datos entre paréntesis son **medidos**, no estimados, salvo donde diga *est
 |---|---|---:|---:|---|
 | **Tier 0** | Crítico / bloqueante | 3 | 0 | — (cerrado) |
 | **Tier 1** | Alta prioridad — accesibilidad AA, build y documentación que engaña | 9 | 0 | — (cerrado) |
-| **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 23 | 1 | bajo·1 |
+| **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 23 | 0 | — (cerrado) |
 | **Tier 3** | Pulido y mantenimiento | 20 | 0 | — (cerrado) |
 | **Tier 4** | Futuro / opcional | 6 | 5 | bajo·4 alto·1 |
-| | **Total** | **61** | **6** | |
+| | **Total** | **61** | **5** | |
 
 **No hay ninguna tarea de Tier 0 abierta.** La auditoría del 2026-09-08 no encontró
 vulnerabilidades explotables, pérdida de datos ni fallos que rompan producción. Las tres
 tareas de Tier 0 son las del backlog anterior, ya cerradas.
 
-**Tiers 0, 1, 2 y 3 están cerrados** salvo T2-21. El repositorio pasó de **cero pruebas**
+**Tiers 0, 1, 2 y 3 están cerrados**; solo quedan las opcionales de Tier 4. El repositorio pasó de **cero pruebas**
 (2026-09-08) a **117 unitarias + 46 e2e + 6 snapshots visuales** (2026-09-10), todas en CI,
 junto con axe en los dos temas, formato con Prettier y presupuestos de Lighthouse que fallan
 el build.
 
-> 📌 **Estado al cierre del 2026-09-10 (para retomar en otro equipo).**
-> - **Pendiente de commit y push:** T3-08 a T3-12 y la documentación de cierre. Tras el push,
->   verificar que CI pasa entero (el paso de snapshots visuales usa las líneas base de Linux,
->   regeneradas en el contenedor de Playwright) y comprobar en producción Competencias,
->   Certificados y las tarjetas de proyecto en los dos temas.
-> - **Abiertas (6):** **T2-21** (etiquetar `v2.0.0` en git; la hace el dueño del repo) y
->   **T4-01, T4-02, T4-04, T4-05, T4-06**, todas opcionales.
+> 📌 **Estado al 2026-09-11 (para retomar en otro equipo).**
+> - Todo subido; CI verde en `main` y producción revisada por el dueño del repo.
+> - `v2.0.0` etiquetada y publicada (T2-21). **Los tags se suben aparte:** `git push origin <tag>`.
+> - **Abiertas (5):** **T4-01, T4-02, T4-04, T4-05, T4-06**, todas opcionales. T4-01 espera a
+>   que `@lhci/cli` publique versión nueva; T4-06 es solo de vigilancia.
+> - El aviso `GitHub token not set` de Lighthouse CI es informativo y se deja así a propósito:
+>   el token solo añadiría un *status check* duplicado, sin enlace al informe porque el
+>   `upload.target` es `filesystem`.
 > - Los snapshots visuales se regeneran con el comando de Docker del README; en Git Bash hace
 >   falta `MSYS_NO_PATHCONV=1`, y Docker Desktop tiene que estar arrancado.
 
@@ -811,7 +812,7 @@ el build.
     un segmento sí funciona** (`/assets/*.js` casa), que era el supuesto sobre el que se
     construyeron las reglas nuevas.
 
-- [ ] **[T2-21] Empezar a etiquetar versiones en git**
+- [x] **[T2-21] Empezar a etiquetar versiones en git**
   - **Área:** DevOps · **Ubicación:** `package.json:4` · repositorio
   - **Qué hacer:** `package.json` declara `version: 2.0.0` y el repositorio no tiene **ni un
     tag**. El `CHANGELOG.md` creado en esta auditoría reconstruye el historial de forma
@@ -819,6 +820,14 @@ el build.
   - **Criterio de aceptación:** existe el tag `v2.0.0` apuntando al commit correspondiente y el
     changelog lo enlaza.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-11 · tag anotado `v2.0.0` sobre **`710f799`**, el último commit del
+    2026-09-07 — la fecha de la sección [2.0.0] del changelog, y ya con `version: 2.0.0` en
+    `package.json`. Lo posterior (desde `a75744c`) queda en [Sin publicar]. Las versiones
+    anteriores (0.1.0, 1.0.0, 1.1.0) se dejan sin tag: son reconstruidas y no se publicaron.
+    ⚠️ **El primer intento se quedó a medias:** el commit que enlazaba el tag desde el changelog
+    (`cdaf5ce`) se subió, pero el tag no — `git push` no sube tags, hace falta
+    `git push origin v2.0.0`. Durante ese hueco los dos enlaces del changelog daban 404.
+    Verificado con `git ls-remote --tags origin`, no con el tag local.
 
 - [x] **[T2-22] Corregir los tags que caen al icono genérico**
   - **Área:** Auditoría de código · **Ubicación:** `src/components/TechIcon.tsx:443,455-461`
@@ -1427,6 +1436,15 @@ el build.
       imágenes son propias, se puede cerrar a `'self' data:`.
   - **Criterio de aceptación:** las cabeceras servidas coinciden con las declaradas.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
+  - **Avance 2026-09-11 (pendiente de deploy):** `X-XSS-Protection: 0`; HSTS declarado como
+    `max-age=31536000; includeSubDomains; preload`, que es **exactamente** lo que producción
+    sirve hoy (medido con `curl -I`), con el porqué comentado en el archivo; e `img-src
+    'self' data:`. Antes de cerrar `img-src` se buscó cualquier imagen de otro origen en
+    `src/` e `index.html`: solo aparecen URLs `https://` dentro de tests unitarios.
+    ⚠️ **Ni las e2e ni Lighthouse CI pueden cazar un fallo aquí:** corren contra
+    `vite preview`, que no aplica las cabeceras de `netlify.toml`. La verificación es en
+    producción: `curl -I` de las tres cabeceras y consola sin errores de CSP con las 6
+    capturas de proyecto cargadas.
 
 - [x] **[T4-03] Decidir sobre privacidad y datos personales**
   - **Área:** Legal · **Severidad:** *requiere revisión legal*
@@ -1469,6 +1487,20 @@ el build.
     más herramientas de reclutamiento automatizadas, tiene sentido. Bajo impacto, coste mínimo.
   - **Criterio de aceptación:** `/llms.txt` existe con un H1 y enlaces.
   - **Esfuerzo:** bajo · **Depende de:** T1-06
+  - **Avance 2026-09-11 (pendiente de deploy):** `public/llms.txt` con el formato de
+    llmstxt.org — H1, resumen en cita, CV (los dos PDF), proyectos con su stack, GitHub y
+    LinkedIn —, sacado de `src/data/projects.ts`, `src/lib/contact.ts` y el `schema.org/Person`
+    de `index.html`. Tres decisiones:
+    - **El email va ofuscado** (`[at]`/`[dot]`), igual que en el `<noscript>` de T2-14: un
+      archivo pensado para que lo lean máquinas es justo lo que la ofuscación quiere evitar.
+    - **Añadido a `links.yml`.** Duplica las rutas de los CV, que llevan la fecha en el nombre;
+      al actualizar el CV este archivo se quedaría apuntando a un 404 sin que nada avisara.
+    - **`Content-Type: text/plain; charset=utf-8` declarado en `netlify.toml`**, como el
+      sitemap en T2-13: sin charset, las tildes pueden llegar como mojibake.
+    ⚠️ Deuda asumida: los proyectos quedan **duplicados a mano** respecto a `projects.ts`.
+    Generarlo en el build sería lo robusto, pero es más código que el propio archivo.
+    **Para cerrarla:** en producción, `/llms.txt` → 200 con `text/plain; charset=utf-8` y
+    las tildes legibles.
 
 - [ ] **[T4-06] `skills-lock.json`: JSON inválido y desactualizado** *(viene de BACKLOG 5)*
   - **Área:** Herramientas · **Ubicación:** `skills-lock.json` (fuera del repositorio, en `.gitignore`)

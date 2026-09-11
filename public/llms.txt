@@ -1,0 +1,33 @@
+# Ricky Angel Jiménez Bueno — Desarrollador Web Full-Stack
+
+> Desarrollador Full-Stack en Santo Domingo (República Dominicana), especializado en .NET
+> (ASP.NET Core, Blazor, C#) y en los stacks MERN/PERN (React, Node.js, Express, PostgreSQL,
+> MongoDB). Egresado de la Universidad Dominicana O&M.
+
+Este archivo resume el portafolio para herramientas automatizadas. La fuente de verdad es el
+propio sitio y los CV en PDF enlazados abajo. Contacto: rickyjimenez1820 [at] gmail [dot] com.
+
+## Currículum
+
+- [CV](https://portafolio-web-rajb.netlify.app/assets/CV-Ricky%20Angel%20Jim%C3%A9nez%20Bueno-07-09-2026.pdf): versión con diseño
+- [CV compatible con ATS](https://portafolio-web-rajb.netlify.app/assets/ATS-CV-Ricky%20Angel%20Jim%C3%A9nez%20Bueno-07-09-2026.pdf): texto plano, pensado para sistemas de selección automatizados
+
+## Proyectos destacados
+
+- [TrackerMultimedia — backend](https://github.com/xfiberex/TrackerMultimedia_Backend): ASP.NET Core 10, EF Core, PostgreSQL. JWT con refresh rotativo y detección de reúso, OAuth con PKCE, API en capas, tests con xUnit
+- [TrackerMultimedia — frontend](https://github.com/xfiberex/TrackerMultimedia_Frontend): React 19, TypeScript, TanStack Query, Tailwind CSS
+- [Stockly — backend](https://github.com/xfiberex/Stockly-B): Node.js, Express 5, TypeScript, Prisma, PostgreSQL. Control de concurrencia en stock, ADRs, métricas y logs estructurados, contratos OpenAPI
+- [Stockly — frontend](https://github.com/xfiberex/Stockly-F): React, TanStack Query, Tailwind CSS
+- [KiosGo](https://github.com/xfiberex/kiosgo): Next.js 16, Prisma 7, PostgreSQL, Zustand. Kiosko de pedidos con panel de administración en tiempo real ([demo](https://kiosgo-two.vercel.app))
+
+## Otros proyectos
+
+- [Sistema de Ventas Web](https://github.com/xfiberex/SistemaVenta_ASP.NET_CORE_MVC): ASP.NET Core MVC, arquitectura en capas, SQL Server
+- [Gestión de Tareas Recurrentes](https://github.com/xfiberex/S_Blazor_TDApp): Blazor WebAssembly, .NET 10, SQL Server
+- [Este portafolio](https://github.com/xfiberex/portafolio-web-rajb): React, TypeScript, Tailwind CSS
+
+## Enlaces
+
+- [Portafolio](https://portafolio-web-rajb.netlify.app/)
+- [GitHub](https://github.com/xfiberex)
+- [LinkedIn](https://www.linkedin.com/in/ricky-angel-jimenez-bueno-52659928a)
