@@ -59,6 +59,63 @@
   --value-scrim: oklch(8% 0.01 256 / 88%);
 }
 
+/* ══════════════════════════════════════════════════════════
+   Tema claro (T3-05)
+
+   Solo sobreescribe los `--value-*`. La capa semántica de abajo no cambia
+   ni una linea: para eso se separaron.
+
+   Cada valor sale de resolver la L que alcanza el ratio de contraste que el
+   tema oscuro ya tenia, no de elegir un gris a ojo. Tabla comparada en T3-07.
+
+   **El conflicto de T1-01 desaparece aqui.** En oscuro, `primary` (texto
+   sobre fondo) exige ser CLARO y `primary-strong` (relleno con texto claro
+   encima) exige ser OSCURO, y por eso son dos tokens. En claro los dos
+   papeles piden lo mismo —mas oscuro— y sus valores convergen. Siguen
+   siendo dos tokens porque la capa semantica es compartida, no porque aqui
+   hagan falta dos colores.
+   ══════════════════════════════════════════════════════════ */
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* ─── Superficies ────────────────────
+     Se invierte la direccion de la elevacion: en oscuro elevar es aclarar,
+     en claro es blanquear. El hueco entre fondo y superficie se mantiene
+     parecido para que las tarjetas se lean sin depender solo del borde. */
+  --value-background: oklch(96% 0.005 256);
+  --value-surface: oklch(99.5% 0.002 256);
+  --value-surface-hover: oklch(97.2% 0.008 256);
+  --value-elevated: oklch(100% 0 0);
+
+  /* ─── Texto (los mismos 3 niveles) ─────── */
+  --value-foreground: oklch(15% 0.02 256);
+  --value-muted: oklch(36% 0.02 256);
+  --value-subtle: oklch(50% 0.02 256);
+
+  /* ─── Acento ───────────────────────── */
+  --value-primary: oklch(51% 0.2 264);
+  --value-primary-strong: oklch(51% 0.2 264);
+  --value-primary-strong-hover: oklch(44% 0.2 264);
+  --value-primary-soft: oklch(51% 0.2 264 / 7%);
+  --value-primary-foreground: oklch(99% 0 0);
+
+  /* ─── Lineas y foco ────────────────── */
+  --value-border: oklch(87% 0.008 256 / 90%);
+  --value-border-strong: oklch(74% 0.012 256);
+  --value-ring: oklch(45% 0.18 264);
+
+  /* ─── Scrim de modales ───────────────
+     Sigue siendo oscuro: su trabajo es apagar el contenido de detras, y un
+     velo claro sobre contenido claro no apaga nada.
+
+     La opacidad es la MISMA que en oscuro (88%) y no menor, aunque el velo
+     parezca mas pesado sobre una pagina clara. Medido: con 60% la franja
+     de scrim tenia una desviacion de luminancia de 7.47 frente a 2.43 en
+     oscuro —tres veces mas contenido colandose— y el modal dejaba de
+     aislar. La luminancia base sube a 20% para que no se lea como negro. */
+  --value-scrim: oklch(20% 0.01 256 / 88%);
+}
+
 @theme inline {
   --color-background: var(--value-background);
   --color-surface: var(--value-surface);
@@ -98,7 +155,11 @@
   /* ─── Ritmo vertical y horizontal ──────────────────────── */
   --spacing-section: clamp(4rem, 3rem + 4vw, 6rem);
   --spacing-gutter: clamp(1rem, 0.5rem + 2vw, 2rem);
-  --spacing-header: 4rem; /* alto del navbar sticky → scroll-mt-header */
+  /* Dos tokens porque son dos medidas distintas: el <nav> mide 4rem, pero el
+     <header> que lo envuelve añade un `border-b` de 1px y mide 65px. Usar el
+     primero como offset de scroll dejaba 1px de la sección tapado. Medido. */
+  --spacing-header: 4rem; /* alto del <nav> → h-header */
+  --spacing-header-total: calc(var(--spacing-header) + 1px); /* + border-b → scroll-mt-header-total */
 
   /* ─── Radio de tarjetas (un solo valor para todas) ─────── */
   --radius-card: 0.875rem;
@@ -131,8 +192,9 @@
   font-weight: 400 700;
   font-display: swap;
   src: url("/fonts/inter-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
-    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -141,9 +203,9 @@
   font-weight: 400 700;
   font-display: swap;
   src: url("/fonts/inter-latin-ext.woff2") format("woff2");
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308,
-    U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
-    U+2C60-2C7F, U+A720-A7FF;
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F,
+    U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
 /* ─── Base ────────────────────────────────────────────────── */
@@ -152,8 +214,24 @@ html {
 }
 
 body {
-  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  /* El fondo vive aquí y no solo en el <div> de Layout: el lienzo lo salvaba
+     `color-scheme: dark`, no un color declarado. Referenciar los tokens aquí
+     también evita que `@theme inline` los pode de `:root` por usarse solo
+     desde utilidades. */
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol",
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

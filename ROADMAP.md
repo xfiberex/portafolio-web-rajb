@@ -19,9 +19,9 @@ Los datos entre paréntesis son **medidos**, no estimados, salvo donde diga *est
 | **Tier 0** | Crítico / bloqueante | 3 | 0 | — (cerrado) |
 | **Tier 1** | Alta prioridad — accesibilidad AA, build y documentación que engaña | 9 | 0 | — (cerrado) |
 | **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 23 | 1 | bajo·1 |
-| **Tier 3** | Pulido y mantenimiento | 20 | 11 | bajo·7 medio·4 |
+| **Tier 3** | Pulido y mantenimiento | 20 | 5 | bajo·4 medio·1 |
 | **Tier 4** | Futuro / opcional | 6 | 5 | bajo·4 alto·1 |
-| | **Total** | **61** | **17** | |
+| | **Total** | **61** | **11** | |
 
 **No hay ninguna tarea de Tier 0 abierta.** La auditoría del 2026-09-08 no encontró
 vulnerabilidades explotables, pérdida de datos ni fallos que rompan producción. Las tres
@@ -905,15 +905,35 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     Todas compatibles con MIT. Se enlaza `public/fonts/LICENSE.txt`, que viaja con la fuente
     como exige la OFL. Y desaparece **Heroicons**, que se agradecía sin usarse.
 
-- [ ] **[T3-05] Definir el tema claro** *(viene de BACKLOG 3)*
+- [x] **[T3-05] Definir el tema claro** *(viene de BACKLOG 3)*
   - **Área:** UI/UX · **Ubicación:** `src/index.css:17-44`
   - **Qué hacer:** el fundamento ya está: `index.css` separa los valores crudos (`:root`, prefijo
     `--value-*`) de la capa semántica (`@theme inline`) justamente para que añadir un tema sea un
     bloque de overrides y no un refactor. Definir los valores en `[data-theme="light"]`.
   - **Criterio de aceptación:** el bloque existe y todos los tokens tienen valor claro.
   - **Esfuerzo:** medio · **Depende de:** T1-01
+  - **Cerrada:** 2026-09-10 · bloque `[data-theme="light"]` con los **17 tokens**. La apuesta
+    de la arquitectura se cumplió: la capa semántica (`@theme inline`) **no cambió ni una
+    línea**, y la app estaba tan tokenizada que en todo `src/` solo había un color crudo
+    (`text-red-500`, el corazón del Footer, que funciona en ambos temas).
 
-- [ ] **[T3-06] Conmutador de tema con persistencia** *(viene de BACKLOG 3)*
+    Ningún valor se eligió a ojo. Se escribió una calculadora de contraste de oklch a sRGB y
+    se **validó primero contra los tres ratios que este repositorio ya había medido en
+    T1-01** (5.38, 5.08 y 4.57): los reprodujo exactos. Luego se resolvió, para cada token,
+    la luminosidad que alcanza el ratio que el tema oscuro ya tenía. Tabla en T3-07.
+
+    Dos inversiones que el enunciado no anticipaba:
+    - **La elevación cambia de sentido.** En oscuro elevar es aclarar; en claro es blanquear.
+      El fondo pasa a gris claro y las tarjetas a blanco, no al revés.
+    - **El conflicto de T1-01 desaparece.** En oscuro `primary` exige ser claro y
+      `primary-strong` exige ser oscuro, y por eso son dos tokens. En claro los dos papeles
+      piden lo mismo y sus valores convergen.
+
+    De paso: el `theme-color` del `<head>` declaraba `#1a1c22`, que **no es ningún color del
+    sitio**. El fondo real es `#080c11` (comprobado convirtiendo el token en Chromium), así
+    que la barra del navegador móvil llevaba tiempo pintándose más clara que la página.
+
+- [x] **[T3-06] Conmutador de tema con persistencia** *(viene de BACKLOG 3)*
   - **Área:** UI/UX · **Ubicación:** `src/components/Navbar.tsx` · `index.html`
   - **Qué hacer:** `localStorage` y `prefers-color-scheme` como valor por defecto. Evitar el flash
     de tema incorrecto aplicando el atributo antes del primer pintado (script inline en el
@@ -921,14 +941,78 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
   - **Criterio de aceptación:** recargar con tema claro no produce destello oscuro, y el CSP sigue
     sin `'unsafe-inline'` en `script-src`.
   - **Esfuerzo:** medio · **Depende de:** T3-05
+  - **Cerrada:** 2026-09-10 · script inline en el `<head>`, hook `useTheme`, botón en la barra
+    y `theme-color` que sigue al tema. Los dos criterios, medidos:
 
-- [ ] **[T3-07] Verificar contraste en ambos temas** *(viene de BACKLOG 3)*
+    **Destello: cero.** No se miró a ojo. Se grabó la carga entera con `Page.startScreencast`
+    a 4G lento + CPU x4 y se midió la luminancia del fondo en **cada fotograma**: 68
+    fotogramas, **0 oscuros**, mínimo 0.947. Y el detector se validó introduciendo un
+    destello de verdad (el mismo script diferido 300 ms): 71 de 71 fotogramas oscuros,
+    luminancia 0.045. Congelado además en `e2e/tema.spec.ts` con una prueba que **bloquea el
+    bundle**: si el tema dependiera de React, con el JS abortado el atributo no aparecería.
+
+    **CSP sin unsafe-inline:** el script se autoriza por hash sha256. Ese hash es frágil de la
+    peor manera —Vite no aplica CSP en desarrollo, así que un hash desincronizado se vería
+    **por primera vez en producción, con la página en blanco**—, y por eso
+    `src/lib/csp.test.ts` lo recalcula desde `index.html` y lo compara con `netlify.toml`.
+    Validado por mutación.
+
+    **El hash depende de los saltos de línea.** Con `core.autocrlf=true` el árbol de trabajo
+    en Windows tiene CRLF y el checkout de CI en Linux tiene LF: dos hashes para el mismo
+    archivo, y el fallo aparecería solo en el sitio desplegado. Se fijó con `.gitattributes`
+    (`index.html text eol=lf`) y el test lo verifica explícitamente.
+
+    **Un bug que solo apareció al escribir la prueba.** La primera versión del hook persistía
+    el tema en cada montaje. Parece inofensivo y no lo es: con **una simple visita** la
+    preferencia quedaba congelada y cambiar el tema del sistema operativo ya no tenía ningún
+    efecto sobre el sitio. Ahora solo se guarda cuando el usuario pulsa el botón. Lo destapó
+    la prueba que carga con el sistema en claro y recarga con el sistema en oscuro.
+
+- [x] **[T3-07] Verificar contraste en ambos temas** *(viene de BACKLOG 3)*
   - **Área:** Accesibilidad · **Ubicación:** `src/index.css`
   - **Qué hacer:** los valores de un tema no se heredan al otro: hay que medir por separado.
     Revisar además que el gradiente de `Layout.tsx:25` y los `shadow-primary/10` funcionen en
     claro.
   - **Criterio de aceptación:** axe en verde con `[data-theme="light"]` activo.
   - **Esfuerzo:** medio · **Depende de:** T3-05, T2-09
+  - **Cerrada:** 2026-09-10 · **axe en verde en los dos temas**, 1588 nodos cada uno. La suite
+    de accesibilidad se parametrizó por tema, y el tema no se fuerza escribiendo el atributo
+    sino con `prefers-color-scheme`, para que la prueba recorra el camino real del visitante.
+    Lleva una guarda propia —afirma que el atributo aplicado es el esperado— porque sin ella
+    un fallo del script inline haría que las dos vueltas auditaran el tema oscuro y la
+    segunda saliera verde **sin medir nada**.
+
+    Ratios medidos, tema contra tema:
+
+    | Par | Oscuro | Claro | Mínimo AA |
+    |---|---:|---:|---:|
+    | foreground / background | 18.54 | 17.52 | 4.5 |
+    | muted / background | 9.82 | 9.66 | 4.5 |
+    | subtle / background | 5.40 | 5.34 | 4.5 |
+    | foreground / surface | 17.49 | 19.39 | 4.5 |
+    | muted / surface | 9.26 | 10.70 | 4.5 |
+    | subtle / surface | 5.09 | 5.91 | 4.5 |
+    | primary / background | 5.38 | 5.36 | 4.5 |
+    | primary / surface | 5.08 | 5.94 | 4.5 |
+    | primary-foreground / primary-strong | 4.57 | 5.85 | 4.5 |
+    | primary-foreground / strong-hover | 5.94 | 7.98 | 4.5 |
+    | ring / background | 7.19 | 6.92 | 3 |
+
+    Ninguna pareja se aleja más del 4 % de su equivalente oscura y seis salen mejor.
+
+    **Lo que axe no vio.** El gradiente de `Layout.tsx` está tokenizado y funciona, pero el
+    **scrim del lightbox no aislaba**: con el 60 % que parecía razonable sobre una página
+    clara, la página de detrás seguía leyéndose. Medido como desviación de luminancia en la
+    franja del velo: **7.47 frente a 2.43** en oscuro, tres veces más contenido colándose.
+    Con la varianza del fondo se despejó la opacidad necesaria (~87 %) y se igualó a la del
+    oscuro, 88 %: ahora **2.41 frente a 2.43**.
+
+    **La suite visual auditaba el tema claro por accidente.** El valor por defecto de
+    `colorScheme` en Playwright es `light`, así que en cuanto el tema empezó a seguir a
+    `prefers-color-scheme` los tres snapshots pasaron a capturar la paleta clara —lo cazaron
+    ellos solos, con un 92 % de píxeles distintos—. Se fijó `colorScheme: "dark"` en
+    `playwright.config.ts` y los snapshots pasan a **seis**: los dos temas por tres anchos, en
+    las dos plataformas.
 
 - [ ] **[T3-08] Igualar el alto útil de las tarjetas de proyecto** *(viene de BACKLOG 2)*
   - **Área:** UI/UX · **Ubicación:** `src/components/Projects.tsx:39` ·
@@ -1074,7 +1158,7 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     dibujo) usada en T3-14 y salió idéntica, y se comprobó a ojo que los 61 iconos de
     Competencias siguen pintando con su color.
 
-- [ ] **[T3-17] Unificar el estilo de código**
+- [x] **[T3-17] Unificar el estilo de código**
   - **Área:** Refactorización · **Ubicación:** `src/components/ui/ObfuscatedEmail.tsx` ·
     `src/components/TechIcon.tsx`
   - **Qué hacer:** estos dos archivos usan comillas simples y omiten el punto y coma; el resto del
@@ -1082,6 +1166,27 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     lo impida. Añadir Prettier (o las reglas equivalentes) y pasarlo una vez.
   - **Criterio de aceptación:** `npx prettier --check .` en verde, y el paso añadido a `ci.yml`.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
+  - **Cerrada:** 2026-09-10 · Prettier 3.9.6 + `.prettierrc.json` (printWidth 120, comillas
+    dobles, punto y coma, `endOfLine: auto`) y `.prettierignore`. Scripts `format` y
+    `format:check`, y paso **Formato (Prettier)** en `ci.yml` tras el lint.
+
+    Los dos archivos que la tarea señalaba ya no existían como tales: `ObfuscatedEmail.tsx`
+    se borró en T3-13 y `TechIcon.tsx` se reescribió en T3-16. Pero **Prettier destapó que
+    el defecto había migrado**: `src/lib/tech-icons.ts`, creado hace unas horas en T3-16,
+    heredó el estilo sin punto y coma del archivo del que salió. Ese es justo el argumento
+    de la tarea —sin regla, el estilo se propaga por copia— y lo confirmó sola.
+
+    23 de ~50 archivos reformateados (+394/-370). `printWidth: 120` se eligió midiendo la
+    distribución real de anchos del repo (p90 = 79, p99 = 192), no por defecto: con los 80
+    de Prettier el diff habría sido varias veces mayor. `endOfLine: auto` respeta que
+    `index.css` sea CRLF y los `.tsx` LF.
+
+    **Los `.md` quedan fuera** (`.prettierignore`): ROADMAP y CONTEXT están maquetados a
+    mano —tablas, sangrías de continuación— y Prettier los reflota. La tarea habla del
+    estilo del código; la decisión queda escrita en el propio ignore y en el paso de CI.
+
+    Verificado por mutación: con un archivo mal formateado `format:check` sale con **1**;
+    sin él, con **0**.
 
 - [x] **[T3-18] Correcciones menores de código**
   - **Área:** Auditoría de código
@@ -1113,7 +1218,7 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
     correcto, incluida la de que wordmark y enlace del nav no queden marcados a la vez.
     Ambas validadas por mutación.
 
-- [ ] **[T3-19] Correcciones menores de estilos y configuración** *(2 de 4 puntos ya aplicados)*
+- [x] **[T3-19] Correcciones menores de estilos y configuración**
   - **Área:** UI/UX · DevOps
   - **Qué hacer:** quedan los dos primeros; los dos últimos se aplicaron el 2026-09-08 al
     cerrar T1-02 y T1-06.
@@ -1129,8 +1234,23 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
       ✅ Aplicado 2026-09-08 con T1-06: eliminado de ambos y `_redirects` borrado.
   - **Criterio de aceptación:** los cuatro puntos aplicados.
   - **Esfuerzo:** bajo · **Depende de:** ~~T1-02, T1-06~~ ninguna (ya cerradas)
+  - **Cerrada:** 2026-09-10 · los dos que quedaban, ambos medidos en el navegador sobre
+    `dist/` servido antes y después:
 
-- [ ] **[T3-20] Correcciones de redacción y metadatos**
+    1. **El 1px del ancla.** Confirmado exacto: `<header>` 65px, `<nav>` 64px, `border-b`
+       1px, `scroll-margin-top` 64px, solape **1px**. La causa era un token haciendo dos
+       trabajos: `--spacing-header` alimentaba tanto `h-header` (alto del `<nav>`) como
+       `scroll-mt-header` (offset, que debe contar el borde). Se separó en dos, como en
+       T1-01: `--spacing-header` sigue siendo 4rem y se añade
+       `--spacing-header-total: calc(var(--spacing-header) + 1px)`, que es el que usa
+       `Section.tsx`. Tras el cambio: `scroll-margin-top` 65px, **solape 0**.
+    2. **El fondo del `body`.** Confirmado: computaba `rgba(0, 0, 0, 0)`. Ahora declara
+       `background-color: var(--color-background)` y `color: var(--color-foreground)`.
+       Efecto secundario útil de cara a T3-05: referenciar los tokens desde CSS de autor
+       impide que `@theme inline` los pode de `:root` por usarse solo desde utilidades
+       —el mismo mecanismo que hizo fallar la tarjeta OG en T2-15—.
+
+- [x] **[T3-20] Correcciones de redacción y metadatos**
   - **Área:** Ortografía y redacción
   - **Qué hacer:**
     - `index.html:8` vs `:32` — el `<title>` dice "Ricky Jiménez - Desarrollador Full-Stack" y el
@@ -1148,6 +1268,26 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
       T2-02, que ya toca esas rutas.
   - **Criterio de aceptación:** los seis puntos aplicados y coherentes entre sí.
   - **Esfuerzo:** bajo · **Depende de:** T2-02, T2-15
+  - **Cerrada:** 2026-09-10 · los seis:
+
+    1. `<title>` → «Ricky Jiménez — Desarrollador Web Full-Stack», idéntico al `og:title`
+       (mismo texto y mismo guion largo).
+    2. `description` igualada a la `og:description`, palabra por palabra. Se eligió
+       **«MERN/PERN»** y no «MERN stack» tras comprobar en `src/data/` que es lo cierto:
+       PostgreSQL aparece en tres proyectos y MongoDB en competencias.
+    3. «agentes IA» → «agentes **de** IA».
+    4. «enfoque en performance» → «enfoque en **rendimiento**», que es el término que ya
+       usaban el README y la meta description.
+    5. «Sistema de Ventas WEB» → «Sistema de Ventas Web».
+    6. `Porfolio-web-rajb.webp` → `Portfolio-web-rajb.webp` (`git mv`), con las dos
+       referencias vivas actualizadas (`projects.ts`, README). Nota: desde T2-15 ese
+       archivo **ya no es la tarjeta social** —esa es `og-image.jpg`—, así que la errata
+       había dejado de ser pública; se corrige igual.
+
+    Los puntos 3 y 4 mueven texto del pliegue, así que **las tres pruebas visuales
+    fallaron**, que es su trabajo. Revisadas las tres imágenes de diferencia: la única
+    zona marcada es la segunda línea del tagline, en los tres anchos. Referencias
+    regeneradas para `win32` y para `linux` (en el contenedor de Playwright).
 
 ---
 
@@ -1244,6 +1384,11 @@ todas en CI. De Tier 2 quedan 10, casi todas de esfuerzo bajo: contenido y redac
 | 2026-09-08 | T3-02 | Árbol de estructura del README reescrito contra el listado real de archivos. |
 | 2026-09-09 | T2-09 | axe-core en CI con Playwright: **1586 nodos auditados**, 0 violaciones serias. Se descubrió que una opacidad intermedia falsea la regla de contraste de axe (dos violaciones fantasma), así que el scan espera a opacidad exactamente 1. |
 | 2026-09-09 | T2-05, T2-07, T2-12, T2-19 | Primeros tests del repositorio: **87**, con Vitest en CI. T2-05 cerrada reescribiendo un criterio que no servía para decidir. `browserslist` declarado (lo fija Tailwind 4, confirmado en su documentación) y valida retroactivamente T2-03. Verificador de enlaces ampliado a las docs. |
+| 2026-09-10 | T2-08, T2-10, T2-11, T2-20, T2-22, T2-23 | Playwright ampliado a **25 e2e + 3 visuales** y Lighthouse CI con presupuestos. El diagnóstico del ROADMAP sobre el LCP era falso: no era el arranque de React —el navbar pinta a 108 ms— sino el final de la animación de entrada del Hero. LCP **748→108 ms** en escritorio y **2292→1624 ms** en móvil, donde el elemento LCP es otro. |
+| 2026-09-10 | T2-15, T2-16, T2-17, T2-18, T3-01 | Bloque de contenido del Hero: de 8 acciones compitiendo a 5 en una sola fila, wordmark «RAJB · Ricky Jiménez» y desplegable de CV con Escape y clic fuera. Tres variantes construidas y comparadas con capturas antes de elegir. |
+| 2026-09-10 | T3-13, T3-14, T3-15, T3-16 | `TechIcon.tsx` de **550 a 74 líneas** en tres archivos (datos / lógica / componente). El análisis de iconos sin usar dio 25 en el primer intento y **18** en el correcto: identificaba los iconos por su `path` y colapsaba las claves que comparten dibujo. Ese mismo error volvió a morder durante el refactor, y por eso `pickIconKey` devuelve la clave y no el icono. |
+| 2026-09-10 | T3-03, T3-04, T3-17, T3-19, T3-20 | Prettier + paso en CI, con los `.md` fuera a propósito. Destapó que el estilo sin punto y coma había **migrado** al archivo recién creado en T3-16. El README describía ESLint 9 (es 10), variables de entorno que no existen y un despliegue a GitHub Pages que perdería todas las cabeceras de `netlify.toml`. Arreglado el solape de 1px de las anclas separando el token del header en dos. |
+| 2026-09-10 | T3-05, T3-06, T3-07 | **Tema claro.** La capa semantica no cambio ni una linea, que era la apuesta de la arquitectura. Los 17 tokens salen de resolver la luminosidad que iguala el contraste del tema oscuro, con una calculadora validada primero contra los ratios que el propio repositorio ya habia medido. Destello **cero**, comprobado midiendo la luminancia de los 68 fotogramas de la carga a 4G lento. El scrim del lightbox no aislaba en claro (7.47 de desviacion frente a 2.43) y se corrigio a 2.41. La suite visual se auto-delato: pasaba a auditar el tema claro por el `colorScheme` por defecto de Playwright. |
 | 2026-09-08 | T2-01, T2-02, T2-03 | Capturas a WebP con `sharp`: **1123 kB → 291 kB (-74 %)**. Sin respaldo PNG (decisión registrada). Se rompió `og:image` al borrar los PNG y se arregló generando `public/og-image.jpg` 1200×630, que cubre la parte medible de T2-15. |
 | 2026-09-08 | T2-14 | `<noscript>` con nombre, rol, email ofuscado y enlaces a CV/GitHub/LinkedIn. Verificado con scripting desactivado de verdad (iframe en sandbox): 0 → 268 caracteres visibles. |
 | 2026-09-08 | T2-05 (parcial) | Reflow forzado: **740.6 ms → 0.5 ms** de coste de lecturas de layout. El diagnóstico del ROADMAP era incorrecto — el 99.9 % era `useScrollspy` leyendo `scrollHeight` en cada frame, no Framer Motion. Sigue abierta porque el insight de DevTools, que es lo que pide el criterio, no baja. |

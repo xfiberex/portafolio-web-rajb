@@ -66,14 +66,25 @@ export const projects: Project[] = [
       "Navegación por categorías con carrito de compras (Zustand)",
       "Panel de administración completo con CRUD de productos",
       "Gestión de órdenes en tiempo real con SWR y polling automático",
-      "Medidas de seguridad implementadas: CSP, CSRF, rate limiting y validación robusta"
+      "Medidas de seguridad implementadas: CSP, CSRF, rate limiting y validación robusta",
     ],
-    tags: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS 4", "PostgreSQL", "Prisma 7", "Zustand", "Zod", "Cloudinary", "SWR"],
+    tags: [
+      "Next.js 16",
+      "React 19",
+      "TypeScript",
+      "Tailwind CSS 4",
+      "PostgreSQL",
+      "Prisma 7",
+      "Zustand",
+      "Zod",
+      "Cloudinary",
+      "SWR",
+    ],
     github: "https://github.com/xfiberex/kiosgo",
     demo: "https://kiosgo-two.vercel.app",
   },
   {
-    title: "Sistema de Ventas WEB",
+    title: "Sistema de Ventas Web",
     subtitle: "ASP.NET Core MVC · Gestión de ventas con arquitectura en capas",
     description:
       "Sistema integral de gestión comercial con dashboard ejecutivo, control de inventario y generación automática de reportes.",
@@ -81,7 +92,7 @@ export const projects: Project[] = [
     features: [
       "Dashboard ejecutivo con métricas en tiempo real",
       "Gestión completa de usuarios, productos e inventario",
-      "Generación automática de facturas y reportes PDF"
+      "Generación automática de facturas y reportes PDF",
     ],
     tags: [
       "C#",
@@ -103,7 +114,7 @@ export const projects: Project[] = [
     features: [
       "Calendario interactivo con programación de tareas por días específicos",
       "Panel de reportes y seguimiento de procesos completados",
-      "API RESTful documentada con Swagger y servicios en segundo plano"
+      "API RESTful documentada con Swagger y servicios en segundo plano",
     ],
     tags: ["Blazor", ".NET 9", "WebAssembly", "EF Core", "SQL Server", "Swagger/OpenAPI", "Background Services"],
     github: "https://github.com/xfiberex/S_Blazor_TDApp",
@@ -113,14 +124,14 @@ export const projects: Project[] = [
     subtitle: "Sitio personal",
     description:
       "Portafolio profesional con diseño moderno, animaciones fluidas y secciones completas para mostrar habilidades, experiencia, proyectos, educación y certificaciones.",
-    image: "/projects/Porfolio-web-rajb.webp",
+    image: "/projects/Portfolio-web-rajb.webp",
     features: [
       "Animaciones y transiciones suaves con Framer Motion",
       "Diseño responsive mobile-first y accesible",
-      "Secciones: Sobre mí, Proyectos, Experiencia, Habilidades, Educación, Certificados y Contacto"
+      "Secciones: Sobre mí, Proyectos, Experiencia, Habilidades, Educación, Certificados y Contacto",
     ],
     tags: ["React", "TailwindCSS", "TypeScript", "Framer Motion", "GitHub"],
     github: "https://github.com/xfiberex/portafolio-web-rajb",
     demo: "https://portafolio-web-rajb.netlify.app",
   },
-]
+];

@@ -62,7 +62,9 @@ const porAuditoria = (id) => mediana(informes.map((r) => r.audits[id].numericVal
 
 const kB = (bytes) => Math.round(bytes / 1024);
 const js = mediana(
-  informes.map((r) => r.audits["resource-summary"].details.items.find((i) => i.resourceType === "script")?.transferSize ?? 0),
+  informes.map(
+    (r) => r.audits["resource-summary"].details.items.find((i) => i.resourceType === "script")?.transferSize ?? 0,
+  ),
 );
 
 console.log(
@@ -76,4 +78,6 @@ console.log(
     `CLS ${porAuditoria("cumulative-layout-shift").toFixed(3)} (0.1) · ` +
     `JS ${kB(js)} kB (160)`,
 );
-console.log(`  elemento LCP: ${informes[0].audits["largest-contentful-paint-element"]?.details?.items?.[0]?.items?.[0]?.node?.snippet ?? "?"}`);
+console.log(
+  `  elemento LCP: ${informes[0].audits["largest-contentful-paint-element"]?.details?.items?.[0]?.items?.[0]?.node?.snippet ?? "?"}`,
+);

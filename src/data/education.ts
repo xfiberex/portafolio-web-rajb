@@ -7,4 +7,4 @@ export const education: Education[] = [
     location: "Santo Domingo, Distrito Nacional",
     period: "05/2019 - 01/2024",
   },
-]
+];

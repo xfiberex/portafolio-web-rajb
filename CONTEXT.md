@@ -63,6 +63,13 @@ portafolio-web-rajb/
 ├── lychee.toml                 Config del verificador de enlaces (exclusiones deliberadas).
 ├── eslint.config.js            Flat config. No respeta .gitignore: las carpetas de
 │                               herramientas IA se excluyen a mano.
+├── .gitattributes              index.html forzado a LF. No es cosmetico: el CSP
+│                               autoriza su script inline por hash, y CRLF/LF dan
+│                               hashes distintos (ver decisiones).
+├── .prettierrc.json            printWidth 120, elegido midiendo los anchos reales
+│                               del repositorio, no por defecto.
+├── .prettierignore             Excluye los .md: ROADMAP y CONTEXT estan maquetados
+│                               a mano y Prettier reflotaria sus tablas.
 ├── public/
 │   ├── assets/                 Los dos PDF del CV. Comparten carpeta con el build de
 │   │                           Vite, y por eso la regla de caché va por extensión.
@@ -831,11 +838,19 @@ icono sin sacarlo de la lista, falla igual que si añade un tag sin icono.
 | `npm run build` | Build de producción a `dist/` | Corre `tsc` antes que Vite: falla ante cualquier error de tipos |
 | `npm run preview` | Servir el `dist/` ya construido | Requiere `npm run build` antes |
 | `npm run type-check` | Solo chequeo de tipos | — |
-| `npm run lint` | ESLint sobre 34 archivos | — |
+| `npm run lint` | ESLint sobre 53 archivos | — |
+| `npm run format:check` | Prettier sobre 63 archivos. Falla si algo esta sin formatear | Corre en CI tras el lint |
+| `npm run format` | Aplica el formato | Los `.md` quedan fuera (`.prettierignore`) |
+| `npm test` | 117 tests unitarios (Vitest). Funciones puras y coherencia de documentos | — |
+| `npm run test:e2e` | 35 tests de extremo a extremo (Playwright) sobre el build | Chromium instalado |
+| `npm run test:visual` | 6 snapshots del pliegue (2 temas x 3 anchos), sin tolerancia | Lineas base por plataforma |
+| `npm run lighthouse` | Presupuestos de rendimiento | Chrome instalado |
+| `npm run medir:lcp` | FCP, LCP y CLS con todos los candidatos de LCP | `npm run preview` en otra terminal |
 | `npm audit` | Vulnerabilidades de dependencias | Las 3 actuales son transitivas y solo de desarrollo |
 | `npx vite build --sourcemap --outDir dist-map` | Build con sourcemaps para atribuir código minificado de una traza | Directorio temporal: **borrarlo después**, no está en `.gitignore` |
 
-**No hay comando de test**: no existe suite (T2-07, T2-10).
+CI corre, en este orden: `type-check`, `lint`, `format:check`, `test`, `build`, y despues
+los tres de navegador (`test:e2e`, `test:visual`, `lighthouse`).
 
 ---
 

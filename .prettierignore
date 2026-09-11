@@ -1,0 +1,16 @@
+node_modules
+dist
+coverage
+stats.html
+package-lock.json
+
+# Artefactos de Playwright y Lighthouse (generados, no editados)
+playwright-report
+test-results
+.lighthouseci
+e2e/**/*-snapshots
+
+# Documentacion escrita a mano. Prettier reflota tablas y listas y
+# destruiria el formato de ROADMAP.md / CONTEXT.md, que se leen tanto
+# como el codigo. El estilo que T3-17 unifica es el del codigo.
+*.md

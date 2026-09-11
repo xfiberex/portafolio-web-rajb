@@ -5,16 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <title>Ricky Jiménez - Desarrollador Full-Stack</title>
+    <title>Ricky Jiménez — Desarrollador Web Full-Stack</title>
     <meta
       name="description"
-      content="Portafolio de Ricky Angel Jiménez Bueno - Desarrollador Web Full-Stack especializado en .NET y MERN stack"
+      content="Desarrollador Full-Stack especializado en .NET y MERN/PERN. Construyo aplicaciones modernas, escalables y accesibles."
     />
     <meta name="author" content="Ricky Angel Jiménez Bueno" />
     <link rel="canonical" href="https://portafolio-web-rajb.netlify.app/" />
 
-    <!-- Pinta la barra del navegador móvil del color del fondo -->
-    <meta name="theme-color" content="#1a1c22" />
+    <!-- Pinta la barra del navegador movil del color del fondo. El valor lo
+         reescribe useTheme al cambiar de tema; este es el del tema oscuro.
+         Es el hex exacto de `--value-background`: el que habia antes
+         (#1a1c22) no correspondia a ningun color del sitio. -->
+    <meta name="theme-color" content="#080c11" />
+
+    <!-- ===================================================================
+         TEMA: se resuelve ANTES del primer pintado (T3-06)
+         Si esto viviera en el bundle, la pagina pintaria en oscuro y
+         saltaria a claro al hidratar. Tiene que ser sincrono y estar aqui.
+
+         Es inline y no un /tema.js porque un archivo aparte seria una
+         peticion que bloquea el render, justo lo que costo bajar el LCP
+         en T2-23. El CSP sigue sin `unsafe-inline`: se autoriza por hash
+         sha256, declarado en netlify.toml. Si tocas este script el hash
+         cambia y `src/lib/csp.test.ts` falla antes de que llegue a
+         produccion —que es donde, si no, se veria una pagina en blanco.
+         =================================================================== -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("tema");
+          if (t !== "light" && t !== "dark") {
+            t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+          }
+          document.documentElement.setAttribute("data-theme", t);
+          if (t === "light") {
+            document.querySelector('meta[name="theme-color"]').setAttribute("content", "#f0f2f5");
+          }
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
 
     <!-- ===================================================================
          OPEN GRAPH / TWITTER
@@ -50,13 +82,7 @@
          retraso que hacia costoso servirla desde Google (T2-04).
          Solo se precarga el subset `latin`: es el unico que necesita el
          contenido actual (medido, 0 caracteres caen en latin-ext). -->
-    <link
-      rel="preload"
-      href="/fonts/inter-latin.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
+    <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
 
     <!-- ===================================================================
          DATOS ESTRUCTURADOS (schema.org/Person)
@@ -93,10 +119,7 @@
           "SQL Server",
           "MongoDB"
         ],
-        "sameAs": [
-          "https://github.com/xfiberex",
-          "https://www.linkedin.com/in/ricky-angel-jimenez-bueno-52659928a"
-        ]
+        "sameAs": ["https://github.com/xfiberex", "https://www.linkedin.com/in/ricky-angel-jimenez-bueno-52659928a"]
       }
     </script>
   </head>
@@ -126,11 +149,27 @@
           margin: 0 auto;
           padding: 4rem 1.5rem;
           color: #f8f8f8;
-          font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+          font-family:
+            Inter,
+            system-ui,
+            -apple-system,
+            &quot;Segoe UI&quot;,
+            Roboto,
+            Helvetica,
+            Arial,
+            sans-serif;
           line-height: 1.6;
         "
       >
-        <p style="margin: 0 0 0.5rem; font-size: 0.875rem; letter-spacing: 0.1em; text-transform: uppercase; color: #487fff">
+        <p
+          style="
+            margin: 0 0 0.5rem;
+            font-size: 0.875rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #487fff;
+          "
+        >
           Hola, soy
         </p>
         <h1 style="margin: 0 0 0.5rem; font-size: 2rem; line-height: 1.15">Ricky Angel Jiménez Bueno</h1>
@@ -142,9 +181,7 @@
           Esta página necesita JavaScript para mostrarse completa. Aquí van los datos esenciales:
         </p>
 
-        <p style="margin: 0 0 0.5rem">
-          <strong>Email:</strong> rickyjimenez1820 [at] gmail [dot] com
-        </p>
+        <p style="margin: 0 0 0.5rem"><strong>Email:</strong> rickyjimenez1820 [at] gmail [dot] com</p>
 
         <ul style="margin: 0; padding-left: 1.25rem">
           <li style="margin-bottom: 0.35rem">
@@ -156,10 +193,7 @@
             <a href="https://github.com/xfiberex" style="color: #487fff">github.com/xfiberex</a>
           </li>
           <li>
-            <a
-              href="https://www.linkedin.com/in/ricky-angel-jimenez-bueno-52659928a"
-              style="color: #487fff"
-            >
+            <a href="https://www.linkedin.com/in/ricky-angel-jimenez-bueno-52659928a" style="color: #487fff">
               LinkedIn
             </a>
           </li>

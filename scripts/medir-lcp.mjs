@@ -28,7 +28,12 @@ const MOVIL = process.argv.includes("--movil");
 const CORRIDAS = 3;
 
 /** Pixel 7-ish, el mismo que emula Lighthouse por defecto. */
-const VIEWPORT_MOVIL = { viewport: { width: 412, height: 823 }, deviceScaleFactor: 1.75, isMobile: true, hasTouch: true };
+const VIEWPORT_MOVIL = {
+  viewport: { width: 412, height: 823 },
+  deviceScaleFactor: 1.75,
+  isMobile: true,
+  hasTouch: true,
+};
 
 const unaCorrida = async () => {
   const navegador = await chromium.launch();

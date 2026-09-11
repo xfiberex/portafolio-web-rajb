@@ -39,17 +39,13 @@ test.describe("Lightbox", () => {
     await expect(page.locator(CIERRE), "el foco no se movió al botón de cierre").toBeFocused();
 
     // El scroll de fondo queda bloqueado mientras el modal está abierto.
-    await expect
-      .poll(() => page.evaluate(() => document.body.style.overflow))
-      .toBe("hidden");
+    await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe("hidden");
 
     /* Trampa de foco: se pulsa Tab más veces que elementos focalizables hay
        dentro del panel, en ambas direcciones. El foco nunca debe salir. */
     for (const modificadores of ["Tab", "Tab", "Tab", "Shift+Tab", "Shift+Tab"]) {
       await page.keyboard.press(modificadores);
-      const dentro = await page.evaluate(() =>
-        Boolean(document.activeElement?.closest('[role="dialog"]')),
-      );
+      const dentro = await page.evaluate(() => Boolean(document.activeElement?.closest('[role="dialog"]')));
       expect(dentro, `el foco se escapó del diálogo tras ${modificadores}`).toBe(true);
     }
 
@@ -57,9 +53,7 @@ test.describe("Lightbox", () => {
 
     await expect(dialogo).toBeHidden();
     await expect(disparador, "el foco no volvió al botón que abrió el visor").toBeFocused();
-    await expect
-      .poll(() => page.evaluate(() => document.body.style.overflow))
-      .toBe(overflowInicial);
+    await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe(overflowInicial);
   });
 
   test("el clic en el scrim cierra el visor", async ({ page }) => {

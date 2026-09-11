@@ -1,7 +1,7 @@
-import { defineConfig } from "vitest/config"
-import react from "@vitejs/plugin-react"
-import tailwindcss from "@tailwindcss/vite"
-import type { PluginOption } from "vite"
+import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+import type { PluginOption } from "vite";
 
 /**
  * `mode` en vez de una variable de entorno: `ANALYZE=1 vite build` no
@@ -13,10 +13,10 @@ import type { PluginOption } from "vite"
  * produccion. Asi el riesgo se queda dentro del modo "analyze".
  */
 export default defineConfig(async ({ mode }) => {
-  const analizador: PluginOption[] = []
+  const analizador: PluginOption[] = [];
 
   if (mode === "analyze") {
-    const { visualizer } = await import("rollup-plugin-visualizer")
+    const { visualizer } = await import("rollup-plugin-visualizer");
     analizador.push(
       visualizer({
         filename: "stats.html",
@@ -24,7 +24,7 @@ export default defineConfig(async ({ mode }) => {
         gzipSize: true,
         brotliSize: true,
       }) as PluginOption,
-    )
+    );
   }
 
   return {
@@ -37,5 +37,5 @@ export default defineConfig(async ({ mode }) => {
       // Los e2e se lanzan con `npm run test:e2e`.
       include: ["src/**/*.test.{ts,tsx}"],
     },
-  }
-})
+  };
+});

@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, Moon, Sun, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import useScrollspy from "../hooks/useScrollspy";
+import useTheme from "../hooks/useTheme";
 
 const MENU_ID = "menu-principal";
 
@@ -20,6 +21,7 @@ const navItems = [
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const { tema, alternar } = useTheme();
   const active = useScrollspy(sections, { rootMargin: "-90px 0px -30% 0px", threshold: 0.1 });
 
   const closeMenu = useCallback(() => setIsOpen(false), []);
@@ -40,7 +42,10 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
-      <nav className="mx-auto flex h-header max-w-6xl items-center justify-between px-gutter" aria-label="Navegación principal">
+      <nav
+        className="mx-auto flex h-header max-w-6xl items-center justify-between px-gutter"
+        aria-label="Navegación principal"
+      >
         {/*
           Sustituye al antiguo wordmark "Inicio" (T2-18). El monograma es
           decorativo (`aria-hidden`): el nombre de al lado ya da el nombre
@@ -94,6 +99,21 @@ const Navbar = () => {
               );
             })}
           </ul>
+
+          {/*
+            El icono muestra el tema al que se VA, no el actual: es la
+            convencion que espera la gente y evita tener que leer la
+            etiqueta para saber que hara el boton. Por eso el nombre
+            accesible dice la accion completa.
+          */}
+          <button
+            type="button"
+            onClick={alternar}
+            className="rounded-md p-3 text-muted hover:bg-surface-hover hover:text-foreground"
+            aria-label={tema === "dark" ? "Cambiar al tema claro" : "Cambiar al tema oscuro"}
+          >
+            {tema === "dark" ? <Sun size={20} aria-hidden="true" /> : <Moon size={20} aria-hidden="true" />}
+          </button>
 
           <button
             ref={toggleRef}

@@ -1,0 +1,6 @@
+# El CSP autoriza el script inline de index.html por hash sha256, y el hash
+# se calcula sobre los bytes exactos del archivo. Con `core.autocrlf=true`
+# el arbol de trabajo en Windows tiene CRLF y el checkout de CI en Linux
+# tiene LF: dos hashes distintos para el mismo archivo, y la pagina se
+# quedaria en blanco SOLO en produccion. Forzar LF elimina el problema.
+index.html text eol=lf

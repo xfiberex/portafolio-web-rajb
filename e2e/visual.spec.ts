@@ -30,39 +30,59 @@ import { expect, test } from "@playwright/test";
 
 const ANCHOS = [375, 768, 1440];
 
-for (const width of ANCHOS) {
-  test(`@visual el pliegue no ha cambiado a ${width}px`, async ({ page }) => {
-    await page.setViewportSize({ width, height: 900 });
-    await page.goto("/");
+/*
+ * Los dos temas se congelan por separado (T3-05/T3-06). No es duplicar por
+ * duplicar: el tema claro es una paleta entera de 17 tokens que nada mas
+ * vigila, y una regresion en ella no aparece en el snapshot oscuro.
+ *
+ * Se induce con `prefers-color-scheme` en vez de escribir `data-theme`: asi
+ * el snapshot incluye el camino real del script inline del <head>.
+ */
+const TEMAS = [
+  { nombre: "oscuro", colorScheme: "dark" as const },
+  { nombre: "claro", colorScheme: "light" as const },
+];
 
-    // Las fuentes propias cambian métricas al cargar; comparar antes de que
-    // estén listas es la fuente clásica de diferencias de un pixel.
-    await page.evaluate(() => document.fonts.ready);
+for (const tema of TEMAS) {
+  for (const width of ANCHOS) {
+    test(`@visual el pliegue ${tema.nombre} no ha cambiado a ${width}px`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme: tema.colorScheme });
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/");
 
-    /* El Hero entra con `staggerContainer`, que `prefers-reduced-motion` no
+      // Las fuentes propias cambian métricas al cargar; comparar antes de que
+      // estén listas es la fuente clásica de diferencias de un pixel.
+      await page.evaluate(() => document.fonts.ready);
+
+      /* El Hero entra con `staggerContainer`, que `prefers-reduced-motion` no
        apaga del todo: quita la duración pero no los retardos. Se espera a la
        CONDICIÓN —opacidad heredada 1 en todo lo del pliegue— y no a un
        tiempo fijo. */
-    await page.waitForFunction(() => {
-      const opacidadHeredada = (el: Element) => {
-        let o = 1;
-        for (let n: Element | null = el; n; n = n.parentElement) o *= parseFloat(getComputedStyle(n).opacity);
-        return o;
-      };
-      return [...document.querySelectorAll("#home a, #home button, header a, header button")].every(
-        (el) => opacidadHeredada(el) === 1,
+      await page.waitForFunction(
+        () => {
+          const opacidadHeredada = (el: Element) => {
+            let o = 1;
+            for (let n: Element | null = el; n; n = n.parentElement) o *= parseFloat(getComputedStyle(n).opacity);
+            return o;
+          };
+          return [...document.querySelectorAll("#home a, #home button, header a, header button")].every(
+            (el) => opacidadHeredada(el) === 1,
+          );
+        },
+        undefined,
+        { timeout: 15_000 },
       );
-    }, undefined, { timeout: 15_000 });
 
-    await expect(page).toHaveScreenshot(`pliegue-${width}.png`, {
-      // Congela animaciones CSS y las lleva a su estado final antes de tirar.
-      animations: "disabled",
-      /* SIN `maxDiffPixelRatio`. Se probó con 0.002 —que suena a margen
+      await expect(page).toHaveScreenshot(`pliegue-${tema.nombre}-${width}.png`, {
+        // Congela animaciones CSS y las lleva a su estado final antes de tirar.
+        animations: "disabled",
+        /* SIN `maxDiffPixelRatio`. Se probó con 0.002 —que suena a margen
          mínimo— y resultó ser un colador: cambiar «Contactar» por
          «Contáctame» pasó sin rechistar, porque un ratio sobre una imagen
          grande tolera miles de píxeles. La comparación exacta funciona
          porque la página es determinista con `prefers-reduced-motion`:
          verificado con tres corridas idénticas en Windows y en Linux. */
+      });
     });
-  });
+  }
 }

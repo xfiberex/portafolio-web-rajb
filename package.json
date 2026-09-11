@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "lint": "eslint .",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
@@ -42,6 +44,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.4.22",
     "globals": "^16.4.0",
+    "prettier": "^3.9.6",
     "rollup-plugin-visualizer": "^7.1.1",
     "sharp": "^0.35.4",
     "typescript": "^5.9.3",

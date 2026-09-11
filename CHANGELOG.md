@@ -20,6 +20,21 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 
 ### Añadido
 
+- **Tema claro y conmutador**, con la preferencia del sistema como valor por defecto y
+  `localStorage` cuando eliges tú. El tema se resuelve en un script inline del `<head>`,
+  antes del primer pintado: **destello cero**, comprobado midiendo la luminancia de los 68
+  fotogramas de una carga a 4G lento con la CPU a un cuarto. El CSP sigue sin
+  `unsafe-inline`; el script se autoriza por hash sha256 y un test recalcula ese hash para
+  que no pueda desincronizarse sin que nadie se entere.
+- **Los 17 tokens del tema claro** salen de resolver la luminosidad que iguala el contraste
+  que ya tenía el tema oscuro, no de elegir grises. La calculadora se validó antes contra
+  los ratios que el propio repositorio había medido en T1-01. axe pasa en los dos temas y
+  ninguna pareja de contraste se aleja más del 4 % de su equivalente oscura.
+- **Prettier con paso propio en CI** (`npm run format` / `format:check`). `printWidth: 120`
+  se eligió midiendo los anchos reales del repositorio (p90 = 79, p99 = 192), no por
+  defecto. Los `.md` quedan **fuera a propósito**: ROADMAP y CONTEXT están maquetados a
+  mano y Prettier reflota sus tablas. Validado por mutación: con un archivo mal formateado
+  el paso sale con 1.
 - **Snapshots visuales** del pliegue a 375/768/1440 (`npm run test:visual`), comparación
   exacta y sin tolerancia. Corren en CI con líneas base de Linux generadas en el contenedor
   oficial de Playwright; las de Windows se conservan para trabajar en local. Verificados con
@@ -74,6 +89,9 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 
 ### Cambiado
 
+- **Título y descripción coherentes entre `<title>`, `description` y Open Graph**: eran
+  cuatro textos distintos con dos guiones distintos. Se unificó en «MERN/PERN» tras
+  comprobar en los datos que es lo cierto —PostgreSQL en tres proyectos— y no «MERN stack».
 - **`TechIcon` pasa de 550 a 74 líneas**, partido en datos
   (`src/data/tech-icons.ts`), resolución (`src/lib/tech-icons.ts`) y componente. Con ello
   desaparecen los dos `eslint-disable` de `react-refresh` que hacían falta solo porque un
@@ -129,6 +147,23 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 
 ### Corregido
 
+- **El `theme-color` no correspondía a ningún color del sitio.** Declaraba `#1a1c22` cuando
+  el fondo real es `#080c11`, así que la barra del navegador móvil se pintaba más clara que
+  la página. Ahora, además, sigue al tema.
+- **El velo del visor de imágenes no aislaba en tema claro.** Medido como desviación de
+  luminancia sobre la franja del velo: 7.47 frente a 2.43 en oscuro, tres veces más
+  contenido colándose. Igualada la opacidad a la del tema oscuro: 2.41.
+- **Las anclas de sección dejaban 1px tapado bajo la barra.** Un solo token,
+  `--spacing-header`, hacía dos trabajos incompatibles: el alto del `<nav>` (4rem) y el
+  offset de scroll, que debe contar también el `border-b` del `<header>` (65px). Separado
+  en dos tokens; solape medido antes y después: 1px → **0**.
+- **El `<body>` no tenía fondo propio** (computaba `rgba(0, 0, 0, 0)`): el color lo ponía un
+  `div` interior y el lienzo lo salvaba `color-scheme: dark`.
+- **Redacción**: «agentes IA» → «agentes **de** IA», «enfoque en performance» → «en
+  rendimiento», «Sistema de Ventas WEB» → «Web», y la errata «Porfolio» del nombre de un
+  archivo de imagen.
+- **El comando de Docker del README no funcionaba en Git Bash**: sin `MSYS_NO_PATHCONV=1`
+  traduce `-w /work` a una ruta de Windows y docker lo rechaza. Probado.
 - **Los marcadores de posición del README** (`tu-usuario`, `tu-perfil`) y el enlace de
   LinkedIn **sin esquema**, que GitHub resolvía como ruta relativa y llevaba a un 404. El
   verificador de enlaces no podía detectarlo —LinkedIn está excluido y un destino sin

@@ -20,15 +20,7 @@ export const skills: Skill[] = [
   },
   {
     category: "Backend",
-    items: [
-      "C#",
-      ".NET 10",
-      "ASP.NET Core (MVC, Web API)",
-      "Node.js",
-      "Express 5",
-      "APIs REST",
-      "Swagger / OpenAPI",
-    ],
+    items: ["C#", ".NET 10", "ASP.NET Core (MVC, Web API)", "Node.js", "Express 5", "APIs REST", "Swagger / OpenAPI"],
   },
   {
     category: "Bases de datos & ORMs",
@@ -65,16 +57,7 @@ export const skills: Skill[] = [
   },
   {
     category: "Herramientas & DevOps",
-    items: [
-      "Git",
-      "GitHub",
-      "Docker",
-      "Docker Compose",
-      "Visual Studio",
-      "VS Code",
-      "Postman",
-      "Prisma Studio",
-    ],
+    items: ["Git", "GitHub", "Docker", "Docker Compose", "Visual Studio", "VS Code", "Postman", "Prisma Studio"],
   },
   {
     category: "Principios",
@@ -91,4 +74,4 @@ export const skills: Skill[] = [
     category: "IAs & Herramientas de Desarrollo",
     items: ["Claude Code", "Prompt Engineering"],
   },
-]
+];

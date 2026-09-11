@@ -41,6 +41,12 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # Paso propio y no `--write`: en CI el formato solo se comprueba.
+      # Los .md quedan fuera (ver .prettierignore): ROADMAP y CONTEXT
+      # estan formateados a mano y Prettier los reflotaria.
+      - name: Formato (Prettier)
+        run: npm run format:check
+
       # Solo funciones puras: la resolución de iconos (~90 heurísticas regex
       # donde el orden importa) y los helpers de URL. El test de tabla falla
       # si se añade una tecnología a src/data/ sin icono, que hasta ahora era

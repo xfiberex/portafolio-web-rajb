@@ -23,43 +23,43 @@ const Contact = () => {
   };
 
   return (
-  <Section id="contact">
-    {/* Usa SectionHeader como el resto de secciones: antes duplicaba su
+    <Section id="contact">
+      {/* Usa SectionHeader como el resto de secciones: antes duplicaba su
         markup a mano, que es justo lo que el componente existe para evitar
         (T3-18). Hereda el `text-center` del contenedor. */}
-    <div className="mx-auto max-w-2xl text-center">
-      <SectionHeader
-        title="Conectemos"
-        subtitle="¿Cuentas con una oportunidad laboral disponible? Me encantaría conocer más detalles sobre la oferta. Siempre estoy dispuesto a asumir nuevos retos y colaboraciones que impulsen mi crecimiento profesional."
-      />
+      <div className="mx-auto max-w-2xl text-center">
+        <SectionHeader
+          title="Conectemos"
+          subtitle="¿Cuentas con una oportunidad laboral disponible? Me encantaría conocer más detalles sobre la oferta. Siempre estoy dispuesto a asumir nuevos retos y colaboraciones que impulsen mi crecimiento profesional."
+        />
 
-      <motion.div
-        variants={fadeUpVariant}
-        initial="hidden"
-        whileInView="visible"
-        viewport={sectionViewport}
-        className="flex flex-col items-center justify-center gap-3 sm:flex-row"
-      >
-        <button
-          type="button"
-          onClick={abrirClienteDeCorreo}
-          className="inline-flex items-center gap-2 rounded-lg bg-primary-strong px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary-strong-hover"
+        <motion.div
+          variants={fadeUpVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={sectionViewport}
+          className="flex flex-col items-center justify-center gap-3 sm:flex-row"
         >
-          <Send size={18} aria-hidden="true" />
-          Enviar email
-        </button>
+          <button
+            type="button"
+            onClick={abrirClienteDeCorreo}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary-strong px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary-strong-hover"
+          >
+            <Send size={18} aria-hidden="true" />
+            Enviar email
+          </button>
 
-        <button
-          type="button"
-          onClick={abrirClienteDeCorreo}
-          className="inline-flex items-center gap-2 rounded-lg px-4 py-3 text-sm text-muted hover:bg-surface-hover hover:text-foreground"
-        >
-          <Mail size={18} aria-hidden="true" />
-          {email}
-        </button>
-      </motion.div>
-    </div>
-  </Section>
+          <button
+            type="button"
+            onClick={abrirClienteDeCorreo}
+            className="inline-flex items-center gap-2 rounded-lg px-4 py-3 text-sm text-muted hover:bg-surface-hover hover:text-foreground"
+          >
+            <Mail size={18} aria-hidden="true" />
+            {email}
+          </button>
+        </motion.div>
+      </div>
+    </Section>
   );
 };
 

@@ -62,7 +62,10 @@ const EXCEPCIONES = new Set([...SIN_LOGOTIPO_POR_DISENO, ...PENDIENTES_DE_ICONO]
 
 describe("pickIcon sobre los tags reales", () => {
   it.each(todosLosTags().filter((t) => !EXCEPCIONES.has(t)))("resuelve %s", (tag) => {
-    expect(pickIconKey(tag), `"${tag}" cae al glifo genérico: añade su icono en src/data/tech-icons.ts o justifícalo en una de las dos listas de este test`).not.toBeNull();
+    expect(
+      pickIconKey(tag),
+      `"${tag}" cae al glifo genérico: añade su icono en src/data/tech-icons.ts o justifícalo en una de las dos listas de este test`,
+    ).not.toBeNull();
   });
 
   /* Guarda contra la podredumbre: si alguien añade el icono de Jest pero se
@@ -190,7 +193,9 @@ describe("inventario de iconos (T3-15)", () => {
 
   it("la lista de reserva coincide exactamente con lo que no se usa", () => {
     const vistas = alcanzadas();
-    const reserva = Object.keys(ICON_PATHS).filter((k) => !vistas.has(k)).sort();
+    const reserva = Object.keys(ICON_PATHS)
+      .filter((k) => !vistas.has(k))
+      .sort();
     expect(
       reserva,
       "cambió el inventario: si añadiste un tag que ya tenía icono, sácalo de ICONOS_EN_RESERVA; si añadiste un icono nuevo sin usar, méteselo",

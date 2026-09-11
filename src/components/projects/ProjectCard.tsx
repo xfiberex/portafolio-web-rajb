@@ -39,7 +39,9 @@ const FeatureList = ({ project }: { project: Project }) =>
 const Heading = ({ project }: { project: Project }) => (
   <>
     <h4 className="text-xl font-bold text-foreground transition-colors group-hover:text-primary">{project.title}</h4>
-    {project.subtitle && <p className="mt-1.5 text-xs font-semibold tracking-wide text-primary uppercase">{project.subtitle}</p>}
+    {project.subtitle && (
+      <p className="mt-1.5 text-xs font-semibold tracking-wide text-primary uppercase">{project.subtitle}</p>
+    )}
   </>
 );
 
@@ -88,7 +90,11 @@ const ProjectCard = ({ project, layout = "featured", onPreview }: ProjectCardPro
   }
 
   return (
-    <motion.article variants={fadeUpVariant} whileHover={cardLift} className={`${cardClass} flex flex-col overflow-hidden`}>
+    <motion.article
+      variants={fadeUpVariant}
+      whileHover={cardLift}
+      className={`${cardClass} flex flex-col overflow-hidden`}
+    >
       {project.image && (
         <div className="relative aspect-video w-full overflow-hidden">
           <img

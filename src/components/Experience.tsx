@@ -41,7 +41,8 @@ const Experience = () => (
               </div>
 
               <p className="mb-4 font-medium text-muted">
-                {item.company} <span className="text-subtle">•</span> <span className="text-subtle">{item.location}</span>
+                {item.company} <span className="text-subtle">•</span>{" "}
+                <span className="text-subtle">{item.location}</span>
               </p>
 
               {item.achievements?.length ? (

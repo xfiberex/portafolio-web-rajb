@@ -22,12 +22,15 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:4173",
     reducedMotion: "reduce",
+    /* Fijado a proposito. El tema sigue a `prefers-color-scheme` (T3-06) y
+       el valor por defecto de Playwright es "light", asi que sin esta linea
+       toda la suite auditaria el tema claro por accidente. Las pruebas que
+       necesitan el otro tema lo piden con `emulateMedia`. */
+    colorScheme: "dark",
     trace: "on-first-retry",
   },
 
-  projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-  ],
+  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 
   webServer: {
     command: "npm run preview",

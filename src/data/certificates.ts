@@ -26,4 +26,4 @@ export const certificates: Certificate[] = [
     issuer: "Udemy",
     link: "https://ude.my/UC-6350abbb-f5a4-42c2-a2d3-c1a5de9ca727",
   },
-]
+];

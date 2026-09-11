@@ -39,4 +39,4 @@ export const experience: Experience[] = [
       "Coordinación con otros equipos de soporte para garantizar una distribución eficiente de los dispositivos y la cobertura de los polígonos asignados.",
     ],
   },
-]
+];

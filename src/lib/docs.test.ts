@@ -44,9 +44,7 @@ describe("enlaces de la documentación", () => {
     const texto = sinCodigo(readFileSync(archivo, "utf8"));
     const destinos = [...texto.matchAll(/\]\(([^)\s]+)/g)].map((m) => m[1]);
 
-    const sospechosos = destinos.filter(
-      (d) => !ESQUEMA.test(d) && !esRelativoLegitimo(d) && /\.[a-z]{2,}\//i.test(d),
-    );
+    const sospechosos = destinos.filter((d) => !ESQUEMA.test(d) && !esRelativoLegitimo(d) && /\.[a-z]{2,}\//i.test(d));
 
     expect(destinos.length, `no se encontró ningún enlace en ${archivo}`).toBeGreaterThan(0);
     expect(

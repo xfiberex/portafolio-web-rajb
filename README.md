@@ -9,7 +9,7 @@ Un portafolio web moderno, seguro y responsivo construido con las últimas tecno
 ![Security](https://img.shields.io/badge/Security-A+-success?logo=netlify&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-![Portafolio-web-rajb](public/projects/Porfolio-web-rajb.webp)
+![Portafolio-web-rajb](public/projects/Portfolio-web-rajb.webp)
 
 ## ✨ Características - [Demostración](https://portafolio-web-rajb.netlify.app/)
 
@@ -93,6 +93,19 @@ npm run lint
 # Verificar tipos TypeScript
 npm run type-check
 
+# Tema: el sitio arranca en el tema del sistema y recuerda tu eleccion.
+# El script que lo resuelve va inline en index.html porque tiene que
+# correr antes del primer pintado; el CSP lo autoriza por hash sha256.
+# Si tocas ese script, `npm test` recalcula el hash y falla hasta que lo
+# actualices en netlify.toml. No lo saltes: sin eso el fallo aparece por
+# primera vez en produccion, con la pagina en blanco.
+
+# Formato (Prettier). CI corre `format:check`, que falla si algo esta sin
+# formatear. Los .md quedan fuera a proposito: ROADMAP y CONTEXT estan
+# maquetados a mano y Prettier reflotaria sus tablas.
+npm run format
+npm run format:check
+
 # Tests unitarios (Vitest). Solo funciones puras; corre tambien en CI
 npm test
 npm run test:watch
@@ -159,7 +172,9 @@ npm run test:visual:update
 # 2. Las de Linux, en el contenedor oficial de Playwright (misma version que
 #    @playwright/test). El volumen sobre node_modules es OBLIGATORIO: sin el,
 #    el `npm ci` de dentro pisa los binarios de Windows y rompe tu entorno.
-docker run --rm -v "$(pwd -W):/work" -v /work/node_modules -w /work \
+#    MSYS_NO_PATHCONV: sin el, Git Bash traduce `-w /work` a una ruta de
+#    Windows y docker rechaza el comando. Probado.
+MSYS_NO_PATHCONV=1 docker run --rm -v "$(pwd -W):/work" -v /work/node_modules -w /work \
   mcr.microsoft.com/playwright:v1.63.0-noble \
   bash -c "npm ci && npm run build && npm run test:visual:update"
 ```

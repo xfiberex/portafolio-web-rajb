@@ -18,7 +18,7 @@ const cvItemClass = "rounded-md px-3 py-2 text-sm text-muted hover:bg-surface-ho
 const ROLES = [
   "Desarrollador Web Full-Stack",
   "Especialista en .NET & MERN/PERN",
-  "Creador de interfaces modernas con agentes IA",
+  "Creador de interfaces modernas con agentes de IA",
 ] as const;
 
 /** react-type-animation intercala la pausa en ms detrás de cada frase. */
@@ -102,7 +102,7 @@ const Hero = () => {
           </div>
 
           <p className="mt-2 leading-relaxed">
-            Construyo aplicaciones modernas, escalables y accesibles con enfoque en performance y buenas prácticas.
+            Construyo aplicaciones modernas, escalables y accesibles con enfoque en rendimiento y buenas prácticas.
           </p>
         </div>
 
