@@ -14,5 +14,12 @@ export const EMAIL_PARTS: [string, string, string] = ["rickyjimenez1820", "gmail
 
 export const buildEmail = ([user, domain, tld]: [string, string, string]): string => `${user}@${domain}.${tld}`;
 
+/**
+ * La forma legible para personas pero no para un rastreador de HTML plano.
+ * Es la que queda en el HTML prerenderizado (T4-04) y la del <noscript>.
+ */
+export const buildEmailOfuscado = ([user, domain, tld]: [string, string, string]): string =>
+  `${user} [at] ${domain} [dot] ${tld}`;
+
 export const CV_URL = toAssetUrl("assets/CV-Ricky Angel Jiménez Bueno-07-09-2026.pdf");
 export const CV_ATS_URL = toAssetUrl("assets/ATS-CV-Ricky Angel Jiménez Bueno-07-09-2026.pdf");

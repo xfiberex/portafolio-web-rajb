@@ -83,7 +83,11 @@ Un portafolio web moderno, seguro y responsivo construido con las últimas tecno
 # Servidor de desarrollo
 npm run dev
 
-# Construir para producción
+# Construir para producción. Son cuatro pasos: tipos, bundle del cliente,
+# bundle de servidor (src/entry-server.tsx) y `scripts/prerender.mjs`, que
+# escribe el HTML dentro del #root de dist/index.html. Así la página se ve
+# sin esperar al JS: FCP y LCP reales bajan un 45% (T4-04). El paso de
+# prerender FALLA el build si el correo literal se cuela en el HTML.
 npm run build
 
 # Vista previa de la construcción
@@ -233,6 +237,7 @@ portafolio-web/
 ├── scripts/
 │   ├── images-to-webp.mjs          Conversión con sharp (npm run images:webp)
 │   ├── medir-lcp.mjs               FCP/LCP/CLS con cada candidato (npm run medir:lcp)
+│   ├── prerender.mjs               Inyecta el HTML en #root; lo llama npm run build
 │   └── resumen-lighthouse.mjs      Una línea con las métricas, para el log de CI
 ├── src/
 │   ├── components/
@@ -266,6 +271,7 @@ portafolio-web/
 │   │   ├── skills.ts               Con `formato` y `columna` por categoría (T3-12)
 │   │   └── tech-icons.ts           Colores de marca y rutas SVG
 │   ├── hooks/
+│   │   ├── useHidratado.ts         false en el prerender y al hidratar; true después
 │   │   ├── usePrefersReducedMotion.ts
 │   │   ├── useScrollspy.ts
 │   │   └── useTheme.ts             Tema claro/oscuro; solo guarda cuando eliges
@@ -281,8 +287,10 @@ portafolio-web/
 │   │   └── tech-icons.test.ts      Test de tabla: cada tag de src/data/ debe resolver
 │   ├── types/index.ts
 │   ├── App.tsx
+│   ├── Raiz.tsx                    Árbol compartido por el cliente y el prerender
+│   ├── entry-server.tsx            Entrada del prerender; solo existe en el build
 │   ├── index.css                   Design system en dos capas
-│   └── main.tsx
+│   └── main.tsx                    Hidrata el HTML prerenderizado (createRoot en dev)
 ├── index.html                      Lleva el script de tema inline (autorizado por hash)
 ├── playwright.config.ts
 ├── lighthouserc.json               Presupuestos de rendimiento que fallan el build

@@ -128,10 +128,14 @@
 
     <!-- ===================================================================
          SIN JAVASCRIPT (T2-14)
-         El <body> solo contiene #root, así que sin JS la página quedaba
-         literalmente en blanco: ni una palabra. Esto es el mínimo para que
-         alguien con un proxy corporativo restrictivo —o con el JS caído—
-         siga sabiendo quién soy y cómo contactarme.
+         Antes del prerender el <body> solo contenía #root y sin JS la
+         página quedaba literalmente en blanco. Desde T4-04 el HTML llega
+         pintado, pero esto NO sobra: las secciones entran con `whileInView`
+         y sin JS heredan `opacity: 0`. Medido con scripting desactivado —el
+         email del bloque Contacto está en el DOM y **no se ve**—, así que
+         este bloque sigue siendo la única vía de contacto sin JavaScript.
+         Contrapartida asumida: sin JS se ven dos <h1>, el prerenderizado y
+         el de aquí.
 
          Estilos en línea a propósito: no dependen de que Tailwind haya
          escaneado este archivo. El CSP los permite ('unsafe-inline' en

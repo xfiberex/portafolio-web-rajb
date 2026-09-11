@@ -86,6 +86,12 @@ Para saber **qué falta**, ver [ROADMAP.md](ROADMAP.md).
 - **`src/lib/contact.ts`**: email y rutas de los CV en un solo sitio. El nombre de los PDF lleva la
   fecha dentro, así que duplicarlos garantizaba enlaces rotos al actualizarlos.
 - **`scripts/images-to-webp.mjs`** y `npm run images:webp` (dependencia nueva: `sharp`).
+- **Prerender del HTML en el build**: la página llega pintada desde el servidor y React solo
+  la hidrata, en vez de construirla desde cero al arrancar. **FCP y LCP reales bajan un 45 %**
+  a 4G lento con la CPU a un cuarto (1924 → 1060 ms), medido con cuatro medianas de tres
+  corridas por configuración. Lighthouse puntúa un punto menos porque simula la descarga del
+  documento, que crece 18 kB; el navegador real dice lo contrario y es el que manda.
+  El build falla si el correo literal se cuela en el HTML generado.
 - **`public/llms.txt`**: resumen del portafolio para herramientas automatizadas —perfil, los
   dos CV, proyectos con su stack y enlaces—, con el email ofuscado como en el `<noscript>`.
   Lo revisa el verificador de enlaces, porque repite las rutas de los CV.

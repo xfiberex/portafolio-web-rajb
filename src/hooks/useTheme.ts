@@ -27,6 +27,10 @@ const esTema = (v: unknown): v is Tema => v === "light" || v === "dark";
  * justo esa averia.
  */
 const temaActual = (): Tema => {
+  // Prerender (T4-04): en Node no hay DOM. El valor no llega a pintarse:
+  // el Navbar elige el icono por CSS y la etiqueta solo tras hidratar.
+  if (typeof document === "undefined") return "dark";
+
   const attr = document.documentElement.getAttribute("data-theme");
   if (esTema(attr)) return attr;
 

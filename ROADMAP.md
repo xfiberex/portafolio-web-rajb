@@ -20,8 +20,8 @@ Los datos entre paréntesis son **medidos**, no estimados, salvo donde diga *est
 | **Tier 1** | Alta prioridad — accesibilidad AA, build y documentación que engaña | 9 | 0 | — (cerrado) |
 | **Tier 2** | Mejoras sustanciales — rendimiento, QA, SEO, contenido | 23 | 0 | — (cerrado) |
 | **Tier 3** | Pulido y mantenimiento | 20 | 0 | — (cerrado) |
-| **Tier 4** | Futuro / opcional | 6 | 5 | bajo·4 alto·1 |
-| | **Total** | **61** | **5** | |
+| **Tier 4** | Futuro / opcional | 6 | 2 | bajo·2 |
+| | **Total** | **61** | **2** | |
 
 **No hay ninguna tarea de Tier 0 abierta.** La auditoría del 2026-09-08 no encontró
 vulnerabilidades explotables, pérdida de datos ni fallos que rompan producción. Las tres
@@ -35,8 +35,13 @@ el build.
 > 📌 **Estado al 2026-09-11 (para retomar en otro equipo).**
 > - Todo subido; CI verde en `main` y producción revisada por el dueño del repo.
 > - `v2.0.0` etiquetada y publicada (T2-21). **Los tags se suben aparte:** `git push origin <tag>`.
-> - **Abiertas (5):** **T4-01, T4-02, T4-04, T4-05, T4-06**, todas opcionales. T4-01 espera a
->   que `@lhci/cli` publique versión nueva; T4-06 es solo de vigilancia.
+> - T4-02 (cabeceras) y T4-05 (`llms.txt`) cerradas y verificadas en producción.
+> - **Abiertas (2):** **T4-01** y **T4-06**, y ninguna tiene trabajo pendiente: T4-01 espera a
+>   que `@lhci/cli` publique versión nueva (hoy 0.15.1) y T4-06 es solo de vigilancia.
+> - El build prerenderiza (T4-04). Si algún día el LCP de `lhci` rompe, mirar primero cuánto
+>   ha crecido `dist/index.html`: el margen es de 112 ms.
+> - Si un equipo no compila con `Cannot find module 'vitest'`, es `node_modules` desfasado
+>   respecto al lockfile: `npm ci`.
 > - El aviso `GitHub token not set` de Lighthouse CI es informativo y se deja así a propósito:
 >   el token solo añadiría un *status check* duplicado, sin enlace al informe porque el
 >   `upload.target` es `filesystem`.
@@ -1422,7 +1427,7 @@ el build.
     cuanto `@lhci/cli` publique una versión que actualice `lighthouse`, `tmp` y `uuid`. Para
     comprobarlo: `npm view @lhci/cli version` (hoy 0.15.1, de junio de 2025).
 
-- [ ] **[T4-02] Ajustar tres cabeceras de seguridad**
+- [x] **[T4-02] Ajustar tres cabeceras de seguridad**
   - **Área:** Seguridad · **Ubicación:** `netlify.toml:23-38,66,75`
   - **Qué hacer:** detalles menores verificados sobre las cabeceras reales de producción:
     - `X-XSS-Protection: 1; mode=block` está obsoleta; todos los navegadores modernos eliminaron
@@ -1436,7 +1441,7 @@ el build.
       imágenes son propias, se puede cerrar a `'self' data:`.
   - **Criterio de aceptación:** las cabeceras servidas coinciden con las declaradas.
   - **Esfuerzo:** bajo · **Depende de:** ninguna
-  - **Avance 2026-09-11 (pendiente de deploy):** `X-XSS-Protection: 0`; HSTS declarado como
+  - **Cerrada:** 2026-09-11 · `X-XSS-Protection: 0`; HSTS declarado como
     `max-age=31536000; includeSubDomains; preload`, que es **exactamente** lo que producción
     sirve hoy (medido con `curl -I`), con el porqué comentado en el archivo; e `img-src
     'self' data:`. Antes de cerrar `img-src` se buscó cualquier imagen de otro origen en
@@ -1445,6 +1450,16 @@ el build.
     `vite preview`, que no aplica las cabeceras de `netlify.toml`. La verificación es en
     producción: `curl -I` de las tres cabeceras y consola sin errores de CSP con las 6
     capturas de proyecto cargadas.
+    ✅ **Verificado en producción** (`94fb968`): las tres cabeceras servidas coinciden
+    carácter a carácter con las declaradas. En navegador, contexto aislado a 1280 px: **6/6
+    capturas cargadas, las 6 peticiones en 200, cero mensajes de consola** y ninguna imagen
+    de otro origen.
+    ⚠️ **Falso positivo evitado:** en la primera pasada, con la ventana estrecha, 3 de 6
+    imágenes no cargaban y parecía que el CSP nuevo las bloqueaba. No: son las miniaturas de
+    «Otros proyectos», que viven en un `hidden sm:block` (`ProjectCard.tsx:95`), y un
+    `loading="lazy"` con `display: none` **nunca se pide**. Lo delató que estaban en
+    `complete: false` sin error en consola — un bloqueo de CSP deja `complete: true`, tamaño
+    0 y un error. Al verificar imágenes perezosas, hacerlo por encima de `sm`.
 
 - [x] **[T4-03] Decidir sobre privacidad y datos personales**
   - **Área:** Legal · **Severidad:** *requiere revisión legal*
@@ -1464,7 +1479,7 @@ el build.
     no mitigado. Sigue sin haber cookies, analítica, almacenamiento ni formularios.
   - **Esfuerzo:** bajo · **Depende de:** T2-04
 
-- [ ] **[T4-04] Evaluar prerender / SSG**
+- [x] **[T4-04] Evaluar prerender / SSG**
   - **Área:** Rendimiento / SEO
   - **Qué hacer:** ⚠️ **premisa corregida el 2026-09-09 por T2-06.** Decía que el cuello de
     botella era no tener ni un carácter en el HTML hasta que React arranca (LCP 3.011 s con
@@ -1477,8 +1492,51 @@ el build.
     con la línea base nueva, no con los 3.011 s de la auditoría.
   - **Criterio de aceptación:** decisión registrada en `CONTEXT.md`, con o sin implementación.
   - **Esfuerzo:** alto · **Depende de:** T2-04, T2-05, T2-06, **T2-23**
+  - **Cerrada:** 2026-09-11 · **implementado.** `vite build --ssr src/entry-server.tsx` +
+    `scripts/prerender.mjs` inyectan 114 kB de HTML en el `#root` de `dist/index.html`, y
+    `main.tsx` pasa a `hydrateRoot` (sigue con `createRoot` si el contenedor está vacío, que
+    es el caso de `vite dev`). Medido a 4G lento + CPU ×4, **4 medianas de 3 corridas por
+    configuración**:
 
-- [ ] **[T4-05] Publicar un `llms.txt`**
+    | | Sin prerender | Con prerender |
+    |---|---:|---:|
+    | FCP/LCP escritorio | 1924 / 1944 ms | **1200 / 1060 ms** |
+    | FCP/LCP móvil | 1932 / 1912 ms | **1056 / 1028 ms** |
+    | `dist/index.html` | 3,2 kB gzip | 21,1 kB gzip |
+
+    **≈45 % menos de FCP y LCP**, y ya no hacen falta los 127 kB de JS para ver nada.
+
+    ⚠️ **Las dos herramientas dicen lo contrario, y hay que saber por qué.** Lighthouse
+    empeora con el prerender: LCP simulado **2218 → 2388 ms** y rendimiento 98 → 97. No es
+    ruido —se repitió en 3 tandas de 3 corridas— sino su modelo: Lantern *simula* la descarga
+    del documento, y el HTML es 18 kB gzip más grande. El navegador real, con red y CPU
+    estranguladas de verdad, mide justo lo contrario. **Se decide por la medición real**; la
+    de Lighthouse queda como presupuesto, no como verdad.
+    ⚠️ **Margen del presupuesto: 112 ms (4,5 %)**, antes 282 ms. Es lo que hay que vigilar:
+    si alguien añade contenido al prerender, el primero en romper será el LCP de `lhci`.
+    ⚠️ **Mi primera medición dijo −17 %, no −45 %:** la tomé con el build y los tests
+    compitiendo por la CPU. Una sola tanda no decide nada; estas son cuatro por configuración.
+
+    Tres cosas que el prerender obligó a cambiar, todas por el mismo motivo —lo que se genera
+    en Node tiene que coincidir con lo que hidrata el navegador—:
+    1. **El correo** (`Contact.tsx`) se pintaba en claro y habría quedado escrito en
+       `dist/index.html`, deshaciendo T3-13. Hasta hidratar se muestra `[at]`/`[dot]`, y
+       `prerender.mjs` **falla el build** si el literal aparece en el HTML. `contact.test.ts`
+       no lo habría visto: solo mira el código fuente.
+    2. **El icono del tema** lo elige ahora el CSS por `data-theme`, no el estado de React: el
+       HTML es el mismo para los dos temas y quien usa el claro habría visto el icono
+       equivocado hasta hidratar. La etiqueta, que no puede venir del CSS, usa `useHidratado`.
+    3. **`useTheme`** ya no toca `document` fuera del navegador.
+
+    Verificado: 117 unitarios, 46 e2e, 6 visuales y los presupuestos de Lighthouse en verde;
+    **cero mensajes de consola** al cargar en tema claro y en oscuro, que es donde aparecería
+    un desajuste de hidratación.
+  - 📌 **El `<noscript>` se queda.** Parecía que sobraba —el HTML ya llega pintado—, pero sin
+    JavaScript las secciones heredan `opacity: 0` de `whileInView`: medido, el email del
+    bloque Contacto está en el DOM y **no se ve**. Sigue siendo la única vía de contacto sin
+    JS. Contrapartida asumida: sin JS se ven dos `<h1>`.
+
+- [x] **[T4-05] Publicar un `llms.txt`**
   - **Área:** SEO · **Ubicación:** `public/`
   - **Qué hacer:** ⚠️ **premisa desfasada (2026-09-08): esa categoría ya puntúa 100 en producción
     sin `llms.txt`**, así que el motivo original desapareció; reevaluar antes de hacerla. Decía:
@@ -1487,7 +1545,7 @@ el build.
     más herramientas de reclutamiento automatizadas, tiene sentido. Bajo impacto, coste mínimo.
   - **Criterio de aceptación:** `/llms.txt` existe con un H1 y enlaces.
   - **Esfuerzo:** bajo · **Depende de:** T1-06
-  - **Avance 2026-09-11 (pendiente de deploy):** `public/llms.txt` con el formato de
+  - **Cerrada:** 2026-09-11 · `public/llms.txt` con el formato de
     llmstxt.org — H1, resumen en cita, CV (los dos PDF), proyectos con su stack, GitHub y
     LinkedIn —, sacado de `src/data/projects.ts`, `src/lib/contact.ts` y el `schema.org/Person`
     de `index.html`. Tres decisiones:
@@ -1499,8 +1557,10 @@ el build.
       sitemap en T2-13: sin charset, las tildes pueden llegar como mojibake.
     ⚠️ Deuda asumida: los proyectos quedan **duplicados a mano** respecto a `projects.ts`.
     Generarlo en el build sería lo robusto, pero es más código que el propio archivo.
-    **Para cerrarla:** en producción, `/llms.txt` → 200 con `text/plain; charset=utf-8` y
-    las tildes legibles.
+    ✅ **Verificado en producción** (`94fb968`): `/llms.txt` → **200**,
+    `Content-Type: text/plain; charset=utf-8`, tildes legibles y contenido **idéntico byte a
+    byte** al de `public/`. 13 de sus 14 URLs responden 200; la de LinkedIn da 999, que es su
+    bloqueo anti-bots y ya está excluida en `lychee.toml`.
 
 - [ ] **[T4-06] `skills-lock.json`: JSON inválido y desactualizado** *(viene de BACKLOG 5)*
   - **Área:** Herramientas · **Ubicación:** `skills-lock.json` (fuera del repositorio, en `.gitignore`)
@@ -1530,6 +1590,8 @@ el build.
 | 2026-09-10 | T3-03, T3-04, T3-17, T3-19, T3-20 | Prettier + paso en CI, con los `.md` fuera a propósito. Destapó que el estilo sin punto y coma había **migrado** al archivo recién creado en T3-16. El README describía ESLint 9 (es 10), variables de entorno que no existen y un despliegue a GitHub Pages que perdería todas las cabeceras de `netlify.toml`. Arreglado el solape de 1px de las anclas separando el token del header en dos. |
 | 2026-09-10 | T3-05, T3-06, T3-07 | **Tema claro.** La capa semantica no cambio ni una linea, que era la apuesta de la arquitectura. Los 17 tokens salen de resolver la luminosidad que iguala el contraste del tema oscuro, con una calculadora validada primero contra los ratios que el propio repositorio ya habia medido. Destello **cero**, comprobado midiendo la luminancia de los 68 fotogramas de la carga a 4G lento. El scrim del lightbox no aislaba en claro (7.47 de desviacion frente a 2.43) y se corrigio a 2.41. La suite visual se auto-delato: pasaba a auditar el tema claro por el `colorScheme` por defecto de Playwright. |
 | 2026-09-10 | T3-08 … T3-12 | **Tier 3 completo.** Las cinco tareas se remidieron antes de tocarlas: los números del enunciado eran de antes de los cambios de contenido. T3-09 y T3-10 con `lh` (reserva del Hero exacta al píxel, CLS con tecleo 0.0035 → 0.0026). T3-08, T3-11 y T3-12 con variantes construidas y elegidas con capturas; Competencias −38 % y sin huecos, con un reparto en columnas elegido entre 2187. T3-11 no cumple el criterio escrito, por decisión y con el motivo anotado. Seis pruebas nuevas, todas validadas por mutación. |
+| 2026-09-11 | T4-04 | **Prerender.** FCP/LCP reales **−45 %** a 4G lento + CPU ×4 (1924 → 1060 ms en escritorio, 1912 → 1028 en móvil), con 4 medianas de 3 corridas por configuración. Lighthouse dice lo contrario (2218 → 2388 ms) porque *simula* la descarga del documento, que crece 18 kB gzip: se decide por el navegador real. Obligó a sacar el correo del HTML generado (habría deshecho T3-13; el build ahora falla si se filtra) y a que el icono del tema lo elija el CSS. El `<noscript>` se queda: sin JS el email hereda `opacity: 0`. |
+| 2026-09-11 | T2-21, T4-02, T4-05 | **Tier 2 completo.** Tag `v2.0.0` sobre `710f799`; el primer push no lo subió (`git push` no sube tags) y los enlaces del changelog dieron 404 hasta subirlo aparte. Cabeceras alineadas con lo que Netlify sirve de verdad y `img-src` cerrado a `'self' data:`. `llms.txt` con charset declarado y bajo el verificador de enlaces. Las dos verificadas en producción: una primera pasada con la ventana estrecha pareció mostrar el CSP bloqueando 3 capturas, pero eran miniaturas `hidden sm:block` con `loading="lazy"` que nunca se piden. |
 | 2026-09-08 | T2-01, T2-02, T2-03 | Capturas a WebP con `sharp`: **1123 kB → 291 kB (-74 %)**. Sin respaldo PNG (decisión registrada). Se rompió `og:image` al borrar los PNG y se arregló generando `public/og-image.jpg` 1200×630, que cubre la parte medible de T2-15. |
 | 2026-09-08 | T2-14 | `<noscript>` con nombre, rol, email ofuscado y enlaces a CV/GitHub/LinkedIn. Verificado con scripting desactivado de verdad (iframe en sandbox): 0 → 268 caracteres visibles. |
 | 2026-09-08 | T2-05 (parcial) | Reflow forzado: **740.6 ms → 0.5 ms** de coste de lecturas de layout. El diagnóstico del ROADMAP era incorrecto — el 99.9 % era `useScrollspy` leyendo `scrollHeight` en cada frame, no Framer Motion. Sigue abierta porque el insight de DevTools, que es lo que pide el criterio, no baja. |

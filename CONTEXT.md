@@ -595,6 +595,50 @@ distingue no es evidencia de nada.
 Esto también explica por qué `e2e/a11y.spec.ts` tiene que esperar a opacidad exactamente 1
 aunque los tests corran con movimiento reducido: la preferencia no quita esos fundidos.
 
+### Lighthouse y el navegador real discrepan sobre el prerender *(T4-04, 2026-09-11)*
+
+El prerender **mejora** el FCP y el LCP reales un ~45 % (1924 → 1060 ms en escritorio a 4G
+lento + CPU ×4, cuatro medianas de 3 corridas) y **empeora** el LCP de Lighthouse: 2218 →
+2388 ms. No es ruido; se repitió en tres tandas.
+
+El motivo es que Lighthouse no mide: **simula**. Su modelo Lantern reconstruye el grafo de red
+y carga el peso del documento en el camino crítico, y `dist/index.html` pasa de 3,2 a 21,1 kB
+gzip. Lo que no modela es lo que gana el prerender: que el contenido se pinta **sin esperar a
+descargar y ejecutar 127 kB de JS**.
+
+Se decide por la medición real, y Lighthouse se queda como **presupuesto** —su trabajo es
+avisar si algo crece—, no como medida de la experiencia. Con el margen en 112 ms (antes 282),
+lo primero que hay que mirar si el presupuesto rompe es cuánto ha crecido el HTML.
+
+Regla general que deja esto: cuando dos herramientas se contradicen, gana la que **mide** un
+navegador de verdad sobre la que **estima** — y antes de creerse ninguna, repetir la tanda. La
+primera medición de esta misma tarea dio −17 % en vez de −45 % porque el build y los tests
+estaban compitiendo por la CPU.
+
+### Lo que el prerender obliga a no hacer en el render *(T4-04, 2026-09-11)*
+
+El HTML se genera en Node durante el build, así que **el primer render ya no es privado**:
+todo lo que se pinte acaba escrito en `dist/index.html`, y tiene que coincidir con lo que
+hidrata el navegador. Tres consecuencias, cada una descubierta por su propio motivo:
+
+1. **Nada que deba quedar fuera del HTML puede pintarse en el primer render.** El correo se
+   ensamblaba en ejecución precisamente para no aparecer en el HTML servido (T3-13), y el
+   prerender lo habría escrito entero. Ahora hasta hidratar se pinta `[at]`/`[dot]` y
+   `scripts/prerender.mjs` **falla el build** si el literal aparece. `contact.test.ts` no
+   cubría esto: revisa el código fuente, no el build.
+2. **Nada que dependa del visitante puede decidir el marcado.** El HTML es el mismo para todo
+   el mundo: el tema del icono lo elige el CSS a partir de `data-theme` —que el script inline
+   del `<head>` fija antes de pintar—, no el estado de React. Si dependiera del estado, quien
+   usa el tema claro vería el icono equivocado hasta hidratar.
+3. **Lo que sí necesita el navegador se pide con `useHidratado`**, que devuelve `false` en el
+   servidor y durante la hidratación y `true` después (`useSyncExternalStore`). Es lo que usan
+   la etiqueta del botón de tema y el correo. Un `useState` + `useEffect` daría el mismo
+   resultado visual, pero con aviso de desajuste.
+
+El `<noscript>` de T2-14 **sigue haciendo falta**, aunque el HTML ya llegue pintado: sin
+JavaScript las secciones heredan `opacity: 0` de `whileInView` y el email del bloque Contacto
+está en el DOM pero no se ve. Medido con scripting desactivado.
+
 ### El verificador de enlaces no ve los enlaces sin esquema *(T2-12, 2026-09-10)*
 
 Se lanzó `links.yml` a mano con el enlace roto del README todavía puesto, para comprobar que

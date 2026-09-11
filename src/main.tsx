@@ -1,22 +1,17 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { MotionConfig } from "framer-motion";
+import { createRoot, hydrateRoot } from "react-dom/client";
 import "./index.css";
-import App from "./App.tsx";
-import ErrorBoundary from "./components/ui/ErrorBoundary";
+import Raiz from "./Raiz";
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    {/*
-      reducedMotion="user" hace que Framer Motion respete
-      `prefers-reduced-motion` en toda la app: los transform y opacity
-      se aplican de golpe en su valor final, sin animar. Las
-      transiciones CSS y el scroll suave los cubre index.css.
-    */}
-    <ErrorBoundary>
-      <MotionConfig reducedMotion="user">
-        <App />
-      </MotionConfig>
-    </ErrorBoundary>
-  </StrictMode>,
-);
+const contenedor = document.getElementById("root")!;
+
+/*
+ * En el build, `#root` ya trae el HTML prerenderizado (T4-04) y React solo
+ * lo hidrata. En `vite dev` no hay prerender y llega vacío: ahí se monta
+ * desde cero. Hidratar un contenedor vacío no falla, pero lo recrea entero
+ * y avisa en consola de un desajuste en cada recarga.
+ */
+if (contenedor.hasChildNodes()) {
+  hydrateRoot(contenedor, <Raiz />);
+} else {
+  createRoot(contenedor).render(<Raiz />);
+}

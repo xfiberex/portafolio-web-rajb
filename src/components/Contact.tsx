@@ -3,7 +3,8 @@ import { Mail, Send } from "lucide-react";
 import { fadeUpVariant, sectionViewport } from "../lib/animations";
 import Section from "./ui/Section";
 import SectionHeader from "./ui/SectionHeader";
-import { buildEmail, EMAIL_PARTS } from "../lib/contact";
+import { buildEmail, buildEmailOfuscado, EMAIL_PARTS } from "../lib/contact";
+import useHidratado from "../hooks/useHidratado";
 
 /**
  * El correo se ensambla en tiempo de ejecución a partir de sus tres partes:
@@ -15,8 +16,14 @@ import { buildEmail, EMAIL_PARTS } from "../lib/contact";
  * `isRevealed` y una rama de render por defecto que **nunca se ejecutaban**:
  * sus dos únicos usos pasaban render prop, y uno de ellos ya pintaba el
  * correo en claro en el primer render (T3-13).
+ *
+ * Con el prerender (T4-04) el primer render ocurre en Node y **se escribe en
+ * `dist/index.html`**: pintar `{email}` ahí deshacía toda la ofuscación.
+ * Hasta hidratar se muestra la forma `[at]`/`[dot]`; `scripts/prerender.mjs`
+ * falla el build si el literal llega al HTML.
  */
 const Contact = () => {
+  const hidratado = useHidratado();
   const email = buildEmail(EMAIL_PARTS);
   const abrirClienteDeCorreo = () => {
     window.location.href = `mailto:${email}`;
@@ -55,7 +62,7 @@ const Contact = () => {
             className="inline-flex items-center gap-2 rounded-lg px-4 py-3 text-sm text-muted hover:bg-surface-hover hover:text-foreground"
           >
             <Mail size={18} aria-hidden="true" />
-            {email}
+            {hidratado ? email : buildEmailOfuscado(EMAIL_PARTS)}
           </button>
         </motion.div>
       </div>

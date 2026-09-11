@@ -3,6 +3,7 @@ import { Menu, Moon, Sun, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import useScrollspy from "../hooks/useScrollspy";
 import useTheme from "../hooks/useTheme";
+import useHidratado from "../hooks/useHidratado";
 
 const MENU_ID = "menu-principal";
 
@@ -22,6 +23,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const { tema, alternar } = useTheme();
+  const hidratado = useHidratado();
   const active = useScrollspy(sections, { rootMargin: "-90px 0px -30% 0px", threshold: 0.1 });
 
   const closeMenu = useCallback(() => setIsOpen(false), []);
@@ -105,14 +107,23 @@ const Navbar = () => {
             convencion que espera la gente y evita tener que leer la
             etiqueta para saber que hara el boton. Por eso el nombre
             accesible dice la accion completa.
+
+            Prerender (T4-04): el HTML generado es el mismo para los dos
+            temas, asi que el ICONO lo elige el CSS a partir de `data-theme`
+            —que el script del <head> ya fijo antes de pintar—: si dependiera
+            de `tema`, quien usa el claro veria el icono equivocado hasta
+            hidratar. La ETIQUETA no puede venir del CSS, y va con
+            `useHidratado`: coincide con el servidor durante la hidratacion
+            y pasa al tema real justo despues, sin aviso de desajuste.
           */}
           <button
             type="button"
             onClick={alternar}
             className="rounded-md p-3 text-muted hover:bg-surface-hover hover:text-foreground"
-            aria-label={tema === "dark" ? "Cambiar al tema claro" : "Cambiar al tema oscuro"}
+            aria-label={hidratado && tema === "light" ? "Cambiar al tema oscuro" : "Cambiar al tema claro"}
           >
-            {tema === "dark" ? <Sun size={20} aria-hidden="true" /> : <Moon size={20} aria-hidden="true" />}
+            <Sun size={20} aria-hidden="true" className="in-data-[theme=light]:hidden" />
+            <Moon size={20} aria-hidden="true" className="hidden in-data-[theme=light]:block" />
           </button>
 
           <button
